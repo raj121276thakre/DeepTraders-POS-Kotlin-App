@@ -30,7 +30,7 @@
     <string name="monthly">Monthly</string>
     <string name="yearly">Yearly</string>
     <string name="customer_name">Customer Name</string>
-    <string name="customer_cell">Customer Cell</string>
+    <string name="customer_cell">Customer Phone Number</string>
     <string name="customer_email">Customer Email</string>
     <string name="customer_address">Customer Address</string>
     <string name="add_customer">Add Customer</string>

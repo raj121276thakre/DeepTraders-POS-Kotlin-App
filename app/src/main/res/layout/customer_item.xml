@@ -41,7 +41,7 @@
                     android:contentDescription="TODO"
                     android:padding="10dp"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/supplier" />
+                    app:srcCompat="@drawable/customer" />
             </LinearLayout>
 
             <LinearLayout
@@ -53,17 +53,18 @@
                 android:paddingLeft="10dp">
 
                 <TextView
-                    android:id="@+id/txt_supplier_name"
+                    android:id="@+id/txt_customer_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
-                    android:text="Supplier Name"
+                    android:text="Customer Name"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
 
+
                 <TextView
-                    android:id="@+id/txt_supplier_cell"
+                    android:id="@+id/txt_customer_cell"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
@@ -72,7 +73,7 @@
                     android:textColor="#EA1D2C" />
 
                 <TextView
-                    android:id="@+id/txt_supplier_email"
+                    android:id="@+id/txt_customer_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
@@ -81,7 +82,7 @@
                     android:textColor="#EA1D2C" />
 
                 <TextView
-                    android:id="@+id/txt_supplier_address"
+                    android:id="@+id/txt_customer_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
