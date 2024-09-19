@@ -113,7 +113,7 @@
 
     <string name="unit_product_buy_price"> Unit Product Buy  Price </string>
     <string name="supplier_name">Supplier Name</string>
-    <string name="supplier_contact_person">Supplier Contact Person</string>
+    <string name="supplier_contact_person">Supplier Contact Number</string>
 
     <string name="supplier_cell">Supplier Cell</string>
 
