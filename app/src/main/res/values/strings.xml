@@ -162,9 +162,9 @@
     <string name="note">Note: </string>
     <string name="want_to_delete_expense">Want to Delete Expense ?</string>
     <string name="expense_deleted">Expense Deleted</string>
-    <string name="order_id">Order ID:</string>
-    <string name="payment_method">Payment Method:</string>
-    <string name="order_type">Order Type </string>
+    <string name="order_id">Order ID: </string>
+    <string name="payment_method">Payment Method: </string>
+    <string name="order_type">Order Type: </string>
     <string name="want_to_delete_supplier">Want to Delete Supplier ?</string>
     <string name="supplier_deleted">Supplier Deleted</string>
     <string name="quantity">Quantity:</string>
