@@ -19,6 +19,7 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.adapter.PosProductAdapter
 import com.example.deeptraderspos.adapter.ProductCategoryAdapter
 import com.example.deeptraderspos.databinding.ActivityPosBinding
+import com.example.deeptraderspos.models.CartItem
 import com.example.deeptraderspos.models.Category
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.product.AddProductActivity
@@ -119,7 +120,7 @@ class PosActivity : AppCompatActivity() {
                     productAdapter = PosProductAdapter(
                         productsList,
                         this,
-                        onAddtocartClick = {product -> addtocartProduct(product)},
+                        onAddtocartClick = {product -> addToCartProduct(product)},
                         onEditClicked = { product -> editProduct(product) }
                     )
                     binding.recycler.adapter = productAdapter
@@ -133,43 +134,48 @@ class PosActivity : AppCompatActivity() {
             }
     }
 
-    private fun addtocartProduct(product: Product) {
+    private fun addToCartProduct(product: Product) {
         val getStock = product.stock
-        val weight_unit_id = product.weightUnit
-        val product_id = product.id
-        val product_weight = product.weight
-        val product_price = product.sellPrice
-        val product_stock = product.stock
+        val weightUnitId = product.weightUnit
+        val productId = product.id
+        val productWeight = product.weight
+        val productPrice = product.sellPrice
+        val productStock = product.stock
+        val productName = product.productName
 
         if (getStock <= 0) {
             Toast.makeText(this, R.string.stock_is_low_please_update_stock, Toast.LENGTH_SHORT).show()
         } else {
             // Check if the product already exists in the cart
             firestore.collection("carts")
-                .whereEqualTo("product_id", product_id)
+                .whereEqualTo("productId", productId)
                 .get()
                 .addOnSuccessListener { result ->
                     if (result.isEmpty) {
                         // Product not found, safe to add
-                        val cartItem = hashMapOf(
-                            "product_id" to product_id,
-                            "product_weight" to product_weight,
-                            "weight_unit_id" to weight_unit_id,
-                            "product_price" to product_price,
-                            "quantity" to 1,
-                            "product_stock" to product_stock
+                        val cartItem = CartItem(
+                            productId = productId,
+                            productName = productName,
+                            productWeight = productWeight!!,
+                            weightUnitId = weightUnitId!!,
+                            productPrice = productPrice,
+                            quantity = 1,
+                            productStock = productStock
                         )
 
-                        firestore.collection("carts")
-                            .add(cartItem)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, R.string.product_added_to_cart, Toast.LENGTH_SHORT).show()
-                                getCartItemCount() // Update the cart count after adding
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, R.string.product_added_to_cart_failed_try_again, Toast.LENGTH_SHORT).show()
-                                Log.e("Firestore", "Error adding cart item", e)
-                            }
+                        if (productId != null) {
+                            firestore.collection("carts")
+                                .document(productId) // Use productId as the document ID
+                                .set(cartItem)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, R.string.product_added_to_cart, Toast.LENGTH_SHORT).show()
+                                    getCartItemCount() // Update the cart count after adding
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this, R.string.product_added_to_cart_failed_try_again, Toast.LENGTH_SHORT).show()
+                                    Log.e("Firestore", "Error adding cart item", e)
+                                }
+                        }
                     } else {
                         // Product already exists in the cart
                         Toast.makeText(this, R.string.product_already_added_to_cart, Toast.LENGTH_SHORT).show()
@@ -181,6 +187,7 @@ class PosActivity : AppCompatActivity() {
                 }
         }
     }
+
 
     private fun getCartItemCount() {
         firestore.collection("carts")
