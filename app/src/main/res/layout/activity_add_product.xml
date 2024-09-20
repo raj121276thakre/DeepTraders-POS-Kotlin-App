@@ -104,6 +104,7 @@
                 android:background="@drawable/round_border"
                 android:fontFamily="@font/sailec_regular"
                 android:hint="@string/product_category"
+                android:focusable="false"
                 android:inputType="text"
                 android:padding="16dp"
                 android:textColor="@color/colorPrimary"

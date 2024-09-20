@@ -27,6 +27,8 @@ class AddProductActivity : AppCompatActivity() {
 
     private val productSupplier = mutableListOf<Map<String, String>>()
     private var selectedSupplierID: String = "0" // Store selected supplier ID
+    private var selectedCategoryID: String = "0" // Store selected supplier ID
+    private var selectedWeightUnitID: String = "0" // Store selected supplier ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,16 +63,93 @@ class AddProductActivity : AppCompatActivity() {
             showSuppliersList()
         }
 
+        binding.etxtProductCategory.setOnClickListener {
+            showCategoriesList()
+        }
 
 
-
+        binding.etxtProductWeight.setOnClickListener {
+            showCategoriesList()
+        }
 
     }
 
+    private fun showWeightUnitsList() {
+        val weightUnitsAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
 
-    //private fun showCategoryList()
+        // Fetch weight units from Firestore
+        db.collection("AllWeightUnits")
+            .get()
+            .addOnSuccessListener { documents ->
+                val weightUnitNames = mutableListOf<String>()
+                val productWeightUnits = mutableListOf<Map<String, String>>()
 
-    //private fun showWeightUnitsList()
+                for (document in documents) {
+                    val weightUnitName = document.getString("weightUnitName") ?: ""
+                    weightUnitNames.add(weightUnitName)
+
+                    // Create a new Map<String, String> to store weight unit data
+                    val weightUnitData = mutableMapOf<String, String>()
+                    for ((key, value) in document.data) {
+                        weightUnitData[key] = value?.toString() ?: "" // Safely handle null values
+                    }
+                    productWeightUnits.add(weightUnitData)
+                }
+
+                weightUnitsAdapter.addAll(weightUnitNames)
+
+                val dialog = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
+                dialog.setView(dialogView)
+                dialog.setCancelable(false)
+
+                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
+                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
+                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
+
+                dialogTitle.setText(R.string.product_weight_unit)
+                dialogList.adapter = weightUnitsAdapter
+
+                dialogInput.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                        weightUnitsAdapter.filter.filter(charSequence)
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                val alertDialog = dialog.create()
+
+                dialogButton.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                dialogList.setOnItemClickListener { parent, view, position, id ->
+                    alertDialog.dismiss()
+                    val selectedItem = weightUnitsAdapter.getItem(position) ?: return@setOnItemClickListener
+
+                    binding.etxtProductWeight.setText(selectedItem)
+
+                    var weightUnitId = "0"
+                    for (i in weightUnitNames.indices) {
+                        if (weightUnitNames[i].equals(selectedItem, ignoreCase = true)) {
+                            weightUnitId = productWeightUnits[i]["weightUnit_id"] ?: "0"
+                        }
+                    }
+
+                    selectedWeightUnitID = weightUnitId
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch weight units: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
 
 
@@ -149,6 +228,89 @@ class AddProductActivity : AppCompatActivity() {
                 }
 
     }
+
+
+    private fun showCategoriesList() {
+        val categoryAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+
+        // Fetch categories from Firestore
+        db.collection("AllCategories")
+            .get()
+            .addOnSuccessListener { documents ->
+                val categoryNames = mutableListOf<String>()
+                val productCategory = mutableListOf<Map<String, String>>()
+
+                for (document in documents) {
+                    val categoryName = document.getString("categoryName") ?: ""
+                    categoryNames.add(categoryName)
+
+                    // Create a new Map<String, String> to store category data
+                    val categoryData = mutableMapOf<String, String>()
+                    for ((key, value) in document.data) {
+                        categoryData[key] = value?.toString() ?: ""  // Convert each value to String
+                    }
+                    productCategory.add(categoryData) // Add the new map to productCategory
+                }
+
+                categoryAdapter.addAll(categoryNames)
+
+                val dialog = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
+                dialog.setView(dialogView)
+                dialog.setCancelable(false)
+
+                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
+                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
+                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
+
+                dialogTitle.setText(R.string.categories)
+                dialogList.adapter = categoryAdapter
+
+                // Implement search functionality
+                dialogInput.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                        categoryAdapter.filter.filter(charSequence)
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                val alertDialog = dialog.create()
+
+                // Close dialog on button click
+                dialogButton.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                // Handle list item click
+                dialogList.setOnItemClickListener { parent, view, position, id ->
+                    alertDialog.dismiss()
+                    val selectedItem = categoryAdapter.getItem(position) ?: return@setOnItemClickListener
+
+                    // Set selected category to your EditText (for example)
+                    binding.etxtProductCategory.setText(selectedItem)
+
+                    var categoryId = "0"
+                    for (i in categoryNames.indices) {
+                        if (categoryNames[i].equals(selectedItem, ignoreCase = true)) {
+                            categoryId = productCategory[i]["category_id"] ?: "0"
+                        }
+                    }
+
+                    // Use the selectedCategoryID where necessary
+                    selectedCategoryID = categoryId
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch categories: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
 
 
