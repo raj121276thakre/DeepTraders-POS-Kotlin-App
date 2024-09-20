@@ -26,6 +26,7 @@ class CartAdapter(
     private val f = DecimalFormat("#0.00")
     private var total_price: Double = 0.0
 
+
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtItemName: TextView = view.findViewById(R.id.txt_item_name)
         val txtPrice: TextView = view.findViewById(R.id.txt_price)
@@ -73,6 +74,11 @@ class CartAdapter(
             }
         }
     }
+
+    fun getTotalPrice(): Double {
+        return total_price
+    }
+
 
     private fun deleteProductFromCart(cartItem: CartItem, position: Int) {
         val cartId = cartItem.productId // Update this based on how you store the cart ID
@@ -135,4 +141,6 @@ class CartAdapter(
     fun getItem(position: Int): CartItem {
         return cartItems[position]
     }
+
+
 }

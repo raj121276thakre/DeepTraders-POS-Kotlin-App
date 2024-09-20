@@ -67,6 +67,7 @@
                 android:background="@color/grey_10" />
 
             <LinearLayout
+                android:id="@+id/select_customer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -81,7 +82,7 @@
                     android:fontFamily="@font/sailec_regular"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="Walk In Customer"
+                    android:text="Select Customer"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/grey_60" />
 
@@ -102,6 +103,7 @@
                 android:background="@color/grey_10" />
 
             <LinearLayout
+                android:id="@+id/select_order_type"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -116,7 +118,7 @@
                     android:fontFamily="@font/sailec_regular"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="PICK UP"
+                    android:text="Select order type"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/grey_60" />
 
@@ -137,13 +139,14 @@
                 android:background="@color/grey_10" />
 
             <LinearLayout
+                android:id="@+id/select_order_payment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/dialog_order_status"
+                    android:id="@+id/dialog_order_payment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2dp"
@@ -151,7 +154,7 @@
                     android:fontFamily="@font/sailec_regular"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="CASH"
+                    android:text="Select Payment method"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/grey_60" />
 
@@ -187,7 +190,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/dialog_txt_total"
+                    android:id="@+id/dialog_txt_subtotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
