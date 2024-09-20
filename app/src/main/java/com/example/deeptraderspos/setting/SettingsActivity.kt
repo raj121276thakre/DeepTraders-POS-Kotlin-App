@@ -42,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        //Setting done
 
         setCardClickListener(binding.cardShopInfo, ShopInformationActivity::class.java)
         setCardClickListener(binding.cardCategory, CategoriesActivity::class.java)
