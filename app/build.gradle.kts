@@ -115,6 +115,11 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:3.21.12")
 
 
+    //material ripple
+   //implementation ("com.balysv.materialripple:library:1.0.2")
+
+
+
 
 
 }

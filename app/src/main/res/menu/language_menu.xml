@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:icon="@drawable/translation"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+
+        app:showAsAction="always">
+        <menu>
+
+
+
+
+            <item
+                android:icon="@drawable/france"
+                android:id="@+id/local_french"
+                android:title="@string/text_french" />
+
+
+            <item
+                android:icon="@drawable/us"
+                android:id="@+id/local_english"
+                android:title="@string/text_english" />
+
+            <item
+                android:icon="@drawable/bangladesh"
+                android:id="@+id/local_bangla"
+                android:title="@string/text_bangla" />
+
+            <item
+                android:icon="@drawable/spain"
+                android:id="@+id/local_spanish"
+                android:title="@string/text_spanish" />
+
+            <item
+                android:icon="@drawable/india"
+                android:id="@+id/local_hindi"
+                android:title="@string/text_hindi" />
+        </menu>
+    </item>
+</menu>
