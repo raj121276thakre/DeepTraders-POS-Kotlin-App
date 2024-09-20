@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DeepTraders POS</string>
+    <string name="app_name">DeepTraders</string>
 
     <string name="text_french" translatable="false">French</string>
     <string name="text_english" translatable="false">English</string>
@@ -286,6 +286,7 @@
     <string name="add_order_type">Add Order Type</string>
     <string name="add_unit">Add Unit</string>
     <string name="select_currency">Select Currency</string>
+    <string name="all_units">All Units</string>
 
 
 </resources>

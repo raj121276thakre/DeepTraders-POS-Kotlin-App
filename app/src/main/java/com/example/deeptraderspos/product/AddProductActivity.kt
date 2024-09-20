@@ -68,8 +68,8 @@ class AddProductActivity : AppCompatActivity() {
         }
 
 
-        binding.etxtProductWeight.setOnClickListener {
-            showCategoriesList()
+        binding.etxtProductWeightUnit.setOnClickListener {
+            showWeightUnitsList()
         }
 
     }
@@ -78,14 +78,14 @@ class AddProductActivity : AppCompatActivity() {
         val weightUnitsAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
 
         // Fetch weight units from Firestore
-        db.collection("AllWeightUnits")
+        db.collection("AllUnits")
             .get()
             .addOnSuccessListener { documents ->
                 val weightUnitNames = mutableListOf<String>()
                 val productWeightUnits = mutableListOf<Map<String, String>>()
 
                 for (document in documents) {
-                    val weightUnitName = document.getString("weightUnitName") ?: ""
+                    val weightUnitName = document.getString("unitName") ?: ""
                     weightUnitNames.add(weightUnitName)
 
                     // Create a new Map<String, String> to store weight unit data
@@ -133,7 +133,7 @@ class AddProductActivity : AppCompatActivity() {
                     alertDialog.dismiss()
                     val selectedItem = weightUnitsAdapter.getItem(position) ?: return@setOnItemClickListener
 
-                    binding.etxtProductWeight.setText(selectedItem)
+                    binding.etxtProductWeightUnit.setText(selectedItem)
 
                     var weightUnitId = "0"
                     for (i in weightUnitNames.indices) {
