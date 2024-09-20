@@ -22,6 +22,21 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".setting.unit.UnitActivity"
+            android:exported="false" />
+        <activity
+            android:name=".setting.order_type.OrderTypeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".setting.payment_method.PaymentMethodActivity"
+            android:exported="false" />
+        <activity
+            android:name=".setting.categories.CategoriesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".setting.shop.ShopInformationActivity"
+            android:exported="false" />
+        <activity
             android:name=".product.AddProductActivity"
             android:exported="false" />
         <activity

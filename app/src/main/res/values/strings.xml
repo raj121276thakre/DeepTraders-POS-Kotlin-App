@@ -285,6 +285,7 @@
     <string name="update_unit">Update Unit</string>
     <string name="add_order_type">Add Order Type</string>
     <string name="add_unit">Add Unit</string>
+    <string name="select_currency">Select Currency</string>
 
 
 </resources>
