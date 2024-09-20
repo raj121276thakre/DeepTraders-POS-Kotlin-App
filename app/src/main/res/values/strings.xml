@@ -287,6 +287,7 @@
     <string name="add_unit">Add Unit</string>
     <string name="select_currency">Select Currency</string>
     <string name="all_units">All Units</string>
+    <string name="all_order_type">All Order Types</string>
 
 
 </resources>
