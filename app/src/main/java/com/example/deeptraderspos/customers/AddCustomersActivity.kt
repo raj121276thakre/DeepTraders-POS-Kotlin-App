@@ -51,6 +51,8 @@ class AddCustomersActivity : AppCompatActivity() {
 
     }
 
+
+
     private fun showSupplierDetails(customer: Customer) {
         binding.etxtCustomerName.setText(customer.customerName)
         binding.etxtCustomerCell.setText(customer.customerPhone)
