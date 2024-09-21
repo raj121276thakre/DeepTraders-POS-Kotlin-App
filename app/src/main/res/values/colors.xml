@@ -14,5 +14,9 @@
     <color name="grey_60">#666666</color>
     <color name="grey_10">#e6e6e6</color>
 
-    <color name="colorTextIcons">#FFFFFF</color>
+    <color name="colorTextIcons">#2C2828</color>
+
+    <color name="test">#04C7FF</color>
+
+
 </resources>

@@ -271,7 +271,7 @@
 
     <string name="reset">Reset</string>
     <string name="change_order_status">Change Order Status</string>
-    <string name="please_change_order_status_to_complete_or_cancel">Please pay remaining amount to change order status to complete.</string>
+    <string name="please_change_order_status_to_complete_or_cancel">Please pay remaining amount to change order status to completed.</string>
     <string name="cancel_order">Cancel Order</string>
     <string name="pay_remaining">Pay Remaining Payment</string>
     <string name="order_completed">Order Completed</string>

@@ -80,14 +80,19 @@ class OrderAdapter(
             val dialogBuilder = NiftyDialogBuilder.getInstance(context)
             dialogBuilder
                 .withTitle(context.getString(R.string.change_order_status))
-                .withMessage(context.getString(R.string.please_change_order_status_to_complete_or_cancel))
+                .withTitleColor("#FFFFFF")
+                .withMessage(context.getString(R.string.please_change_order_status_to_complete_or_cancel) + "\n\nRemaining Payment amount : ₹${order.remainingAmount}")
+                .withMessageColor("#FFFFFF")
                 .withEffect(Effectstype.Slidetop)
-                .withDialogColor("#01baef") // Use color code for dialog
-                .withButton1Text("₹${order.remainingAmount}")
+                .withDialogColor("#04C7FF") // Use color code for dialog
+                .withButton1Text("Cancel\n")
+                .withButtonDrawable(R.drawable.rounded_button)
                 .withButton2Text(context.getString(R.string.pay_remaining))
-//                .setButton1Click {
-//
-//                }
+                .withDividerColor("#FFFFFF")
+
+                .setButton1Click {
+                    dialogBuilder.dismiss()
+                }
                 .setButton2Click {
                     updateOrderStatus(order.orderId, Constants.COMPLETED, holder)
                     dialogBuilder.dismiss()
