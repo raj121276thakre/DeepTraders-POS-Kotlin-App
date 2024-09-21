@@ -13,20 +13,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.deeptraderspos.Constants
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.models.Order
+import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype
+import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 class OrderAdapter(
     private val context: Context,
     private var orderData: List<Order>
 ) : RecyclerView.Adapter<OrderAdapter.MyViewHolder>() {
 
-    /*
-    1. Add OrderDetailsActivity
-    2. search in OrdersActivity
-    3. change order status
-     */
-
-
+    private val firestore = FirebaseFirestore.getInstance()
 
     // Update data in the adapter
     fun updateOrderData(newOrders: List<Order>) {
@@ -58,15 +59,86 @@ class OrderAdapter(
         else if (order.orderStatus == Constants.PENDING) {
             holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
             holder.txtOrderStatus.setTextColor(Color.WHITE)
-            holder.imgStatus.visibility = View.GONE
+            holder.imgStatus.visibility = View.VISIBLE
         }
 
-//        holder.itemView.setOnClickListener {
-//            val intent = Intent(context, OrderDetailsActivity::class.java)
-//            intent.putExtra("order_id", order.orderId)
-//            context.startActivity(intent)
-//        }
+        holder.imgStatus.setOnClickListener {
+
+
+
+
+        }
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, OrderDetailsActivity::class.java)
+            intent.putExtra("order_id", order.orderId)
+            context.startActivity(intent)
+        }
+
+
+        holder.imgStatus.setOnClickListener {
+            val dialogBuilder = NiftyDialogBuilder.getInstance(context)
+            dialogBuilder
+                .withTitle(context.getString(R.string.change_order_status))
+                .withMessage(context.getString(R.string.please_change_order_status_to_complete_or_cancel))
+                .withEffect(Effectstype.Slidetop)
+                .withDialogColor("#01baef") // Use color code for dialog
+                .withButton1Text("₹${order.remainingAmount}")
+                .withButton2Text(context.getString(R.string.pay_remaining))
+//                .setButton1Click {
+//
+//                }
+                .setButton2Click {
+                    updateOrderStatus(order.orderId, Constants.COMPLETED, holder)
+                    dialogBuilder.dismiss()
+                }
+                .show()
+        }
+
+
+
+
     }
+
+
+
+    private fun updateOrderStatus(orderId: String, status: String, holder: MyViewHolder) {
+
+        // Get current date in the required format
+        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
+        val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
+
+        // Prepare the data to update
+        val updateData = mapOf(
+            "orderStatus" to status,
+            "remainingAmtPaidDate" to currentDate,
+            "remainingAmtPaidTime" to currentTime,
+            "remainingAmount" to 0.0
+        )
+
+        val orderRef = firestore.collection("AllOrders").document(orderId)
+        orderRef.update(updateData)
+            .addOnSuccessListener {
+                if (status == Constants.COMPLETED) {
+                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
+                    holder.txtOrderStatus.text = Constants.COMPLETED
+                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#43a047"))
+                    holder.txtOrderStatus.setTextColor(Color.WHITE)
+                    holder.imgStatus.visibility = View.GONE
+                } else {
+                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
+                    holder.txtOrderStatus.text = Constants.PENDING
+                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
+                    holder.txtOrderStatus.setTextColor(Color.WHITE)
+                    holder.imgStatus.visibility = View.GONE
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, R.string.failed, Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
     override fun getItemCount(): Int {
         return orderData.size

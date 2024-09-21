@@ -17,7 +17,8 @@ data class Order(
     val totalPrice: Double = 0.0,
     val totalPaidAmount: Double = 0.0,
     val remainingAmount: Double = 0.0,
-    val remainingAmtPaidDate: String = ""
+    val remainingAmtPaidDate: String = "",
+    val remainingAmtPaidTime: String = "",
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -33,6 +34,7 @@ data class Order(
         parcel.readDouble(),
         parcel.readDouble(),
         parcel.readDouble(),
+        parcel.readString() ?: "",
         parcel.readString() ?: ""
     )
 
@@ -51,6 +53,7 @@ data class Order(
         parcel.writeDouble(totalPaidAmount)
         parcel.writeDouble(remainingAmount)
         parcel.writeString(remainingAmtPaidDate)
+        parcel.writeString(remainingAmtPaidTime)
     }
 
     override fun describeContents(): Int {

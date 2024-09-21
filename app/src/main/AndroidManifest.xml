@@ -22,6 +22,9 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".orders.OrderDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".pos.ProductCart"
             android:exported="false" />
         <activity

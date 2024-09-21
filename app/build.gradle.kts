@@ -115,8 +115,10 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:3.21.12")
 
 
-    //material ripple
-   //implementation ("com.balysv.materialripple:library:1.0.2")
+
+   implementation ("com.github.sd6352051:NiftyDialogEffects:v1.0.3")
+
+
 
 
 

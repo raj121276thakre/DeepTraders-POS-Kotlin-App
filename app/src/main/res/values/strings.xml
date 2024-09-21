@@ -7,6 +7,9 @@
     <string name="text_spanish" translatable="false">Spanish</string>
     <string name="text_hindi" translatable="false">हिन्दी</string>
 
+    <string name="price_rupee">₹ %s</string>
+
+
 
     <!--Replace your adMob application ID here -->
     <string name="admob_application_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
@@ -268,8 +271,9 @@
 
     <string name="reset">Reset</string>
     <string name="change_order_status">Change Order Status</string>
-    <string name="please_change_order_status_to_complete_or_cancel">Please change order status to complete or cancel. If cancel, it will not affect in stock</string>
+    <string name="please_change_order_status_to_complete_or_cancel">Please pay remaining amount to change order status to complete.</string>
     <string name="cancel_order">Cancel Order</string>
+    <string name="pay_remaining">Pay Remaining Payment</string>
     <string name="order_completed">Order Completed</string>
     <string name="order_updated">Order Updated</string>
     <string name="backup_to_google_drive">Backup to Google Drive/Others</string>

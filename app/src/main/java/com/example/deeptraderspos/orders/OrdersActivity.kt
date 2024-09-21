@@ -34,7 +34,6 @@ class OrdersActivity : AppCompatActivity() {
 
         // Setup RecyclerView and Adapter
         setupRecyclerView()
-
         // Fetch orders from Firestore
         fetchOrders()
     }
@@ -57,6 +56,8 @@ class OrdersActivity : AppCompatActivity() {
                         document.toObject(Order::class.java) // Convert Firestore document to com.example.deeptraderspos.models.Order object
                     fetchedOrders.add(order) // Add order to list
                 }
+                // Reverse the order to show the latest orders at the top
+                fetchedOrders.reverse()
                 updateAdapter(fetchedOrders) // Update the adapter with the new data
             }
             .addOnFailureListener { e ->
@@ -65,7 +66,10 @@ class OrdersActivity : AppCompatActivity() {
             }
     }
 
-    // Update the adapter with fetched orders
+
+
+
+        // Update the adapter with fetched orders
     private fun updateAdapter(orders: List<Order>) {
         orderAdapter.updateOrderData(orders)
     }
