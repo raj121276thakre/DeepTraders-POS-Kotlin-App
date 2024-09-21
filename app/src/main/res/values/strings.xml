@@ -290,6 +290,8 @@
     <string name="all_order_type">All Order Types</string>
     <string name="product_removed_failed">Product remove failed</string>
     <string name="product_quantity_update_failed">Product Quantity failed to update</string>
+    <string name="total_remaining_amount">"Total Remaining Price : "</string>
+    <string name="total_paid_price">"Total Paid "</string>
 
 
 </resources>

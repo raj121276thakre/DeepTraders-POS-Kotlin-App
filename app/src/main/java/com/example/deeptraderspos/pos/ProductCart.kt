@@ -180,7 +180,7 @@ class ProductCart : AppCompatActivity() {
         val calculated_total_cost = total_cost + calculated_tax - discount
         dialogBinding.dialogTxtTotalCost.setText("₹" + f.format(calculated_total_cost))
 
-
+        var updatedCalculatedCost = calculated_total_cost
 
         dialogBinding.etxtDialogDiscount.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -205,10 +205,14 @@ class ProductCart : AppCompatActivity() {
                                 calculated_total_cost
                             )
                         )
+                        updatedCalculatedCost = calculated_total_cost
+
+
                     }
                 } else {
                     val calculated_total_cost = total_cost + calculated_tax - discount
                     dialogBinding.dialogTxtTotalCost.setText("₹" + f.format(calculated_total_cost))
+                    updatedCalculatedCost = calculated_total_cost
                 }
             }
 
@@ -216,7 +220,47 @@ class ProductCart : AppCompatActivity() {
             }
         })
 
+        val paid = 0.0
+        val remainingPrice = (updatedCalculatedCost - paid).toDouble()
+        dialogBinding.dialogTxtTotalRemainingAmt.setText("₹" + f.format(remainingPrice))
 
+        dialogBinding.etxtDialogTotalPaidamt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                var paid = 0.0
+                val get_paid = s.toString()
+                if (!get_paid.isEmpty() && get_paid != ".") {
+                    var remainingPrice = (updatedCalculatedCost- paid).toDouble()
+                    paid = get_paid.toDouble()
+                    if (paid == remainingPrice) {
+                        dialogBinding.etxtDialogTotalPaidamt.setError("All amount paid")
+                        dialogBinding.etxtDialogTotalPaidamt.requestFocus()
+
+                        dialogBinding.btnSubmit.setVisibility(View.VISIBLE)
+                    } else {
+                        dialogBinding.btnSubmit.setVisibility(View.VISIBLE)
+                        remainingPrice =(updatedCalculatedCost- paid).toDouble()
+                        dialogBinding.dialogTxtTotalRemainingAmt.setText(
+                            "₹" + f.format(
+                                remainingPrice
+                            )
+                        )
+                    }
+                } else {
+                    var remainingPrice = (updatedCalculatedCost - paid).toDouble()
+                    dialogBinding.dialogTxtTotalRemainingAmt.setText(
+                        "₹" + f.format(
+                            remainingPrice
+                        )
+                    )
+                }
+            }
+
+            override fun afterTextChanged(s: Editable) {
+            }
+        })
 
 
         dialogBinding.btnSubmit.setOnClickListener {
@@ -227,7 +271,9 @@ class ProductCart : AppCompatActivity() {
                 dialogBinding.dialogCustomer.text.toString(),
                 calculated_tax,  // You can calculate this properly
                 dialogBinding.etxtDialogDiscount.text.toString(),
-                dialogBinding.dialogTxtTotalCost.text.toString()
+                dialogBinding.dialogTxtTotalCost.text.toString(),
+                dialogBinding.etxtDialogTotalPaidamt.text.toString(),
+                dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
             )
             dialog.dismiss()
         }
@@ -258,17 +304,24 @@ class ProductCart : AppCompatActivity() {
         customerName: String,
         calculatedTax: Double,
         discount: String,
-        totalCostString: String
+        totalCostString: String,
+        totalPaidAmount: String,
+        remainingAmount: String
     ) {
         val itemCount = productCartAdapter.itemCount
         if (itemCount > 0) {
             val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
             val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
 
-            val numericValueString = totalCostString.replace("₹", "").trim() // Remove the currency symbol and trim any whitespace
+            val numericValueString = totalCostString.replace("₹", "")
+                .trim() // Remove the currency symbol and trim any whitespace
             val totalCost: Double? = numericValueString.toDoubleOrNull()
 
-            val productsList = mutableListOf<ProductOrder>()
+            val remainingNumericValueString = remainingAmount.replace("₹", "")
+                .trim() // Remove the currency symbol and trim any whitespace
+            val totalRemaining: Double? = remainingNumericValueString.toDoubleOrNull()
+
+            val productsList = arrayListOf<ProductOrder>()
             for (i in 0 until itemCount) {
                 val cartItem = productCartAdapter.getItem(i)
                 val productOrder = ProductOrder(
@@ -294,15 +347,18 @@ class ProductCart : AppCompatActivity() {
                 tax = calculatedTax,
                 discount = discount,
                 products = productsList,
-                totalPrice = totalCost!!
-            )
+                totalPrice = totalCost!!,
+                totalPaidAmount = totalPaidAmount.toDouble(),
+                remainingAmount = totalRemaining!!,
+
+                )
 
             // Save order to Firestore
             firestore.collection("AllOrders")
                 .document(orderId) // Use the generated order ID
                 .set(order)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "com.example.deeptraderspos.models.Order placed successfully!", Toast.LENGTH_SHORT).show()
                     deleteCartItems() // Call method to delete cart items
                     startActivity(Intent(this, OrdersActivity::class.java))
                     finish() // Return to previous activity
@@ -315,7 +371,6 @@ class ProductCart : AppCompatActivity() {
             Toast.makeText(this, R.string.no_product_in_cart, Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
     private fun deleteCartItems() {
@@ -332,7 +387,11 @@ class ProductCart : AppCompatActivity() {
                         // Optionally, you can show a log or toast for each deleted item
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error removing item: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error removing item: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
             }
         }
@@ -340,8 +399,6 @@ class ProductCart : AppCompatActivity() {
         // Optionally, show a toast after attempting to delete all items
         Toast.makeText(this, "Cart cleared successfully!", Toast.LENGTH_SHORT).show()
     }
-
-
 
 
     private fun showCustomersList(dialogCustomer: TextView) {
@@ -536,7 +593,7 @@ class ProductCart : AppCompatActivity() {
 
                 for (document in documents) {
                     // Safely get the order type name, provide a default value if null
-                    val orderTypeName = document.getString("orderTypeName") ?: "Unknown Order Type"
+                    val orderTypeName = document.getString("orderTypeName") ?: "Unknown com.example.deeptraderspos.models.Order Type"
                     orderTypes.add(orderTypeName)
 
                     // Safely convert each field to string, if null provide a default value

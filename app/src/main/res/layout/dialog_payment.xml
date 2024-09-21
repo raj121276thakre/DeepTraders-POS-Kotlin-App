@@ -290,6 +290,62 @@
             </LinearLayout>
 
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/sailec_regular"
+                    android:padding="15dp"
+                    android:text="@string/total_paid_price"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/etxt_dialog_totalPaidamt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:gravity="right"
+                    android:hint="0.00"
+                    android:inputType="numberDecimal"
+                    android:padding="15dp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/sailec_regular"
+                    android:padding="15dp"
+                    android:text="@string/total_remaining_amount"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/dialog_txt_total_remainingAmt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/sailec_regular"
+                    android:gravity="right"
+                    android:padding="15dp"
+                    android:text="00"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
         </LinearLayout>
 
 

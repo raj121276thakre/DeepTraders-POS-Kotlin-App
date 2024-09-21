@@ -54,7 +54,7 @@ class OrdersActivity : AppCompatActivity() {
                 val fetchedOrders = mutableListOf<Order>()
                 for (document in documents) {
                     val order =
-                        document.toObject(Order::class.java) // Convert Firestore document to Order object
+                        document.toObject(Order::class.java) // Convert Firestore document to com.example.deeptraderspos.models.Order object
                     fetchedOrders.add(order) // Add order to list
                 }
                 updateAdapter(fetchedOrders) // Update the adapter with the new data
