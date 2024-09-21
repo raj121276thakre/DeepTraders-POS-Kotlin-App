@@ -62,18 +62,14 @@ class OrderAdapter(
             holder.imgStatus.visibility = View.VISIBLE
         }
 
-        holder.imgStatus.setOnClickListener {
 
-
-
-
-        }
 
         holder.itemView.setOnClickListener {
             val intent = Intent(context, OrderDetailsActivity::class.java)
-            intent.putExtra("order_id", order.orderId)
+            intent.putExtra("order", order)  // Pass the Parcelable Order object
             context.startActivity(intent)
         }
+
 
 
         holder.imgStatus.setOnClickListener {

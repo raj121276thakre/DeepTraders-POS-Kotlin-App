@@ -101,7 +101,7 @@
     <string name="shop_contact_number">Shop Contact Number</string>
     <string name="shop_email">Shop Email</string>
     <string name="shop_address">Shop Address</string>
-    <string name="currency_symbol">Currency Symbol</string>
+    <string name="currency_symbol">₹</string>
     <string name="shop_currency">Shop Currency</string>
     <string name="edit">Edit</string>
     <string name="update_information">Update Information</string>
@@ -152,7 +152,7 @@
     <string name="select_customer">SELECT CUSTOMER</string>
     <string name="order_history">Order History</string>
     <string name="order_details">Order Details</string>
-    <string name="total_price">Total Price: </string>
+    <string name="total_price">Total Price : </string>
     <string name="add_expense">Add Expense</string>
     <string name="hi_welcome">Hello! Welcome</string>
     <string name="product_removed_from_cart">Product removed from cart</string>
@@ -238,7 +238,7 @@
     <string name="successfully_updated">Successfully Updated</string>
     <string name="payment_methods">Payment Methods</string>
     <string name="tax_in_percentage">Tax in percentage (%)</string>
-    <string name="sub_total">Sub Total</string>
+    <string name="sub_total">Sub Total : </string>
     <string name="total_tax">Total Tax</string>
     <string name="discount">Discount</string>
     <string name="discount_cant_be_greater_than_total_price">Discount can\'t_be greater than total price</string>
@@ -296,6 +296,8 @@
     <string name="product_quantity_update_failed">Product Quantity failed to update</string>
     <string name="total_remaining_amount">"Total Remaining Price : "</string>
     <string name="total_paid_price">"Total Paid "</string>
+    <string name="total_paid">Total Paid :</string>
+    <string name="total_remaining">"Total Remaining : "</string>
 
 
 </resources>

@@ -264,20 +264,7 @@ class ProductCart : AppCompatActivity() {
         })
 
 
-//        dialogBinding.btnSubmit.setOnClickListener {
-//            // Proceed with the order
-//            proceedOrder(
-//                dialogBinding.dialogOrderType.text.toString(),
-//                dialogBinding.dialogOrderPayment.text.toString(),
-//                dialogBinding.dialogCustomer.text.toString(),
-//                calculated_tax,  // You can calculate this properly
-//                dialogBinding.etxtDialogDiscount.text.toString(),
-//                dialogBinding.dialogTxtTotalCost.text.toString(),
-//                dialogBinding.etxtDialogTotalPaidamt.text.toString(),
-//                dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
-//            )
-//            dialog.dismiss()
-//        }
+
 
 
         dialogBinding.btnSubmit.setOnClickListener {
