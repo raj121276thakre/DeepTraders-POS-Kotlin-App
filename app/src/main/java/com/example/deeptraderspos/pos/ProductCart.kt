@@ -26,6 +26,7 @@ import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.ShopInformation
 import com.example.deeptraderspos.orders.OrdersActivity
+import com.example.deeptraderspos.product.ProductAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -232,16 +233,16 @@ class ProductCart : AppCompatActivity() {
                 var paid = 0.0
                 val get_paid = s.toString()
                 if (!get_paid.isEmpty() && get_paid != ".") {
-                    var remainingPrice = (updatedCalculatedCost- paid).toDouble()
+                    var remainingPrice = (updatedCalculatedCost - paid).toDouble()
                     paid = get_paid.toDouble()
-                    if (paid == remainingPrice) {
-                        dialogBinding.etxtDialogTotalPaidamt.setError("All amount paid")
+                    if (paid > updatedCalculatedCost) {
+                        dialogBinding.etxtDialogTotalPaidamt.setError("you are paying extra !!")
                         dialogBinding.etxtDialogTotalPaidamt.requestFocus()
 
                         dialogBinding.btnSubmit.setVisibility(View.VISIBLE)
                     } else {
                         dialogBinding.btnSubmit.setVisibility(View.VISIBLE)
-                        remainingPrice =(updatedCalculatedCost- paid).toDouble()
+                        remainingPrice = (updatedCalculatedCost - paid).toDouble()
                         dialogBinding.dialogTxtTotalRemainingAmt.setText(
                             "₹" + f.format(
                                 remainingPrice
@@ -263,20 +264,72 @@ class ProductCart : AppCompatActivity() {
         })
 
 
+//        dialogBinding.btnSubmit.setOnClickListener {
+//            // Proceed with the order
+//            proceedOrder(
+//                dialogBinding.dialogOrderType.text.toString(),
+//                dialogBinding.dialogOrderPayment.text.toString(),
+//                dialogBinding.dialogCustomer.text.toString(),
+//                calculated_tax,  // You can calculate this properly
+//                dialogBinding.etxtDialogDiscount.text.toString(),
+//                dialogBinding.dialogTxtTotalCost.text.toString(),
+//                dialogBinding.etxtDialogTotalPaidamt.text.toString(),
+//                dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
+//            )
+//            dialog.dismiss()
+//        }
+
+
         dialogBinding.btnSubmit.setOnClickListener {
-            // Proceed with the order
-            proceedOrder(
-                dialogBinding.dialogOrderType.text.toString(),
-                dialogBinding.dialogOrderPayment.text.toString(),
-                dialogBinding.dialogCustomer.text.toString(),
-                calculated_tax,  // You can calculate this properly
-                dialogBinding.etxtDialogDiscount.text.toString(),
-                dialogBinding.dialogTxtTotalCost.text.toString(),
-                dialogBinding.etxtDialogTotalPaidamt.text.toString(),
-                dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
-            )
-            dialog.dismiss()
+            // Reset previous errors
+            dialogBinding.dialogOrderType.error = null
+            dialogBinding.dialogOrderPayment.error = null
+            dialogBinding.dialogCustomer.error = null
+
+            // Get values from the fields
+            val orderType = dialogBinding.dialogOrderType.text.toString()
+            val paymentMethod = dialogBinding.dialogOrderPayment.text.toString()
+            val customer = dialogBinding.dialogCustomer.text.toString()
+
+            var isValid = true
+
+            // Check if order type is selected
+            if (orderType == "Select order type") {
+                dialogBinding.dialogOrderType.error = "Please select a valid order type"
+                isValid = false
+            }
+
+            // Check if payment method is selected
+            if (paymentMethod == "Select Payment method") {
+                dialogBinding.dialogOrderPayment.error = "Please select a valid payment method"
+                isValid = false
+            }
+
+            // Check if customer is selected
+            if (customer == "Select Customer") {
+                dialogBinding.dialogCustomer.error = "Please select a valid customer"
+                isValid = false
+            }
+
+            // If all fields are valid, proceed with the order
+            if (isValid) {
+                proceedOrder(
+                    orderType,
+                    paymentMethod,
+                    customer,
+                    calculated_tax,  // You can calculate this properly
+                    dialogBinding.etxtDialogDiscount.text.toString(),
+                    dialogBinding.dialogTxtTotalCost.text.toString(),
+                    dialogBinding.etxtDialogTotalPaidamt.text.toString(),
+                    dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
+                )
+                dialog.dismiss()
+            }
         }
+
+
+
+
 
         dialogBinding.btnClose.setOnClickListener {
             dialog.dismiss()
@@ -321,6 +374,16 @@ class ProductCart : AppCompatActivity() {
                 .trim() // Remove the currency symbol and trim any whitespace
             val totalRemaining: Double? = remainingNumericValueString.toDoubleOrNull()
 
+            // Convert totalPaidAmount to Double
+            val totalPaidAmountDouble: Double? = totalPaidAmount.toDoubleOrNull()
+
+            // Check if totalRemaining == 0 and totalPaidAmount == totalCost
+            val orderStatus = if (totalRemaining == 0.0 || totalPaidAmountDouble!! >= totalCost!!) {
+                "Completed"
+            } else {
+                "Pending"
+            }
+
             val productsList = arrayListOf<ProductOrder>()
             for (i in 0 until itemCount) {
                 val cartItem = productCartAdapter.getItem(i)
@@ -335,42 +398,85 @@ class ProductCart : AppCompatActivity() {
             }
 
             // Generate a unique order ID
-            val orderId = UUID.randomUUID().toString()
-
-            val order = Order(
-                orderId = orderId,
-                orderDate = currentDate,
-                orderTime = currentTime,
-                orderType = type,
-                paymentMethod = paymentMethod,
-                customerName = customerName,
-                tax = calculatedTax,
-                discount = discount,
-                products = productsList,
-                totalPrice = totalCost!!,
-                totalPaidAmount = totalPaidAmount.toDouble(),
-                remainingAmount = totalRemaining!!,
-
+           // val orderId = UUID.randomUUID().toString()
+            generateOrderId { orderId ->
+                val order = Order(
+                    orderId = orderId,
+                    orderDate = currentDate,
+                    orderTime = currentTime,
+                    orderType = type,
+                    paymentMethod = paymentMethod,
+                    customerName = customerName,
+                    tax = calculatedTax,
+                    discount = discount,
+                    products = productsList,
+                    totalPrice = totalCost!!,
+                    totalPaidAmount = totalPaidAmount.toDouble(),
+                    remainingAmount = totalRemaining!!,
+                    orderStatus = orderStatus
                 )
 
-            // Save order to Firestore
-            firestore.collection("AllOrders")
-                .document(orderId) // Use the generated order ID
-                .set(order)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "com.example.deeptraderspos.models.Order placed successfully!", Toast.LENGTH_SHORT).show()
-                    deleteCartItems() // Call method to delete cart items
-                    startActivity(Intent(this, OrdersActivity::class.java))
-                    finish() // Return to previous activity
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error placing order: ${e.message}", Toast.LENGTH_SHORT)
-                        .show()
-                }
-        } else {
+                // Save order to Firestore
+                firestore.collection("AllOrders")
+                    .document(orderId) // Use the generated order ID
+                    .set(order)
+                    .addOnSuccessListener {
+                        Toast.makeText(
+                            this,
+                            "Order placed successfully!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        deleteCartItems() // Call method to delete cart items
+                        startActivity(Intent(this, OrdersActivity::class.java))
+                        finish() // Return to previous activity
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            this,
+                            "Error placing order: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+
+            }
+        }else {
             Toast.makeText(this, R.string.no_product_in_cart, Toast.LENGTH_SHORT).show()
         }
     }
+
+
+
+    private fun generateOrderId(onOrderIdGenerated: (String) -> Unit) {
+        val ordersCollection = firestore.collection("AllOrders")
+
+        // Get total number of orders
+        ordersCollection.get()
+            .addOnSuccessListener { querySnapshot ->
+                val totalOrders = querySnapshot.size() // Get the count of orders
+                val newOrderNumber = totalOrders + 1
+
+                // Dynamically calculate the padding size based on the total number of orders
+                val length = when {
+                    newOrderNumber < 1000 -> 4 // If less than 1000, use 4 digits
+                    newOrderNumber < 10000 -> 5 // If between 1000 and 9999, use 5 digits
+                    newOrderNumber < 100000 -> 6 // If between 10000 and 99999, use 6 digits
+                    newOrderNumber < 1000000 -> 7 // If between 100000 and 999999, use 7 digits
+                    else -> newOrderNumber.toString().length // Adjust based on the number of digits
+                }
+
+                // Pad the order number with leading zeros to match the calculated length
+                val newOrderId = newOrderNumber.toString().padStart(length, '0')
+
+                // Return the generated orderId
+                onOrderIdGenerated(newOrderId)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error generating order ID: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
 
     private fun deleteCartItems() {
@@ -593,7 +699,8 @@ class ProductCart : AppCompatActivity() {
 
                 for (document in documents) {
                     // Safely get the order type name, provide a default value if null
-                    val orderTypeName = document.getString("orderTypeName") ?: "Unknown com.example.deeptraderspos.models.Order Type"
+                    val orderTypeName = document.getString("orderTypeName")
+                        ?: "Unknown com.example.deeptraderspos.models.Order Type"
                     orderTypes.add(orderTypeName)
 
                     // Safely convert each field to string, if null provide a default value

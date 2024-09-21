@@ -54,8 +54,9 @@ class OrderAdapter(
             holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#43a047"))
             holder.txtOrderStatus.setTextColor(Color.WHITE)
             holder.imgStatus.visibility = View.GONE
-        } else if (order.orderStatus == Constants.CANCEL) {
-            holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#e53935"))
+        }
+        else if (order.orderStatus == Constants.PENDING) {
+            holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
             holder.txtOrderStatus.setTextColor(Color.WHITE)
             holder.imgStatus.visibility = View.GONE
         }

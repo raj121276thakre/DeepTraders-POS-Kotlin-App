@@ -8,7 +8,7 @@ data class Order(
     val orderDate: String = "",
     val orderTime: String = "",
     val orderType: String = "",
-    val orderStatus: String = "Pending",
+    val orderStatus: String = "",
     val paymentMethod: String = "",
     val customerName: String = "",
     val tax: Double = 0.0,
