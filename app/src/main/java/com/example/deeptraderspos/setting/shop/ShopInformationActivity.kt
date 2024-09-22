@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityShopInformationBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -36,7 +37,8 @@ class ShopInformationActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         // Go Back Button
         val goBackBtn = binding.menuIcon

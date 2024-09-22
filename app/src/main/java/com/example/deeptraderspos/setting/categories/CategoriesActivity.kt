@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityCategoriesBinding
 import com.example.deeptraderspos.databinding.ActivityExpenseBinding
 import com.example.deeptraderspos.expense.AddExpenseActivity
@@ -36,7 +37,8 @@ class CategoriesActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // Set status bar color
+        Utils.setStatusBarColor(this)
         // Go Back Button
         val goBackBtn = binding.menuIcon
         goBackBtn.setOnClickListener {

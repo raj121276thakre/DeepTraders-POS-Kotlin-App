@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.Constants
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrderDetailsBinding
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
@@ -51,6 +52,8 @@ class OrderDetailsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         // Go Back Button
         val goBackBtn = binding.menuIcon

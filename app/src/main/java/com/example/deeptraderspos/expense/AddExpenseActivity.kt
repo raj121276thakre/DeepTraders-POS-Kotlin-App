@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddExpenseBinding
 import com.example.deeptraderspos.models.Expense
 import com.google.firebase.firestore.FirebaseFirestore
@@ -34,6 +35,8 @@ class AddExpenseActivity : AppCompatActivity() {
             insets
         }
 
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         db = FirebaseFirestore.getInstance()
 

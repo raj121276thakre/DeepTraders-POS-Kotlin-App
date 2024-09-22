@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.HomeActivity
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.PosProductAdapter
 import com.example.deeptraderspos.adapter.ProductCategoryAdapter
 import com.example.deeptraderspos.databinding.ActivityPosBinding
@@ -53,6 +54,8 @@ class PosActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         supportActionBar?.setHomeButtonEnabled(true) //for back button
         supportActionBar?.setDisplayHomeAsUpEnabled(true) //for back button

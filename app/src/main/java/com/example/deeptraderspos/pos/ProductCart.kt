@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.CartAdapter
 import com.example.deeptraderspos.databinding.ActivityProductCartBinding
 import com.example.deeptraderspos.databinding.DialogPaymentBinding
@@ -56,6 +57,8 @@ class ProductCart : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         supportActionBar?.setHomeButtonEnabled(true) // for back button
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // for back button

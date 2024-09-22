@@ -31,6 +31,8 @@ class HomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         setCardClickListener(binding.cardCustomers, CustomersActivity::class.java)
         setCardClickListener(binding.cardSuppliers, SuppliersActivity::class.java)

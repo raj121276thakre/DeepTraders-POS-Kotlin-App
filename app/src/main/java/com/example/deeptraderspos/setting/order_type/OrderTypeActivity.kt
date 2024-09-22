@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrderTypeBinding
 import com.example.deeptraderspos.models.OrderType
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,7 +34,8 @@ class OrderTypeActivity : AppCompatActivity() {
             insets
         }
 
-
+        // Set status bar color
+        Utils.setStatusBarColor(this)
         // Go Back Button
         val goBackBtn = binding.menuIcon
         goBackBtn.setOnClickListener {

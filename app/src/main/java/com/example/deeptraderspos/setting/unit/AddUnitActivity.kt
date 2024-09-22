@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddUnitBinding
 import com.example.deeptraderspos.models.Units
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,6 +27,9 @@ class AddUnitActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // Set status bar color
+        Utils.setStatusBarColor(this)
+
         db = FirebaseFirestore.getInstance()
 
         // Handle add unit button click

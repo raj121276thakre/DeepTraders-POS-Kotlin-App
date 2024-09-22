@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddProductBinding
 import com.example.deeptraderspos.models.Product
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,7 +41,8 @@ class AddProductActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
 
         db = FirebaseFirestore.getInstance()

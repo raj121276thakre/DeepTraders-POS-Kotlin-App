@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
+import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityPaymentMethodBinding
 import com.example.deeptraderspos.models.PaymentMethod
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,7 +33,8 @@ class PaymentMethodActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // Set status bar color
+        Utils.setStatusBarColor(this)
 
         // Go Back Button
         val goBackBtn = binding.menuIcon
