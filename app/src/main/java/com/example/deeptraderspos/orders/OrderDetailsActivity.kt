@@ -59,6 +59,8 @@ class OrderDetailsActivity : AppCompatActivity() {
         // Initialize DecimalFormat
         f = DecimalFormat("#0.00")
 
+        setToolbarDetails(order.customerName, order.orderId)
+
         // Set up action bar
         supportActionBar?.apply {
             setHomeButtonEnabled(true) // Enable back button
@@ -132,6 +134,12 @@ class OrderDetailsActivity : AppCompatActivity() {
 
     }
 
+    private fun setToolbarDetails(customerName: String, orderId: String) {
+        binding.txtCustomerName.text = customerName
+        binding.txtOrderId.text = "Order ID :#$orderId"
+
+    }
+
 
     // Set up button listeners for PDF receipt and thermal printer
     private fun setupButtonListeners() {
@@ -144,6 +152,270 @@ class OrderDetailsActivity : AppCompatActivity() {
 
 
     private fun createPdf(context: Context, order: Order) {
+        val directoryPath =
+            context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
+        if (directoryPath == null) {
+            Toast.makeText(context, "Unable to access storage", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val filePath =
+            "$directoryPath/Invoice_${order.orderId}.pdf" // Use a unique identifier from the order
+        val file = File(filePath)
+
+        try {
+            val pdfWriter = PdfWriter(file)
+            val pdfDocument = PdfDocument(pdfWriter)
+            val document = Document(pdfDocument, PageSize.A4)
+
+            // Set margins
+            document.setMargins(20f, 20f, 20f, 20f)
+
+            // Header - Company Information with Blue Background
+            val headerTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 1f)))
+                .useAllAvailableWidth()
+                .setBackgroundColor(ColorConstants.BLUE)
+                .setFontColor(ColorConstants.WHITE)
+
+            headerTable.addCell(
+                Cell().add(Paragraph("BlueBird Industries")) // shop name
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setFontSize(16f)
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            headerTable.addCell(
+                Cell().add(Paragraph("INVOICE"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontSize(24f)
+                    .setBold()
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            document.add(headerTable)
+
+            // Sub-header - Contact Information
+            val subHeaderTable = Table(UnitValue.createPercentArray(floatArrayOf(3f, 1f, 1f)))
+                .useAllAvailableWidth()
+                .setMarginBottom(10f)
+
+            subHeaderTable.addCell(
+                Cell(1, 2).add(
+                    Paragraph(
+                        """
+            |G no. 328/1 Kaloshi, Khandala
+            |Rahimatpur road side, Satara 415002
+            |Phone: +919775240422
+            |Email: pawaraj87@gmail.com
+            """.trimMargin()
+                    )
+                )
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            subHeaderTable.addCell(
+                Cell().add(Paragraph("Invoice No: ${order.orderId}\nDate: ${order.orderDate}"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            document.add(subHeaderTable)
+
+            // Bill To Section
+            val billToTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
+                .useAllAvailableWidth()
+                .setMarginBottom(10f)
+
+            billToTable.addCell(
+                Cell().add(Paragraph("Bill To\n${order.customerName}")) // Assuming customerName is in Order
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(14f)
+                    .setBold()
+            )
+
+            document.add(billToTable)
+
+            // Item Table Header
+            val itemTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 2f, 2f, 2f, 2f)))
+                .useAllAvailableWidth()
+                .setBackgroundColor(ColorConstants.BLUE)
+                .setFontColor(ColorConstants.WHITE)
+                .setMarginBottom(10f)
+
+
+            itemTable.addHeaderCell("Item Name")
+            itemTable.addHeaderCell("Quantity")
+            itemTable.addHeaderCell("Weight")
+            itemTable.addHeaderCell("Price/Unit")
+            itemTable.addHeaderCell("Amount")
+
+            // Calculate total price
+            var subTotalPrice = 0.0
+
+            // Add item rows from order.products
+            order.products.forEach { product ->
+
+                val amount = product.quantity * product.productPrice
+                subTotalPrice += amount // Accumulate total price
+
+                itemTable.addCell(product.productName) // Assuming ProductOrder has name
+                itemTable.addCell(product.quantity.toString())
+                // itemTable.addCell("Box") // Assuming unit is Box for simplicity
+                itemTable.addCell(product.productWeight.toString()) // Assuming unit is Box for simplicity
+                itemTable.addCell(product.productPrice.toString()) // Assuming price is a property in ProductOrder
+                itemTable.addCell((product.quantity * product.productPrice).toString()) // Calculate amount
+            }
+
+            // Add Total Row
+            itemTable.addCell(
+                Cell(1, 4).add(Paragraph("Sub Total"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBold()
+            )
+            itemTable.addCell(Cell().add(Paragraph(subTotalPrice.toString()))) // Use calculated totalPrice
+
+            // itemTable.addCell(Cell().add(Paragraph(order.totalPrice.toString()))) // Assuming totalPrice is a property in Order
+
+            document.add(itemTable)
+
+            // Footer - Payment Details
+            val footerTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
+                .useAllAvailableWidth()
+                .setMarginTop(20f)
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Pay To:"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(
+                    Paragraph(
+                        """
+            |Bank Name: The Satara District Central Co Operative Bank
+            |Account No: 01197026000288
+            |Bank IFSC code: SDC0001197
+            |Account Holder's Name: Pawar Udyog Samuh
+            """.trimMargin()
+                    )
+                )
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Sub Total Amount : $subTotalPrice"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Total tax : ${order.tax}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Discount : ${order.discount}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Total Amount : ${order.totalPrice}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            /*
+            here check first if
+             */
+
+            if (order.orderStatus == Constants.PENDING) {
+
+                footerTable.addCell(
+                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
+                        .setBorder(Border.NO_BORDER)
+                        .setBold()
+                )
+
+                footerTable.addCell(
+                    Cell().add(Paragraph("Total Remaining  Amount : ${order.remainingAmount}"))
+                        .setBorder(Border.NO_BORDER)
+                        .setBold()
+                )
+
+            } else {
+
+                footerTable.addCell(
+                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
+                        .setBorder(Border.NO_BORDER)
+                        .setBold()
+                )
+
+                val totalCalculedRemaining = (order.totalPrice - order.totalPaidAmount).toDouble()
+
+                footerTable.addCell(
+                    Cell().add(Paragraph("The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate))
+                        .setBorder(Border.NO_BORDER)
+                        .setBold()
+                )
+
+            }
+
+
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            // Add any additional footer details here...
+
+            document.add(footerTable)
+
+            document.close()
+            Toast.makeText(context, "Pdf Created: $filePath", Toast.LENGTH_LONG).show()
+
+            openPdfPreview(this, file)
+
+//            // Open the PDF
+//            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                setDataAndType(uri, "application/pdf")
+//                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+//                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            }
+//
+//            val chooser = Intent.createChooser(intent, "Open PDF")
+//            context.startActivity(chooser)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openPdfPreview(context: Context, file: File) {
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        // Check if there's an app to handle the intent
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Toast.makeText(context, "No application found to view PDF", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    /*
+      private fun createPdf(context: Context, order: Order) {
         val directoryPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
         if (directoryPath == null) {
             Toast.makeText(context, "Unable to access storage", Toast.LENGTH_SHORT).show()
@@ -384,7 +656,6 @@ class OrderDetailsActivity : AppCompatActivity() {
             Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
-
-
+     */
 
 }
