@@ -59,6 +59,12 @@ class PosActivity : AppCompatActivity() {
         supportActionBar?.setTitle(R.string.all_product)
         supportActionBar?.hide()
 
+        // Go Back Button
+        val goBackBtn = binding.imgBack
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         binding.txtNoProducts.visibility = View.GONE
 
         // Set up RecyclerViews

@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/menu_icon"
+            android:id="@+id/goBackBtn"
             android:layout_width="30dp"
             android:layout_height="25dp"
             android:contentDescription="Menu"
@@ -46,9 +46,10 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/bell_icon"
-            android:layout_width="30dp"
+            android:id="@+id/gotoPosBtn"
+            android:layout_width="50dp"
             android:layout_height="30dp"
+            android:src="@drawable/pos"
             android:contentDescription="Notifications" />
 
     </LinearLayout>

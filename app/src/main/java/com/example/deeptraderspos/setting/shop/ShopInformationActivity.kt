@@ -37,6 +37,13 @@ class ShopInformationActivity : AppCompatActivity() {
             insets
         }
 
+
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         // Initially make all EditTexts not editable
         setEditTextsEditable(false)
 

@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.orders.supplierOrders
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,6 +20,7 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.databinding.ActivityOrdersSupplierBinding
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.orders.OrderAdapter
+import com.example.deeptraderspos.pos.PosActivity
 import com.google.firebase.firestore.FirebaseFirestore
 
 class OrdersSupplierActivity : AppCompatActivity() {
@@ -43,6 +45,19 @@ class OrdersSupplierActivity : AppCompatActivity() {
         }
 
         firestore = FirebaseFirestore.getInstance()
+
+        // Go Back Button
+        val goBackBtn = binding.goBackBtn
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
+        // Go to POS Activity Button
+        val gotoPosBtn = binding.gotoPosBtn
+        gotoPosBtn.setOnClickListener {
+            val intent = Intent(this, PosActivity::class.java)  // Replace with your POS Activity class name
+            startActivity(intent)
+        }
 
         // Setup RecyclerView and Adapter
         setupRecyclerView()

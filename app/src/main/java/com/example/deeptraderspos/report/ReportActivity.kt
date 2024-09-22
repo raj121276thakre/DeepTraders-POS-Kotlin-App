@@ -17,5 +17,12 @@ class ReportActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+
+        // Go Back Button
+//        val goBackBtn = binding.menuIcon
+//        goBackBtn.setOnClickListener {
+//            onBackPressed()  // This will take you back to the previous activity
+//        }
     }
 }

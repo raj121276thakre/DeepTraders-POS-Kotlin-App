@@ -37,6 +37,12 @@ class CategoriesActivity : AppCompatActivity() {
             insets
         }
 
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         binding.fabAdd.setOnClickListener {
             val intent = Intent(this@CategoriesActivity, AddCategoryActivity::class.java)
             startActivity(intent)

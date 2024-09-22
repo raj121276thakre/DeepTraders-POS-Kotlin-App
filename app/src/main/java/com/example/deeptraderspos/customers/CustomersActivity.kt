@@ -35,6 +35,14 @@ class CustomersActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         binding.fabAdd.setOnClickListener {
             val intent = Intent(this@CustomersActivity, AddCustomersActivity::class.java)
             startActivity(intent)

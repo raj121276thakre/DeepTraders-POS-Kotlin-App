@@ -34,6 +34,13 @@ class ProductActivity : AppCompatActivity() {
             insets
         }
 
+
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         binding.fabAddProduct.setOnClickListener {
             val intent = Intent(this@ProductActivity, AddProductActivity::class.java)
             startActivity(intent)

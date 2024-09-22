@@ -34,6 +34,12 @@ class ExpenseActivity : AppCompatActivity() {
         }
 
 
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         binding.fabAddExpense.setOnClickListener {
             val intent = Intent(this@ExpenseActivity, AddExpenseActivity::class.java)
             startActivity(intent)

@@ -52,6 +52,12 @@ class OrderDetailsActivity : AppCompatActivity() {
             insets
         }
 
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
 
         // Retrieve the order from the intent
         order = intent.getParcelableExtra<Order>("order") ?: return

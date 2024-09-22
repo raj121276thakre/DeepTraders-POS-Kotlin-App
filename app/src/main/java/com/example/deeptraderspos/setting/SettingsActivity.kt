@@ -31,6 +31,12 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
         //Setting done
 
         setCardClickListener(binding.cardShopInfo, ShopInformationActivity::class.java)

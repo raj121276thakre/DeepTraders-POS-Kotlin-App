@@ -30,6 +30,7 @@ class AddCustomersActivity : AppCompatActivity() {
             insets
         }
 
+
         db = FirebaseFirestore.getInstance()
 
         customer = intent.getParcelableExtra("customer")
