@@ -31,9 +31,6 @@ import com.google.firebase.ktx.Firebase
 
 class PosActivity : AppCompatActivity() {
 
-
-    //product added to cart firestore
-
     private lateinit var binding: ActivityPosBinding
     private lateinit var productAdapter: PosProductAdapter
     private lateinit var categoryAdapter: ProductCategoryAdapter
@@ -143,6 +140,74 @@ class PosActivity : AppCompatActivity() {
             }
     }
 
+
+    private fun loadCategories() {
+        firestore.collection("AllCategories").get()
+            .addOnSuccessListener { result ->
+                categoryList.clear() // Clear the list before adding new items
+                for (document in result) {
+                    val category = document.toObject(Category::class.java)
+                    categoryList.add(category)
+                }
+
+
+                if (categoryList.isEmpty()) {
+                    Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
+                } else {
+                    categoryAdapter = ProductCategoryAdapter(categoryList, this) { category ->
+                        // Handle category click
+                        loadProductsByCategory(category.categoryName!!)  // Assuming Category has an 'id' property
+                    }
+                    binding.categoryRecyclerview.adapter = categoryAdapter
+                }
+
+                categoryAdapter.notifyDataSetChanged() // Notify adapter of data change
+            }
+            .addOnFailureListener { exception ->
+                Log.w("Firestore Error", "Error getting categories: ", exception)
+            }
+    }
+
+
+    private fun loadProductsByCategory(categoryName: String) {
+        firestore.collection("AllProducts")
+            .whereEqualTo("productCategory", categoryName) // Assuming Product has a categoryId property
+            .get()
+            .addOnSuccessListener { result ->
+                productsList.clear() // Clear the list before adding new items
+                for (document in result) {
+                    val product = document.toObject(Product::class.java)
+                    productsList.add(product)
+                }
+
+                if (productsList.isEmpty()) {
+                    binding.recycler.visibility = View.GONE
+                    binding.imageNoProduct.visibility = View.VISIBLE
+                    binding.imageNoProduct.setImageResource(R.drawable.not_found)
+                    binding.txtNoProducts.visibility = View.VISIBLE
+                } else {
+                    binding.recycler.visibility = View.VISIBLE
+                    binding.imageNoProduct.visibility = View.GONE
+                    binding.txtNoProducts.visibility = View.GONE
+
+                    productAdapter = PosProductAdapter(
+                        productsList,
+                        this,
+                        onAddtocartClick = { product -> addToCartProduct(product) },
+                        onEditClicked = { product -> editProduct(product) }
+                    )
+                    binding.recycler.adapter = productAdapter
+                }
+
+                productAdapter.notifyDataSetChanged() // Notify adapter of data change
+            }
+            .addOnFailureListener { exception ->
+                Log.w("Firestore Error", "Error getting products: ", exception)
+            }
+    }
+
+
+
     private fun addToCartProduct(product: Product) {
         val getStock = product.stock
         val weightUnitId = product.weightUnit
@@ -212,30 +277,6 @@ class PosActivity : AppCompatActivity() {
     }
 
 
-    private fun loadCategories() {
-        firestore.collection("AllCategories").get()
-            .addOnSuccessListener { result ->
-                categoryList.clear() // Clear the list before adding new items
-                for (document in result) {
-                    val category = document.toObject(Category::class.java)
-                    categoryList.add(category)
-                }
-
-
-                if (categoryList.isEmpty()) {
-                    Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
-                } else {
-                    categoryAdapter = ProductCategoryAdapter(categoryList, this, onClicked = {})
-                    binding.categoryRecyclerview.adapter = categoryAdapter
-                }
-
-                categoryAdapter.notifyDataSetChanged() // Notify adapter of data change
-            }
-            .addOnFailureListener { exception ->
-                Log.w("Firestore Error", "Error getting categories: ", exception)
-            }
-    }
-
     private fun searchProducts(query: String) {
         firestore.collection("AllProducts")
             .whereGreaterThanOrEqualTo("productName", query)
@@ -278,14 +319,6 @@ class PosActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
-
-//    private fun updateCartCount() {
-//        // Assume you have a method to get cart item count, update accordingly
-//        val count = getCartItemCount()// Replace with your logic to get cart item count
-//        binding.txtCount.visibility = if (count == 0) View.INVISIBLE else View.VISIBLE
-//        binding.txtCount.text = count.toString()
-//    }
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

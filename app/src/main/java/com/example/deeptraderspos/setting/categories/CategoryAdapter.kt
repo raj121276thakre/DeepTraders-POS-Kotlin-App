@@ -11,6 +11,7 @@ class CategoryAdapter(
     private val categories: MutableList<Category>,
     private val context: Context,
     private val onDeleteClicked: (Category) -> Unit,
+
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     inner class CategoryViewHolder(private val binding: CategoryItemBinding) :
@@ -27,7 +28,7 @@ class CategoryAdapter(
                     context.packageName
                 )
 
-              //image
+                //image
 
                 // Set delete button listener
                 imgDelete.setOnClickListener {
@@ -35,12 +36,15 @@ class CategoryAdapter(
                 }
 
 
+
+
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = CategoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            CategoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CategoryViewHolder(binding)
     }
 

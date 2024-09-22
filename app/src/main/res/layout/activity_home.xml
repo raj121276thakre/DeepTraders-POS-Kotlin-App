@@ -121,7 +121,6 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="7.5dp"
                     android:layout_weight="1"
