@@ -16,10 +16,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
-import com.example.deeptraderspos.databinding.ActivityOrdersBinding
 import com.example.deeptraderspos.databinding.ActivityOrdersSupplierBinding
 import com.example.deeptraderspos.models.Order
-import com.example.deeptraderspos.orders.customerOrders.OrderAdapter
+import com.example.deeptraderspos.orders.OrderAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 
 class OrdersSupplierActivity : AppCompatActivity() {
@@ -129,7 +128,7 @@ class OrdersSupplierActivity : AppCompatActivity() {
                         }
                     }
 
-                    selectedSupplierID = supplierId
+                    selectedSupplierID = selectedItem
 
                     // Filter orders based on selected supplier ID
                     filterOrdersBySupplier(selectedSupplierID)

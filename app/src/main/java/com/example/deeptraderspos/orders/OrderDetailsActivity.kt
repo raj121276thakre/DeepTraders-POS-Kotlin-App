@@ -1,4 +1,4 @@
-package com.example.deeptraderspos.orders.customerOrders
+package com.example.deeptraderspos.orders
 
 import android.content.Context
 import android.content.Intent
@@ -55,11 +55,18 @@ class OrderDetailsActivity : AppCompatActivity() {
 
         // Retrieve the order from the intent
         order = intent.getParcelableExtra<Order>("order") ?: return
+        val isSupplier = intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
 
         // Initialize DecimalFormat
         f = DecimalFormat("#0.00")
 
-        setToolbarDetails(order.customerName, order.orderId)
+        val name = if (isSupplier) {
+            order.supplierName
+        } else {
+              order.customerName
+        }
+
+        setToolbarDetails(name, order.orderId)
 
         // Set up action bar
         supportActionBar?.apply {

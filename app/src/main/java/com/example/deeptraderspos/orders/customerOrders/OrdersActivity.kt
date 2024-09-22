@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.databinding.ActivityOrdersBinding
 import com.example.deeptraderspos.models.Order
+import com.example.deeptraderspos.orders.OrderAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 
 class OrdersActivity : AppCompatActivity() {

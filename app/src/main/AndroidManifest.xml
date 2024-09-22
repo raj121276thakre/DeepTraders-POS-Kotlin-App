@@ -28,7 +28,7 @@
             android:name=".orders.supplierOrders.OrdersSupplierActivity"
             android:exported="false" />
         <activity
-            android:name=".orders.customerOrders.OrderDetailsActivity"
+            android:name=".orders.OrderDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".pos.ProductCart"

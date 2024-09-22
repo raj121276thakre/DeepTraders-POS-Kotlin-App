@@ -1,4 +1,4 @@
-package com.example.deeptraderspos.orders.customerOrders
+package com.example.deeptraderspos.orders
 
 import android.content.Context
 import android.content.Intent
@@ -74,6 +74,7 @@ class OrderAdapter(
         holder.itemView.setOnClickListener {
             val intent = Intent(context, OrderDetailsActivity::class.java)
             intent.putExtra("order", order)  // Pass the Parcelable Order object
+            intent.putExtra("isSupplier", isSupplier)
             context.startActivity(intent)
         }
 
