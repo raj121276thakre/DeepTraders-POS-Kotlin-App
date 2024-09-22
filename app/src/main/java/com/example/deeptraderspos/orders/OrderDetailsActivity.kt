@@ -84,6 +84,8 @@ class OrderDetailsActivity : AppCompatActivity() {
             setTitle(R.string.order_details) // Set title
         }
 
+
+
         // Set up RecyclerView with adapter
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(this@OrderDetailsActivity)
@@ -94,7 +96,8 @@ class OrderDetailsActivity : AppCompatActivity() {
         val productList: List<ProductOrder> = order.products
         if (productList.isEmpty()) {
             Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
-        } else {
+        }
+        else {
             orderDetailsAdapter = OrderDetailsAdapter(this, productList)
             binding.recycler.adapter = orderDetailsAdapter
 
@@ -107,6 +110,20 @@ class OrderDetailsActivity : AppCompatActivity() {
                 )
         }
 
+
+
+        setOrderDetails()
+
+
+        binding.btnPdfReceipt.setOnClickListener {
+            // Handle PDF generation logic
+            createPdf(this, order,name)
+        }
+
+
+    }
+
+    private fun setOrderDetails() {
         // Get tax, discount, and currency
         val tax = (order.tax).toDouble() ?: 0.0
         val discount = order.discount.toDoubleOrNull() ?: 0.0
@@ -143,12 +160,8 @@ class OrderDetailsActivity : AppCompatActivity() {
             binding.txtRemainingPaidDateTime.visibility = View.GONE
         }
 
-
-        // Set up button listeners
-        setupButtonListeners()
-
-
     }
+
 
     private fun setToolbarDetails(customerName: String, orderId: String) {
         binding.txtCustomerName.text = customerName
@@ -157,17 +170,9 @@ class OrderDetailsActivity : AppCompatActivity() {
     }
 
 
-    // Set up button listeners for PDF receipt and thermal printer
-    private fun setupButtonListeners() {
-        binding.btnPdfReceipt.setOnClickListener {
-            // Handle PDF generation logic
-            createPdf(this, order)
-        }
-
-    }
 
 
-    private fun createPdf(context: Context, order: Order) {
+    private fun createPdf(context: Context, order: Order, name: String) {
         val directoryPath =
             context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
         if (directoryPath == null) {
@@ -243,7 +248,7 @@ class OrderDetailsActivity : AppCompatActivity() {
                 .setMarginBottom(10f)
 
             billToTable.addCell(
-                Cell().add(Paragraph("Bill To\n${order.customerName}")) // Assuming customerName is in Order
+                Cell().add(Paragraph("Bill To\n${name}")) // Assuming customerName is in Order
                     .setTextAlignment(TextAlignment.LEFT)
                     .setBorder(Border.NO_BORDER)
                     .setFontSize(14f)
@@ -341,12 +346,11 @@ class OrderDetailsActivity : AppCompatActivity() {
             footerTable.addCell(
                 Cell().add(Paragraph("Total Amount : ${order.totalPrice}"))
                     .setBorder(Border.NO_BORDER)
+                    .setFontSize(16f)
                     .setBold()
             )
 
-            /*
-            here check first if
-             */
+
 
             if (order.orderStatus == Constants.PENDING) {
 
@@ -359,6 +363,7 @@ class OrderDetailsActivity : AppCompatActivity() {
                 footerTable.addCell(
                     Cell().add(Paragraph("Total Remaining  Amount : ${order.remainingAmount}"))
                         .setBorder(Border.NO_BORDER)
+                        .setFontSize(16f)
                         .setBold()
                 )
 
@@ -375,6 +380,7 @@ class OrderDetailsActivity : AppCompatActivity() {
                 footerTable.addCell(
                     Cell().add(Paragraph("The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate))
                         .setBorder(Border.NO_BORDER)
+                        .setFontSize(16f)
                         .setBold()
                 )
 
@@ -385,6 +391,7 @@ class OrderDetailsActivity : AppCompatActivity() {
             footerTable.addCell(
                 Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
                     .setBorder(Border.NO_BORDER)
+                    .setFontSize(16f)
                     .setBold()
             )
 
@@ -397,16 +404,7 @@ class OrderDetailsActivity : AppCompatActivity() {
 
             openPdfPreview(this, file)
 
-//            // Open the PDF
-//            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-//            val intent = Intent(Intent.ACTION_VIEW).apply {
-//                setDataAndType(uri, "application/pdf")
-//                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-//                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//            }
-//
-//            val chooser = Intent.createChooser(intent, "Open PDF")
-//            context.startActivity(chooser)
+
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
