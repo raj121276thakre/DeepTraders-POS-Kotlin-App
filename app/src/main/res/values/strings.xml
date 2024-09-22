@@ -298,6 +298,9 @@
     <string name="total_paid">Total Paid :</string>
     <string name="total_remaining">"Total Remaining : "</string>
     <string name="sort_order">Sort order by  customer</string>
+    <string name="sort_order_supplier">Sort order by  supplier</string>
+    <string name="all_suppliers_orders">All Suppliers Orders</string>
+    <string name="all_customers_orders">All Customers Orders</string>
 
 
 </resources>

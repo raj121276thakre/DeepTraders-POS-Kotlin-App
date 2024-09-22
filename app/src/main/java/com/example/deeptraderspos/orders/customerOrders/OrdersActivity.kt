@@ -160,7 +160,7 @@ class OrdersActivity : AppCompatActivity() {
 
     // Setup RecyclerView and attach Adapter. ,
     private fun setupRecyclerView() {
-        orderAdapter = OrderAdapter(this, ordersList)
+        orderAdapter = OrderAdapter(this, ordersList, false)
         binding.ordersRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.ordersRecyclerView.adapter = orderAdapter
     }
@@ -213,9 +213,6 @@ class OrdersActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
-
-
 
 
     // Update the adapter with fetched orders

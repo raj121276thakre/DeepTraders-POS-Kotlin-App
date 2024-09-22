@@ -39,7 +39,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/sailec_regular"
             android:paddingStart="12dp"
-            android:text="@string/all_orders"
+            android:text="@string/all_customers_orders"
 
             android:textColor="#ffffff"
             android:textSize="20sp"

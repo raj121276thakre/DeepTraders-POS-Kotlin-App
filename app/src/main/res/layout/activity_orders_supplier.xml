@@ -1,10 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".orders.supplierOrders.OrdersSupplierActivity">
+    android:id="@+id/allOrders_supplier"
+    tools:context=".orders.supplierOrders.OrdersSupplierActivity"
+    android:background="@color/white"
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Toolbar -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/actionbar_gradient"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/menu_icon"
+            android:layout_width="30dp"
+            android:layout_height="25dp"
+            android:contentDescription="Menu"
+            android:src="@drawable/back"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/sailec_regular"
+            android:paddingStart="12dp"
+            android:text="@string/all_suppliers_orders"
+
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/bell_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="Notifications" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="4.5"
+        >
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Filter :"
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/round_border"
+            />
+
+
+        <EditText
+            android:layout_weight="2.5"
+            android:id="@+id/etxt_sort_order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/round_border"
+            android:drawableRight="@drawable/ic_arrow_down"
+            android:ems="10"
+            android:fontFamily="@font/sailec_regular"
+            android:hint="@string/sort_order_supplier"
+            android:focusable="false"
+            android:inputType="textPersonName"
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@+id/resetFilterBtn"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/round_border"
+            />
+
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ordersRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        tools:itemCount="3"
+        tools:listitem="@layout/order_item">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/image_no_product"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="50dp" />
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/txt_no_products"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sailec_regular"
+                    android:gravity="center"
+                    android:text="@string/no_order_found"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="24sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

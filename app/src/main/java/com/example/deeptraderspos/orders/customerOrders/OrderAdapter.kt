@@ -23,7 +23,8 @@ import java.util.Locale
 
 class OrderAdapter(
     private val context: Context,
-    private var orderData: List<Order>
+    private var orderData: List<Order>,
+    private val isSupplier: Boolean
 ) : RecyclerView.Adapter<OrderAdapter.MyViewHolder>() {
 
     private val firestore = FirebaseFirestore.getInstance()
@@ -42,7 +43,14 @@ class OrderAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val order = orderData[position]
 
-        holder.txtCustomerName.text = order.customerName
+
+        // Set name based on whether it's a supplier or customer
+        if (isSupplier) {
+            holder.txtCustomerName.text = order.supplierName
+        } else {
+            holder.txtCustomerName.text = order.customerName
+        }
+
         holder.txtOrderId.text = context.getString(R.string.order_id) + order.orderId
         holder.txtPaymentMethod.text = context.getString(R.string.payment_method) + order.paymentMethod
         holder.txtOrderType.text = context.getString(R.string.order_type) + order.orderType
@@ -68,6 +76,8 @@ class OrderAdapter(
             intent.putExtra("order", order)  // Pass the Parcelable Order object
             context.startActivity(intent)
         }
+
+
 
 
 
@@ -116,8 +126,9 @@ class OrderAdapter(
             "remainingAmount" to 0.0
         )
 
-        val orderRef = firestore.collection("AllOrders").document(orderId)
-        orderRef.update(updateData)
+        val orderRef = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
+
+        orderRef.document(orderId).update(updateData)
             .addOnSuccessListener {
                 if (status == Constants.COMPLETED) {
                     Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()

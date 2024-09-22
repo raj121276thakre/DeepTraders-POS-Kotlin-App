@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivityHomeBinding
 import com.example.deeptraderspos.expense.ExpenseActivity
+import com.example.deeptraderspos.orders.OrdersMainActivity
 import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.pos.PosActivity
 import com.example.deeptraderspos.product.ProductActivity
@@ -35,7 +36,7 @@ class HomeActivity : AppCompatActivity() {
         setCardClickListener(binding.cardSuppliers, SuppliersActivity::class.java)
         setCardClickListener(binding.cardProducts, ProductActivity::class.java)
         setCardClickListener(binding.cardPos, PosActivity::class.java)
-        setCardClickListener(binding.cardOrderList, OrdersActivity::class.java)
+        setCardClickListener(binding.cardOrderList, OrdersMainActivity::class.java)
         setCardClickListener(binding.cardReport, ReportActivity::class.java)
         setCardClickListener(binding.cardExpense, ExpenseActivity::class.java)
         setCardClickListener(binding.cardSettings, SettingsActivity::class.java)

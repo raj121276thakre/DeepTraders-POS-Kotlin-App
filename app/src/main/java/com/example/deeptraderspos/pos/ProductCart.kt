@@ -520,7 +520,10 @@ class ProductCart : AppCompatActivity() {
                 }
 
                 // Pad the order number with leading zeros to match the calculated length
-                val newOrderId = newOrderNumber.toString().padStart(length, '0')
+                val paddedOrderId = newOrderNumber.toString().padStart(length, '0')
+
+                // Prefix with 'C' for customer or 'S' for supplier based on the isSupplier flag
+                val newOrderId = if (isSupplier) "S$paddedOrderId" else "C$paddedOrderId"
 
                 // Return the generated orderId
                 onOrderIdGenerated(newOrderId)
