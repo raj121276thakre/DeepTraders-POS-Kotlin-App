@@ -1,7 +1,6 @@
 package com.example.deeptraderspos
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -11,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivityHomeBinding
 import com.example.deeptraderspos.expense.ExpenseActivity
-import com.example.deeptraderspos.orders.OrdersActivity
+import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.pos.PosActivity
 import com.example.deeptraderspos.product.ProductActivity
 import com.example.deeptraderspos.report.ReportActivity

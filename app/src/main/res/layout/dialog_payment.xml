@@ -60,6 +60,43 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_10" />
+
+            <LinearLayout
+                android:id="@+id/select_customer_supplier"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:padding="16dp">
+
+                <CheckBox
+                    android:layout_weight="1"
+                    android:id="@+id/checkbox_customer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:text="Customer"
+                    android:textColor="@color/grey_60"
+                    android:fontFamily="@font/sailec_regular"/>
+
+                <CheckBox
+                    android:layout_weight="1"
+                    android:id="@+id/checkbox_supplier"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="16dp"
+                    android:text="Supplier"
+                    android:textColor="@color/grey_60"
+                    android:fontFamily="@font/sailec_regular"/>
+
+
+            </LinearLayout>
+
 
             <View
                 android:layout_width="match_parent"
@@ -88,6 +125,43 @@
 
                 <ImageButton
                     android:id="@+id/img_select_customer"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_arrow_down"
+                    app:tint="@color/grey_60"
+                    tools:ignore="VectorDrawableCompat" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_10" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/select_supplier"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dialog_supplier"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/sailec_regular"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:text="Select Supplier"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="@color/grey_60" />
+
+                <ImageButton
+                    android:id="@+id/img_select_supplier"
                     android:layout_width="?attr/actionBarSize"
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/selectableItemBackgroundBorderless"

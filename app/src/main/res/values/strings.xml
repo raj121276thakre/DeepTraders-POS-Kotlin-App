@@ -10,7 +10,6 @@
     <string name="price_rupee">₹ %s</string>
 
 
-
     <!--Replace your adMob application ID here -->
     <string name="admob_application_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
 

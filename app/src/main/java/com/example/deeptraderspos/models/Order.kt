@@ -11,6 +11,7 @@ data class Order(
     val orderStatus: String = "",
     val paymentMethod: String = "",
     val customerName: String = "",
+    val supplierName: String = "",
     val tax: Double = 0.0,
     val discount: String = "",
     val products: List<ProductOrder> = emptyList(),  // Use List instead of ArrayList
@@ -21,6 +22,7 @@ data class Order(
     val remainingAmtPaidTime: String = "",
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -46,6 +48,7 @@ data class Order(
         parcel.writeString(orderStatus)
         parcel.writeString(paymentMethod)
         parcel.writeString(customerName)
+        parcel.writeString(supplierName)
         parcel.writeDouble(tax)
         parcel.writeString(discount)
         parcel.writeTypedList(products)

@@ -25,14 +25,13 @@ import com.example.deeptraderspos.models.CartItem
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.ShopInformation
-import com.example.deeptraderspos.orders.OrdersActivity
-import com.example.deeptraderspos.product.ProductAdapter
+import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
+import com.example.deeptraderspos.orders.supplierOrders.OrdersSupplierActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 class ProductCart : AppCompatActivity() {
 
@@ -43,6 +42,7 @@ class ProductCart : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
 
     private var selectedCustomerID: String = "0" // Store selected supplier ID
+    private var selectedSupplierID: String = "0" // Store selected supplier ID
     private var tax: Double = 0.0 //
 
 
@@ -168,7 +168,6 @@ class ProductCart : AppCompatActivity() {
             .setCancelable(false)
             .create()
 
-
         val total_cost: Double = productCartAdapter.getTotalPrice()
         dialogBinding.dialogTxtSubtotal.setText("₹" + f.format(total_cost))
 
@@ -265,20 +264,105 @@ class ProductCart : AppCompatActivity() {
 
 
 
+        /*
+        here check if customers check box selected then visible the  dialogBinding.select_customer and hide the  dialogBinding.select_supplier
+        else do reverse hide the  dialogBinding.select_customer and visible the  dialogBinding.select_supplier
+         */
+
+        // by default customer is checked
+        dialogBinding.checkboxCustomer.isChecked = true
+
+        // Assuming you have already initialized dialogBinding and your CheckBoxes
+        dialogBinding.checkboxCustomer.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                // Show the customer selection dialog and hide supplier dialog
+                dialogBinding.selectCustomer.visibility = View.VISIBLE
+                dialogBinding.selectSupplier.visibility = View.GONE
+
+                // Uncheck the supplier checkbox
+                dialogBinding.checkboxSupplier.isChecked = false
+            } else {
+                // If the customer checkbox is unchecked, check supplier checkbox
+                if (dialogBinding.checkboxSupplier.isChecked) {
+                    // Hide customer selection dialog and show supplier dialog
+                    dialogBinding.selectCustomer.visibility = View.GONE
+                    dialogBinding.selectSupplier.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        dialogBinding.checkboxSupplier.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                // Show the supplier selection dialog and hide customer dialog
+                dialogBinding.selectSupplier.visibility = View.VISIBLE
+                dialogBinding.selectCustomer.visibility = View.GONE
+
+                // Uncheck the customer checkbox
+                dialogBinding.checkboxCustomer.isChecked = false
+            } else {
+                // If the supplier checkbox is unchecked, check customer checkbox
+                if (dialogBinding.checkboxCustomer.isChecked) {
+                    // Hide supplier selection dialog and show customer dialog
+                    dialogBinding.selectSupplier.visibility = View.GONE
+                    dialogBinding.selectCustomer.visibility = View.VISIBLE
+                }
+            }
+        }
+
+
+        dialogBinding.btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.selectCustomer.setOnClickListener {
+            showCustomersList(dialogBinding.dialogCustomer)
+        }
+
+        dialogBinding.selectSupplier.setOnClickListener {
+            showSuppliersList(dialogBinding.dialogSupplier)
+        }
+
+        dialogBinding.selectOrderType.setOnClickListener {
+            showOrderTypesList(dialogBinding.dialogOrderType)
+        }
+
+        dialogBinding.selectOrderPayment.setOnClickListener {
+            showPaymentMethodsList(dialogBinding.dialogOrderPayment)
+        }
 
 
         dialogBinding.btnSubmit.setOnClickListener {
             // Reset previous errors
             dialogBinding.dialogOrderType.error = null
             dialogBinding.dialogOrderPayment.error = null
+
             dialogBinding.dialogCustomer.error = null
+            dialogBinding.dialogSupplier.error = null
 
             // Get values from the fields
             val orderType = dialogBinding.dialogOrderType.text.toString()
             val paymentMethod = dialogBinding.dialogOrderPayment.text.toString()
             val customer = dialogBinding.dialogCustomer.text.toString()
+            val supplier = dialogBinding.dialogSupplier.text.toString()
 
             var isValid = true
+
+
+
+            // Check if customer is selected when customer checkbox is checked
+            if (dialogBinding.checkboxCustomer.isChecked && customer == "Select Customer") {
+                dialogBinding.dialogCustomer.error = "Please select a valid customer"
+                isValid = false
+            }
+
+            // Check if supplier is selected when supplier checkbox is checked
+            if (dialogBinding.checkboxSupplier.isChecked && supplier == "Select Supplier") {
+                dialogBinding.dialogSupplier.error = "Please select a valid supplier"
+                isValid = false
+            }
+
+
+
 
             // Check if order type is selected
             if (orderType == "Select order type") {
@@ -292,150 +376,133 @@ class ProductCart : AppCompatActivity() {
                 isValid = false
             }
 
-            // Check if customer is selected
-            if (customer == "Select Customer") {
-                dialogBinding.dialogCustomer.error = "Please select a valid customer"
-                isValid = false
-            }
-
-            // If all fields are valid, proceed with the order
             if (isValid) {
-                proceedOrder(
-                    orderType,
-                    paymentMethod,
-                    customer,
-                    calculated_tax,  // You can calculate this properly
-                    dialogBinding.etxtDialogDiscount.text.toString(),
-                    dialogBinding.dialogTxtTotalCost.text.toString(),
-                    dialogBinding.etxtDialogTotalPaidamt.text.toString(),
-                    dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
-                )
+                if (dialogBinding.checkboxCustomer.isChecked) {
+                    proceedOrder(
+                        orderType,
+                        paymentMethod,
+                        customer, // Pass the selected customer or supplier
+                        calculated_tax,  // You can calculate this properly
+                        dialogBinding.etxtDialogDiscount.text.toString(),
+                        dialogBinding.dialogTxtTotalCost.text.toString(),
+                        dialogBinding.etxtDialogTotalPaidamt.text.toString(),
+                        dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
+                        false
+                    )
+                }
+                if (dialogBinding.checkboxSupplier.isChecked) {
+                    proceedOrder(
+                        orderType,
+                        paymentMethod,
+                        supplier, // Pass the selected customer or supplier
+                        calculated_tax,  // You can calculate this properly
+                        dialogBinding.etxtDialogDiscount.text.toString(),
+                        dialogBinding.dialogTxtTotalCost.text.toString(),
+                        dialogBinding.etxtDialogTotalPaidamt.text.toString(),
+                        dialogBinding.dialogTxtTotalRemainingAmt.text.toString(),
+                        true
+                    )
+                }
+
+
                 dialog.dismiss()
             }
+
+
+
         }
 
-
-
-
-
-        dialogBinding.btnClose.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogBinding.selectCustomer.setOnClickListener {
-            showCustomersList(dialogBinding.dialogCustomer)
-        }
-
-        dialogBinding.selectOrderType.setOnClickListener {
-            showOrderTypesList(dialogBinding.dialogOrderType)
-        }
-
-        dialogBinding.selectOrderPayment.setOnClickListener {
-            showPaymentMethodsList(dialogBinding.dialogOrderPayment)
-        }
 
         dialog.show()
     }
 
-
     private fun proceedOrder(
         type: String,
         paymentMethod: String,
-        customerName: String,
+        name: String, // Can be customer or supplier name
         calculatedTax: Double,
         discount: String,
         totalCostString: String,
         totalPaidAmount: String,
-        remainingAmount: String
+        remainingAmount: String,
+        isSupplier: Boolean // Flag to distinguish between customer and supplier
     ) {
         val itemCount = productCartAdapter.itemCount
         if (itemCount > 0) {
             val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
             val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
 
-            val numericValueString = totalCostString.replace("₹", "")
-                .trim() // Remove the currency symbol and trim any whitespace
-            val totalCost: Double? = numericValueString.toDoubleOrNull()
+            val totalCost = totalCostString.replace("₹", "").trim().toDoubleOrNull()
+            val totalRemaining = remainingAmount.replace("₹", "").trim().toDoubleOrNull()
+            val totalPaidAmountDouble = totalPaidAmount.toDoubleOrNull()
 
-            val remainingNumericValueString = remainingAmount.replace("₹", "")
-                .trim() // Remove the currency symbol and trim any whitespace
-            val totalRemaining: Double? = remainingNumericValueString.toDoubleOrNull()
-
-            // Convert totalPaidAmount to Double
-            val totalPaidAmountDouble: Double? = totalPaidAmount.toDoubleOrNull()
-
-            // Check if totalRemaining == 0 and totalPaidAmount == totalCost
-            val orderStatus = if (totalRemaining == 0.0 || totalPaidAmountDouble!! >= totalCost!!) {
+            val orderStatus = if (totalRemaining == 0.0 || (totalPaidAmountDouble != null && totalPaidAmountDouble >= (totalCost ?: 0.0))) {
                 "Completed"
             } else {
                 "Pending"
             }
 
-            val productsList = arrayListOf<ProductOrder>()
-            for (i in 0 until itemCount) {
-                val cartItem = productCartAdapter.getItem(i)
-                val productOrder = ProductOrder(
-                    productId = cartItem.productId ?: "",
-                    productName = cartItem.productName ?: "",
-                    productWeight = cartItem.productWeight,
-                    quantity = cartItem.quantity,
-                    productPrice = cartItem.productPrice
-                )
-                productsList.add(productOrder)
+            val productsList = ArrayList<ProductOrder>().apply {
+                for (i in 0 until itemCount) {
+                    val cartItem = productCartAdapter.getItem(i)
+                    add(ProductOrder(
+                        productId = cartItem.productId ?: "",
+                        productName = cartItem.productName ?: "",
+                        productWeight = cartItem.productWeight,
+                        quantity = cartItem.quantity,
+                        productPrice = cartItem.productPrice
+                    ))
+                }
             }
 
-            // Generate a unique order ID
-           // val orderId = UUID.randomUUID().toString()
-            generateOrderId { orderId ->
+            generateOrderId(isSupplier) { orderId ->
                 val order = Order(
                     orderId = orderId,
                     orderDate = currentDate,
                     orderTime = currentTime,
                     orderType = type,
                     paymentMethod = paymentMethod,
-                    customerName = customerName,
+                    customerName = if (!isSupplier) name else "", // Default to empty string
+                    supplierName = if (isSupplier) name else "", // Default to empty string
                     tax = calculatedTax,
                     discount = discount,
                     products = productsList,
-                    totalPrice = totalCost!!,
-                    totalPaidAmount = totalPaidAmount.toDouble(),
-                    remainingAmount = totalRemaining!!,
+                    totalPrice = totalCost ?: 0.0,
+                    totalPaidAmount = totalPaidAmountDouble ?: 0.0,
+                    remainingAmount = totalRemaining ?: 0.0,
                     orderStatus = orderStatus
                 )
 
-                // Save order to Firestore
-                firestore.collection("AllOrders")
-                    .document(orderId) // Use the generated order ID
+                val collection = if (isSupplier) "AllOrdersSuppliers" else "AllOrders"
+                firestore.collection(collection)
+                    .document(orderId)
                     .set(order)
                     .addOnSuccessListener {
-                        Toast.makeText(
-                            this,
-                            "Order placed successfully!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        deleteCartItems() // Call method to delete cart items
-                        startActivity(Intent(this, OrdersActivity::class.java))
-                        finish() // Return to previous activity
+                        Toast.makeText(this, "${if (isSupplier) "Supplier" else "Customer"} Order placed successfully!", Toast.LENGTH_SHORT).show()
+                        deleteCartItems()
+                        if (isSupplier){
+                            startActivity(Intent(this, OrdersSupplierActivity::class.java))
+                            finish()
+                        }else{
+                            startActivity(Intent(this, OrdersActivity::class.java))
+                            finish()
+                        }
+
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(
-                            this,
-                            "Error placing order: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        Toast.makeText(this, "Error placing order: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-
             }
-        }else {
+        } else {
             Toast.makeText(this, R.string.no_product_in_cart, Toast.LENGTH_SHORT).show()
         }
     }
 
 
 
-    private fun generateOrderId(onOrderIdGenerated: (String) -> Unit) {
-        val ordersCollection = firestore.collection("AllOrders")
+    private fun generateOrderId(isSupplier: Boolean,onOrderIdGenerated: (String) -> Unit) {
+       // val ordersCollection = firestore.collection("AllOrders")
+        val ordersCollection = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
 
         // Get total number of orders
         ordersCollection.get()
@@ -493,6 +560,82 @@ class ProductCart : AppCompatActivity() {
         Toast.makeText(this, "Cart cleared successfully!", Toast.LENGTH_SHORT).show()
     }
 
+
+
+    private fun showSuppliersList(dialogSupplier: TextView) {
+        val supplierAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+
+        // Fetch suppliers from Firestore
+        firestore.collection("AllSuppliers")
+            .get()
+            .addOnSuccessListener { documents ->
+                val supplierNames = mutableListOf<String>()
+                val supplierData = mutableListOf<Map<String, String>>()
+
+                for (document in documents) {
+                    val supplierName = document.getString("supplierName") ?: ""
+                    supplierNames.add(supplierName)
+
+                    // Create a new Map<String, String> to store supplier data
+                    val supplierInfo = mutableMapOf<String, String>()
+                    for ((key, value) in document.data) {
+                        supplierInfo[key] = value.toString() // Convert each value to String
+                    }
+                    supplierData.add(supplierInfo)
+                }
+
+                supplierAdapter.addAll(supplierNames)
+
+                val dialog = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
+                dialog.setView(dialogView)
+                dialog.setCancelable(false)
+
+                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
+                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
+                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
+
+                dialogTitle.setText(R.string.suppliers) // Update title for suppliers
+                dialogList.adapter = supplierAdapter
+
+                // Implement search functionality
+                dialogInput.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                        supplierAdapter.filter.filter(charSequence)
+                    }
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                val alertDialog = dialog.create()
+
+                dialogButton.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                dialogList.setOnItemClickListener { parent, view, position, id ->
+                    alertDialog.dismiss()
+                    val selectedItem = supplierAdapter.getItem(position) ?: return@setOnItemClickListener
+
+                    dialogSupplier.setText(selectedItem)
+
+                    var supplierId = "0"
+                    for (i in supplierNames.indices) {
+                        if (supplierNames[i].equals(selectedItem, ignoreCase = true)) {
+                            supplierId = supplierData[i]["supplier_id"] ?: "0"
+                        }
+                    }
+
+                    selectedSupplierID = supplierId // Assuming you have a variable for selectedSupplierID
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch suppliers: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
 
     private fun showCustomersList(dialogCustomer: TextView) {
         val customerAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
@@ -584,7 +727,6 @@ class ProductCart : AppCompatActivity() {
             }
     }
 
-
     private fun showPaymentMethodsList(dialogPaymentMethod: TextView) {
         val paymentAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
 
@@ -672,7 +814,6 @@ class ProductCart : AppCompatActivity() {
                 ).show()
             }
     }
-
 
     private fun showOrderTypesList(dialogOrderType: TextView) {
         val orderTypeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)

@@ -8,23 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
-import com.example.deeptraderspos.customers.CustomersActivity
-import com.example.deeptraderspos.databinding.ActivityExpenseBinding
 import com.example.deeptraderspos.databinding.ActivitySettingsBinding
-import com.example.deeptraderspos.expense.ExpenseActivity
-import com.example.deeptraderspos.expense.ExpenseAdapter
-import com.example.deeptraderspos.models.Expense
-import com.example.deeptraderspos.orders.OrdersActivity
-import com.example.deeptraderspos.pos.PosActivity
-import com.example.deeptraderspos.product.ProductActivity
-import com.example.deeptraderspos.report.ReportActivity
 import com.example.deeptraderspos.setting.categories.CategoriesActivity
 import com.example.deeptraderspos.setting.order_type.OrderTypeActivity
 import com.example.deeptraderspos.setting.payment_method.PaymentMethodActivity
 import com.example.deeptraderspos.setting.shop.ShopInformationActivity
 import com.example.deeptraderspos.setting.unit.UnitActivity
-import com.example.deeptraderspos.suppliers.SuppliersActivity
-import com.google.firebase.firestore.FirebaseFirestore
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding

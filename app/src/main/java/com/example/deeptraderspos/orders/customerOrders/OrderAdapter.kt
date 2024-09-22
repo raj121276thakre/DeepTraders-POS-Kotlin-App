@@ -1,4 +1,4 @@
-package com.example.deeptraderspos.orders
+package com.example.deeptraderspos.orders.customerOrders
 
 import android.content.Context
 import android.content.Intent
@@ -16,7 +16,6 @@ import com.example.deeptraderspos.models.Order
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

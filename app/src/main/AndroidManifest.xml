@@ -22,7 +22,10 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
-            android:name=".orders.OrderDetailsActivity"
+            android:name=".orders.supplierOrders.OrdersSupplierActivity"
+            android:exported="false" />
+        <activity
+            android:name=".orders.customerOrders.OrderDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".pos.ProductCart"
@@ -70,7 +73,7 @@
             android:name=".pos.PosActivity"
             android:exported="false" />
         <activity
-            android:name=".orders.OrdersActivity"
+            android:name=".orders.customerOrders.OrdersActivity"
             android:exported="false" />
         <activity
             android:name=".setting.SettingsActivity"
