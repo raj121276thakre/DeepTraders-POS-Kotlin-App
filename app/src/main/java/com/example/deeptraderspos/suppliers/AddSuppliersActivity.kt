@@ -36,6 +36,10 @@ class AddSuppliersActivity : AppCompatActivity() {
         supplier = intent.getParcelableExtra("supplier")
         if (supplier != null) {
             showSupplierDetails(supplier!!)
+            // Make etxtSupplierCell non-editable
+            binding.etxtSupplierCell.isFocusable = false
+            binding.etxtSupplierCell.isFocusableInTouchMode = false
+            binding.etxtSupplierCell.isCursorVisible = false
         }
 
 
@@ -62,6 +66,76 @@ class AddSuppliersActivity : AppCompatActivity() {
 
     }
 
+
+    private fun saveSupplierData() {
+        // Collect supplier data from input fields
+        val supplierName = binding.etxtSupplierName.text.toString().trim()
+        val supplierPhone = binding.etxtSupplierCell.text.toString().trim()
+        val supplierEmail = binding.etxtSupplierEmail.text.toString().trim()
+        val supplierAddress = binding.etxtSupplierAddress.text.toString().trim()
+
+        // Validation check
+        if (supplierName.isEmpty() || supplierPhone.isEmpty()) {
+            Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Check if a supplier with the same phone number already exists
+        db.collection("AllSuppliers")
+            .whereEqualTo("supplierPhone", supplierPhone)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // Supplier with the same phone number already exists
+                    Toast.makeText(this, "Supplier with this phone number already exists.", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Create a supplier object
+                    val supplier = Supplier(
+                        supplierName = supplierName,
+                        supplierPhone = supplierPhone,
+                        supplierEmail = if (supplierEmail.isNotEmpty()) supplierEmail else null,
+                        supplierAddress = if (supplierAddress.isNotEmpty()) supplierAddress else null
+                    )
+
+                    // Save to Firestore
+                    db.collection("AllSuppliers")
+                        .add(supplier)
+                        .addOnSuccessListener { documentReference ->
+                            val documentId = documentReference.id
+                            val supplierWithId = supplier.copy(id = documentId)
+
+                            db.collection("AllSuppliers").document(documentId)
+                                .set(supplierWithId)
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        this,
+                                        "Supplier added successfully with ID",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    finish() // Close the activity after successful save
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(
+                                        this,
+                                        "Failed to update supplier: ${e.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Failed to add supplier: ${e.message}", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error checking for existing supplier: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+    /*
     private fun saveSupplierData() {
         // Collect supplier data from input fields
         val supplierName = binding.etxtSupplierName.text.toString().trim()
@@ -124,10 +198,14 @@ class AddSuppliersActivity : AppCompatActivity() {
         }
     }
 
+     */
+
 
 
     private fun updateSupplier() {
         // Collect supplier data from input fields
+
+
         val supplierName = binding.etxtSupplierName.text.toString().trim()
         val supplierPhone = binding.etxtSupplierCell.text.toString().trim()
         val supplierEmail = binding.etxtSupplierEmail.text.toString().trim()

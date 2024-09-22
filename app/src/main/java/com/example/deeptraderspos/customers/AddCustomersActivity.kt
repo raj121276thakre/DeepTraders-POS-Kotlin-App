@@ -38,6 +38,10 @@ class AddCustomersActivity : AppCompatActivity() {
         customer = intent.getParcelableExtra("customer")
         if (customer != null) {
             showSupplierDetails(customer!!)
+            // Make etxtSupplierCell non-editable
+            binding.etxtCustomerCell.isFocusable = false
+            binding.etxtCustomerCell.isFocusableInTouchMode = false
+            binding.etxtCustomerCell.isCursorVisible = false
         }
 
 
@@ -67,6 +71,73 @@ class AddCustomersActivity : AppCompatActivity() {
 
     }
 
+    private fun saveSupplierData() {
+        // Collect customer data from input fields
+        val customerName = binding.etxtCustomerName.text.toString().trim()
+        val customerPhone = binding.etxtCustomerCell.text.toString().trim()
+        val customerEmail = binding.etxtCustomerEmail.text.toString().trim()
+        val customerAddress = binding.etxtCustomerAddress.text.toString().trim()
+
+        // Validation check
+        if (customerName.isEmpty() || customerPhone.isEmpty()) {
+            Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Check if a customer with the same phone number or email already exists
+        db.collection("AllCustomers")
+            .whereEqualTo("customerPhone", customerPhone)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // Customer with the same phone number already exists
+                    Toast.makeText(this, "Customer with this phone number already exists.", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Create a customer object
+                    val customer = Customer(
+                        customerName = customerName,
+                        customerPhone = customerPhone,
+                        customerEmail = if (customerEmail.isNotEmpty()) customerEmail else null,
+                        customerAddress = if (customerAddress.isNotEmpty()) customerAddress else null
+                    )
+
+                    // Save to Firestore
+                    db.collection("AllCustomers")
+                        .add(customer)
+                        .addOnSuccessListener { documentReference ->
+                            val documentId = documentReference.id
+                            val customerWithId = customer.copy(id = documentId)
+
+                            db.collection("AllCustomers").document(documentId)
+                                .set(customerWithId)
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        this,
+                                        "Customer added successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    finish() // Close the activity after successful save
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(
+                                        this,
+                                        "Failed to update Customer: ${e.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Failed to add Customer: ${e.message}", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error checking for existing customer: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+/*
     private fun saveSupplierData() {
         // Collect supplier data from input fields
         val customerName = binding.etxtCustomerName.text.toString().trim()
@@ -128,6 +199,8 @@ class AddCustomersActivity : AppCompatActivity() {
                 }
         }
     }
+
+ */
 
 
 
