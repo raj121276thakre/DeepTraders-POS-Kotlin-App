@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">DeepTraders</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="version">V1.0.0</string>
+
 
     <string name="text_french" translatable="false">French</string>
     <string name="text_english" translatable="false">English</string>
