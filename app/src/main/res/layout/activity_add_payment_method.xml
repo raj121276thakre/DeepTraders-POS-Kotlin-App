@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".setting.payment_method.AddPaymentMethodActivity"
     android:id="@+id/addPaymentMethod"
+    android:background="@color/activityBackgroundColor"
     android:orientation="vertical">
 
     <ScrollView

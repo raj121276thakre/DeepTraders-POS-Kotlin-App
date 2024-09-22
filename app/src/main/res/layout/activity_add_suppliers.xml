@@ -6,6 +6,7 @@
     android:id="@+id/AddSupplierScreen"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/activityBackgroundColor"
     tools:context=".suppliers.AddSuppliersActivity"
     >
 

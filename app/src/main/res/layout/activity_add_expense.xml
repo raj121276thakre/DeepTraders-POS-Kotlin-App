@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".expense.AddExpenseActivity"
+    android:background="@color/activityBackgroundColor"
     android:id="@+id/AddExpense"
     android:orientation="vertical">
 

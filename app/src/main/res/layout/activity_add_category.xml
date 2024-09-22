@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/activityBackgroundColor"
     tools:context=".setting.categories.AddCategoryActivity"
     android:id="@+id/addCategories"
     android:orientation="vertical">

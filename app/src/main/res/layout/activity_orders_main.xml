@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/allMainOrders"
-    android:background="#f7f7f7"
+    android:background="@color/activityBackgroundColor"
     tools:context=".orders.OrdersMainActivity">
 
     <!-- Toolbar -->
