@@ -7,8 +7,8 @@
     android:gravity="center"
     android:orientation="vertical"
     android:background="@color/white"
-    android:id="@+id/expenseGraph"
-    tools:context=".report.expensesReport.ExpenseGraphActivity">
+    android:id="@+id/dailyExpenseGraph"
+    tools:context=".report.expensesReport.ExpenseGraphActivityDaily">
 
     <!-- Toolbar -->
     <LinearLayout
@@ -20,17 +20,13 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="10dp"
         android:gravity="center_vertical"
-        android:background="@drawable/actionbar_gradient"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/actionbar_gradient">
 
         <ImageView
-            android:visibility="visible"
             android:id="@+id/menu_icon"
             android:layout_width="30dp"
-            android:src="@drawable/back"
             android:layout_height="25dp"
+            android:src="@drawable/back"
             android:contentDescription="Menu" />
 
         <TextView
@@ -38,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/monthly_expense_graph"
+            android:text="@string/daily_expense_graph"
             android:textStyle="bold"
             android:fontFamily="@font/sailec_regular"
             android:textSize="20sp"
@@ -52,35 +48,25 @@
             android:contentDescription="Notifications" />
     </LinearLayout>
 
-
     <LinearLayout
-        android:id="@+id/layout_year"
+        android:id="@+id/layout_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/round_border"
         android:orientation="horizontal"
-        android:layout_gravity="center"
         android:weightSum="2">
 
         <TextView
-            android:id="@+id/txt_select_month"
+            android:id="@+id/txt_select_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_arrow_down"
             android:fontFamily="@font/sailec_regular"
-      android:layout_gravity="center"
-            android:textAlignment="center"
+            android:gravity="center"
             android:padding="10dp"
-            android:text="@string/select_month"
+            android:text="@string/select_date"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_down"
-            android:layout_gravity="center"
-            />
-
     </LinearLayout>
 
     <ScrollView
@@ -90,14 +76,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barchart"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" >
-
-            </com.github.mikephil.charting.charts.BarChart>
+                android:layout_height="400dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

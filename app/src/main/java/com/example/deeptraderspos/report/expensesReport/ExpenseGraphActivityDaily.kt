@@ -4,11 +4,9 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
-import com.example.deeptraderspos.databinding.ActivityExpenseGraphBinding
+import com.example.deeptraderspos.databinding.ActivityExpenseGraphDailyBinding
 import com.example.deeptraderspos.models.Expense
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarData
@@ -19,66 +17,57 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ExpenseGraphActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityExpenseGraphBinding
+class ExpenseGraphActivityDaily : AppCompatActivity() {
+    private lateinit var binding: ActivityExpenseGraphDailyBinding
     private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityExpenseGraphBinding.inflate(layoutInflater)
+        binding = ActivityExpenseGraphDailyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.expenseGraph)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         // Set the status bar color
         Utils.setStatusBarColor(this)
 
         db = FirebaseFirestore.getInstance()
 
-        // Trigger month picker
-        binding.layoutYear.setOnClickListener {
-            showMonthPicker()
+        // Trigger date picker
+        binding.layoutDate.setOnClickListener {
+            showDatePicker()
         }
 
-        // Optionally initialize with the current month data
+        // Optionally initialize with today's data
         val now = Calendar.getInstance()
-        fetchMonthlyExpenses(now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1)
+        fetchDailyExpenses(now)
     }
 
-    private fun showMonthPicker() {
+    private fun showDatePicker() {
         val now = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
-            this, { _, year, month, _ ->
-                val selectedMonth = month + 1 // Month is zero-based
-                fetchMonthlyExpenses(year, selectedMonth)
-                // Set the selected month in the TextView
-                binding.txtSelectMonth.text = "${getMonthName(selectedMonth)} $year"
+            this, { _, year, month, dayOfMonth ->
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+                fetchDailyExpenses(selectedDate)
+                binding.txtSelectDate.text = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(selectedDate.time)
             },
             now.get(Calendar.YEAR),
             now.get(Calendar.MONTH),
             now.get(Calendar.DAY_OF_MONTH)
         )
 
-        datePickerDialog.show() // Show the dialog without trying to hide the day picker
+        datePickerDialog.show()
     }
 
-    private fun fetchMonthlyExpenses(year: Int, month: Int) {
-        // Format dates for Firestore query
-        val startOfMonth = "$year-${String.format("%02d", month)}-01"
-        val endOfMonth = if (month == 12) {
-            "${year + 1}-01-01" // Start of next year if December
-        } else {
-            "$year-${String.format("%02d", month + 1)}-01" // Start of next month
-        }
+    private fun fetchDailyExpenses(selectedDate: Calendar) {
+        // Format selected date to "YYYY-MM-DD"
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate = dateFormat.format(selectedDate.time)
 
-        Log.d("ExpenseGraphActivity", "Fetching from $startOfMonth to $endOfMonth")
+        Log.d("ExpenseGraphActivityDaily", "Fetching expenses for date: $formattedDate")
 
         db.collection("AllExpenses")
-            .whereGreaterThanOrEqualTo("expenseDate", startOfMonth)
-            .whereLessThan("expenseDate", endOfMonth) // Ensure exclusive end date
+            .whereEqualTo("expenseDate", formattedDate)
             .get()
             .addOnSuccessListener { documents ->
                 val expensesList = mutableListOf<Expense>()
@@ -88,44 +77,34 @@ class ExpenseGraphActivity : AppCompatActivity() {
                     expensesList.add(expense)
                     totalExpense += expense.expenseAmount
                 }
+                Log.d("ExpenseGraphActivityDaily", "Fetched ${documents.size()} documents.")
                 updateBarChart(expensesList)
                 binding.txtTotalSales.text = getString(R.string.total_sales) +getString(R.string.currency_symbol) + String.format("%.2f", totalExpense)
             }
             .addOnFailureListener { exception ->
-                Log.w("ExpenseGraphActivity", "Error getting documents: ", exception)
+                Log.w("ExpenseGraphActivityDaily", "Error getting documents: ", exception)
             }
     }
 
     private fun updateBarChart(expensesList: List<Expense>) {
         val entries = ArrayList<BarEntry>()
-        val labels = ArrayList<String>() // For storing expense names
+        val labels = ArrayList<String>()
 
         for ((index, expense) in expensesList.withIndex()) {
             entries.add(BarEntry(index.toFloat(), expense.expenseAmount.toFloat()))
             labels.add(expense.expenseName) // Add expense names to labels
         }
 
-        val barDataSet = BarDataSet(entries, "Expenses")
+        val barDataSet = BarDataSet(entries, "Daily Expenses")
         barDataSet.color = resources.getColor(R.color.colorPrimary)
 
         val barData = BarData(barDataSet)
         binding.barchart.data = barData
-
-        // Set custom value formatter for x-axis to show expense names
         binding.barchart.xAxis.valueFormatter = object : ValueFormatter() {
             override fun getAxisLabel(value: Float, axis: com.github.mikephil.charting.components.AxisBase?): String {
                 return labels.getOrNull(value.toInt()) ?: ""
             }
         }
-
         binding.barchart.invalidate() // Refresh the chart
-    }
-
-    private fun getMonthName(month: Int): String {
-        val monthNames = arrayOf(
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        )
-        return monthNames[month - 1] // month is 1-based in this context
     }
 }

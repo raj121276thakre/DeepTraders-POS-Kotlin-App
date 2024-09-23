@@ -21,15 +21,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
+
         <activity
-            android:name=".report.SalesReportActivity"
+            android:name=".report.expensesReport.ExpenseGraphActivityYearly"
             android:exported="false" />
         <activity
-            android:name=".report.expensesReport.ExpenseReportActivity"
+            android:name=".report.expensesReport.ExpenseGraphActivityDaily"
             android:exported="false" />
         <activity
             android:name=".report.expensesReport.ExpenseGraphActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".report.SalesReportActivity"
+            android:exported="false" />
+
         <activity
             android:name=".orders.OrdersMainActivity"
             android:exported="false" />

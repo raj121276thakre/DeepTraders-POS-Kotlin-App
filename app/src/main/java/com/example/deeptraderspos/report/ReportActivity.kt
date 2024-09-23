@@ -12,7 +12,8 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityReportBinding
 import com.example.deeptraderspos.databinding.ActivitySettingsBinding
 import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivity
-import com.example.deeptraderspos.report.expensesReport.ExpenseReportActivity
+import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivityDaily
+import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivityYearly
 import com.example.deeptraderspos.setting.categories.CategoriesActivity
 import com.example.deeptraderspos.setting.order_type.OrderTypeActivity
 import com.example.deeptraderspos.setting.payment_method.PaymentMethodActivity
@@ -43,9 +44,9 @@ class ReportActivity : AppCompatActivity() {
 
 
         setCardClickListener(binding.cardSalesReport, SalesReportActivity::class.java)
-        setCardClickListener(binding.cardExpenseReport, ExpenseReportActivity::class.java)
-      //  setCardClickListener(binding.cardGraphReport, GraphReportActivity::class.java)
         setCardClickListener(binding.cardExpenseGraph, ExpenseGraphActivity::class.java)
+        setCardClickListener(binding.cardDailyExpenseGraph, ExpenseGraphActivityDaily::class.java)
+        setCardClickListener(binding.cardYearlyExpenseGraph, ExpenseGraphActivityYearly::class.java)
 
     }
 

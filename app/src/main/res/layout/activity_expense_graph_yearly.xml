@@ -2,12 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/expensReport"
-    tools:context=".report.expensesReport.ExpenseReportActivity"
-    android:background="@color/grey_5">
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:id="@+id/dailyExpenseGraph"
+    tools:context=".report.expensesReport.ExpenseGraphActivityYearly">
 
     <!-- Toolbar -->
     <LinearLayout
@@ -19,17 +20,13 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="10dp"
         android:gravity="center_vertical"
-        android:background="@drawable/actionbar_gradient"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/actionbar_gradient">
 
         <ImageView
-            android:visibility="visible"
             android:id="@+id/menu_icon"
             android:layout_width="30dp"
-            android:src="@drawable/back"
             android:layout_height="25dp"
+            android:src="@drawable/back"
             android:contentDescription="Menu" />
 
         <TextView
@@ -37,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/all_expense_report"
+            android:text="@string/yearly_expense_graph"
             android:textStyle="bold"
             android:fontFamily="@font/sailec_regular"
             android:textSize="20sp"
@@ -51,6 +48,27 @@
             android:contentDescription="Notifications" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layout_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/round_border"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/txt_select_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_arrow_down"
+            android:fontFamily="@font/sailec_regular"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/select_year"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -58,16 +76,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler"
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barchart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="?android:attr/selectableItemBackground">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="400dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,40 +90,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/txt_total_price"
+                    android:id="@+id/txt_total_sales"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:background="@color/colorAccent"
-                    android:gravity="right"
-                    android:padding="5dp"
-                    android:text="@string/total_price"
-                    android:textColor="#fff"
-                    android:textSize="24sp"
-                    app:fontFamily="@font/sailec_regular" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/image_no_product"
-                    android:layout_width="300dp"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="50dp" />
-
-                <TextView
-                    android:id="@+id/txt_no_products"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
                     android:fontFamily="@font/sailec_regular"
-                    android:gravity="center"
-                    android:text="@string/no_data_found"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="24sp" />
+                    android:padding="10dp"
+                    android:text="@string/total_sales"
+                    android:textColor="#fff"
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
