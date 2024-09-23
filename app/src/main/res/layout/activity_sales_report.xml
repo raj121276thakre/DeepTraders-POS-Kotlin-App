@@ -89,6 +89,47 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_marginVertical="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:weightSum="2"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:padding="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/txt_totalOrders"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimary"
+                    android:gravity="center"
+                    android:layout_marginHorizontal="5dp"
+                    android:padding="5dp"
+                    android:text="@string/total_orders"
+                    android:textColor="#fff"
+                    android:textSize="21sp"
+                    app:fontFamily="@font/sailec_regular" />
+
+                <TextView
+                    android:id="@+id/txt_totalProducts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginHorizontal="5dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="@string/total_products_qty"
+                    android:textColor="#fff"
+                    android:textSize="21sp"
+                    app:fontFamily="@font/sailec_regular" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
@@ -173,7 +214,7 @@
                     android:layout_weight="1"
                     android:id="@+id/txt_Profit"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@color/green"
                     android:gravity="center"
                     android:layout_marginHorizontal="5dp"
@@ -184,15 +225,15 @@
                     app:fontFamily="@font/sailec_regular" />
 
                 <TextView
-                    android:id="@+id/txt_Loss"
+                    android:id="@+id/txt_Remaining"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#E41111"
+                    android:background="@color/colorPrimary"
                     android:layout_marginHorizontal="5dp"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@string/loss"
+                    android:text="@string/remaining"
                     android:textColor="#fff"
                     android:textSize="21sp"
                     app:fontFamily="@font/sailec_regular" />

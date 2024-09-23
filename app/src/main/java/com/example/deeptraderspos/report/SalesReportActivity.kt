@@ -17,6 +17,10 @@ import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class SalesReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySalesReportBinding
@@ -58,9 +62,9 @@ class SalesReportActivity : AppCompatActivity() {
     }
 
     // Call this function to start the fetching process
-    private fun fetchData() {
+    private fun fetchData(timeFrame: String? = null) {
         fetchAllProducts { productMap ->
-            fetchAllOrdersData(productMap)
+            fetchAllOrdersData(productMap, timeFrame)
         }
     }
 
@@ -82,13 +86,97 @@ class SalesReportActivity : AppCompatActivity() {
             }
     }
 
-    private fun fetchAllOrdersData(productMap: Map<String, Product>) {
-        firestore.collection("AllOrders")
-            .get()
+    private fun fetchAllOrdersData(productMap: Map<String, Product>, timeFrame: String?) {
+
+        val query = firestore.collection("AllOrders")
+
+        // Apply filters based on the time frame
+        val startDate: String?
+        val endDate: String?
+
+        when (timeFrame) {
+            "daily" -> {
+                // Get today's date in "yyyy-MM-dd" format
+                val calendar = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+
+                startDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                }.time)
+
+                endDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                }.time)
+            }
+
+            "monthly" -> {
+                val calendar = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                startDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                }.time)
+
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                endDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                }.time)
+            }
+
+            "yearly" -> {
+                val calendar = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+
+                calendar.set(Calendar.MONTH, 0) // January
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                startDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                }.time)
+
+                calendar.set(Calendar.MONTH, 11) // December
+                calendar.set(Calendar.DAY_OF_MONTH, 31)
+                endDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                }.time)
+            }
+
+            else -> {
+                // No filtering, fetch all orders
+                startDate = null
+                endDate = null
+            }
+        }
+
+        val orderQuery = if (startDate != null && endDate != null) {
+            query.whereGreaterThanOrEqualTo("orderDate", startDate)
+                .whereLessThanOrEqualTo("orderDate", endDate)
+        } else {
+            query // No filtering
+        }
+
+        // firestore.collection("AllOrders")
+        orderQuery.get()
             .addOnSuccessListener { documents ->
                 if (documents.isEmpty) {
                     showNoData()
                 } else {
+
+
+                    val totalNumberOfOrders = documents.size()
+
                     val allProductOrders = mutableListOf<ProductOrder>()
                     val allOrders = mutableListOf<Order>()
                     var totalSales = 0.0
@@ -98,6 +186,7 @@ class SalesReportActivity : AppCompatActivity() {
                     var totalProfit = 0.0
                     var totalLoss = 0.0
                     var subTotalSales = 0.0
+                    var totalQuantityOfProducts = 0
 
                     // Assuming you have fetched products into a map for easy access
                     // productMap = mutableMapOf<String, Product>() // Replace with actual fetching logic
@@ -173,6 +262,10 @@ class SalesReportActivity : AppCompatActivity() {
 
                         // Total loss if there's any unpaid amount
                         totalLoss += if (order.remainingAmount > 0) order.remainingAmount else 0.0
+
+                        for (productOrder in productsList) {
+                            totalQuantityOfProducts += productOrder.quantity // Add quantity of each product
+                        }
                     }
 
                     // Now you have all totals calculated
@@ -183,7 +276,9 @@ class SalesReportActivity : AppCompatActivity() {
                         totalDiscount,
                         netSales,
                         totalProfit,
-                        totalLoss
+                        totalLoss,
+                        totalNumberOfOrders,
+                        totalQuantityOfProducts
                     )
                 }
             }
@@ -200,8 +295,15 @@ class SalesReportActivity : AppCompatActivity() {
         totalDiscount: Double,
         netSales: Double,
         totalProfit: Double,
-        totalLoss: Double
+        totalLoss: Double,
+        totalOrders: Int,
+        totalProductsSold: Int,
     ) {
+
+
+        binding.txtTotalOrders.text = getString(R.string.total_orders) + " "  + totalOrders
+        binding.txtTotalProducts.text = getString(R.string.total_products_qty) + " "  + totalProductsSold
+
         // Update your UI with the calculated totals
         // Example:
         binding.txtTotalPrice.text =
@@ -213,11 +315,27 @@ class SalesReportActivity : AppCompatActivity() {
         binding.txtNetSales.text =
             getString(R.string.net_sales) + " " + getString(R.string.currency_symbol) + netSales
 
-        binding.txtProfit.text =
-            getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
-        binding.txtLoss.text =
-            getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalLoss
-        // Add more UI updates as needed for profit and loss
+        // Check if totalProfit is greater than 0
+        if (totalProfit > 0) {
+            binding.txtProfit.text = getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
+            // Set background color to green or any desired color for profit
+            binding.txtProfit.setBackgroundColor(getColor(R.color.green))
+        } else {
+            binding.txtProfit.text = getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit
+            // Set background color to red for loss
+            binding.txtProfit.setBackgroundColor(getColor(R.color.red))
+        }
+
+// Check if totalLoss is greater than 0
+        if (totalLoss.toInt() > 0) {
+            binding.txtRemaining.text = getString(R.string.remaining) + " " + getString(R.string.currency_symbol) + totalLoss
+        } else {
+            // If totalLoss is 0, null, or empty, hide the text view
+            binding.txtRemaining.visibility = View.GONE
+        }
+
+
+
     }
 
 
@@ -262,22 +380,26 @@ class SalesReportActivity : AppCompatActivity() {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_all_sales -> {
+                    setToolbarTitle("All Sales Report")
                     fetchData()
                     true
                 }
 
                 R.id.menu_daily -> {
-                   // fetchData("daily")
+                    setToolbarTitle("Daily Sales Report")
+                    fetchData("daily")
                     true
                 }
 
                 R.id.menu_monthly -> {
-                   // fetchData("monthly")
+                    setToolbarTitle("Monthly Sales Report")
+                    fetchData("monthly")
                     true
                 }
 
                 R.id.menu_yearly -> {
-                   // fetchData("yearly")
+                    setToolbarTitle("Yearly Sales Report")
+                    fetchData("yearly")
                     true
                 }
 
@@ -287,9 +409,10 @@ class SalesReportActivity : AppCompatActivity() {
         popupMenu.show()
     }
 
+    private fun setToolbarTitle(title: String) {
 
-    private fun getReport(period: String) {
-        Toast.makeText(this, period, Toast.LENGTH_SHORT).show()
+        binding.toolbarTitle.text = title
+
     }
 
 

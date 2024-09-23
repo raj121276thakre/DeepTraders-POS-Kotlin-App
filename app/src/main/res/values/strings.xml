@@ -300,6 +300,7 @@
     <string name="total_paid_price">"Total Paid "</string>
     <string name="total_paid">Total Paid :</string>
     <string name="total_remaining">"Total Remaining : "</string>
+    <string name="remaining">"Remaining : "</string>
     <string name="sort_order">Sort order by  customer</string>
     <string name="sort_order_supplier">Sort order by  supplier</string>
     <string name="all_suppliers_orders">All Suppliers Orders</string>
@@ -307,6 +308,8 @@
     <string name="all_order_products">All Ordered Products</string>
     <string name="profit">Profit : </string>
     <string name="loss">Loss : </string>
+    <string name="total_orders">"Toatal Orders : "</string>
+    <string name="total_products_qty">"Total Products : "</string>
 
 
 </resources>

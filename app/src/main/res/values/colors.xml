@@ -5,6 +5,7 @@
     <color name="colorAccent">#01baef</color>
     <color name="white">#FFFFFF</color>
     <color name="green">#17d57e</color>
+    <color name="red">#E41111</color>
     <color name="statusBarColor">#06B3E4</color>
 
     <color name="activityBackgroundColor">#f7f7f7</color>
