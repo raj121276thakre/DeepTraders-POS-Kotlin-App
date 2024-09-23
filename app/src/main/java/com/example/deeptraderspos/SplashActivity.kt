@@ -34,6 +34,17 @@ class SplashActivity : AppCompatActivity() {
             actionBar.hide()
         }
 
+//        Handler().postDelayed({
+//            val intent = Intent(
+//                this@SplashActivity,
+//                HomeActivity::class.java
+//            )
+//            startActivity(intent)
+//            finish()
+//        }, splashTimeOut.toLong())
+
+        // Testing Internet on Off
+
         Handler().postDelayed({
             val intent = Intent(
                 this@SplashActivity,
@@ -42,7 +53,6 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, splashTimeOut.toLong())
-
 
     }
 }

@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivityHomeBinding
 import com.example.deeptraderspos.expense.ExpenseActivity
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.orders.OrdersMainActivity
 import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.pos.PosActivity
@@ -23,7 +24,7 @@ import com.example.deeptraderspos.report.ReportActivity
 import com.example.deeptraderspos.setting.SettingsActivity
 import com.example.deeptraderspos.suppliers.SuppliersActivity
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

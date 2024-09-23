@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:background="@color/white"
-    android:id="@+id/dailyExpenseGraph"
+    android:id="@+id/yearlyExpenseGraph"
     tools:context=".report.expensesReport.ExpenseGraphActivityYearly">
 
     <!-- Toolbar -->
