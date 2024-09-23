@@ -108,7 +108,7 @@
                     android:gravity="center"
                     android:layout_marginHorizontal="5dp"
                     android:padding="5dp"
-                    android:text="@string/total_orders"
+                    tools:text="@string/total_orders"
                     android:textColor="#fff"
                     android:textSize="21sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -122,7 +122,7 @@
                     android:layout_marginHorizontal="5dp"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@string/total_products_qty"
+                    tools:text="@string/total_products_qty"
                     android:textColor="#fff"
                     android:textSize="21sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -144,7 +144,7 @@
                     android:background="@color/colorAccent"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:text="@string/total_price"
+                    tools:text="@string/total_price"
                     android:textColor="#fff"
                     android:textSize="20sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -159,7 +159,7 @@
                     android:background="@color/colorAccent"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:text="@string/total_tax"
+                    tools:text="@string/total_tax"
                     android:textColor="#fff"
                     android:textSize="20sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -174,7 +174,7 @@
                     android:background="@color/colorAccent"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:text="@string/total_discount"
+                    tools:text="@string/total_discount"
                     android:textColor="#fff"
                     android:textSize="20sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -190,7 +190,7 @@
                     android:background="@color/colorAccent"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:text="@string/net_sales"
+                    tools:text="@string/net_sales"
                     android:textColor="#fff"
                     android:textSize="20sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -215,11 +215,11 @@
                     android:id="@+id/txt_Profit"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:background="@color/green"
+                    tools:background="@color/green"
                     android:gravity="center"
                     android:layout_marginHorizontal="5dp"
                     android:padding="5dp"
-                    android:text="@string/profit"
+                    tools:text="@string/profit"
                     android:textColor="#fff"
                     android:textSize="21sp"
                     app:fontFamily="@font/sailec_regular" />
@@ -233,14 +233,26 @@
                     android:layout_marginHorizontal="5dp"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@string/remaining"
+                    tools:text="@string/remaining"
                     android:textColor="#fff"
                     android:textSize="21sp"
                     app:fontFamily="@font/sailec_regular" />
 
             </LinearLayout>
 
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barchart"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="260dp"
+                android:layout_width="match_parent"
+                android:layout_height="400dp">
+
+            </com.github.mikephil.charting.charts.BarChart>
+
+
             <TextView
+                android:visibility="gone"
                 android:id="@+id/txt_total_orders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -256,6 +268,7 @@
 
 
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="gone"
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -265,6 +278,8 @@
                 android:background="?android:attr/selectableItemBackground">
 
             </androidx.recyclerview.widget.RecyclerView>
+
+
 
 
 

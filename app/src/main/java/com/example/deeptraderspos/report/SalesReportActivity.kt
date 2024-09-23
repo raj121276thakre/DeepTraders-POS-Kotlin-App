@@ -1,6 +1,8 @@
 package com.example.deeptraderspos.report
 
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -22,12 +24,20 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
+
 class SalesReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySalesReportBinding
 
     private lateinit var orderDetailsAdapter: SalesReportAdapter
     private lateinit var firestore: FirebaseFirestore
-
+    private lateinit var barChart: BarChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +52,9 @@ class SalesReportActivity : AppCompatActivity() {
         // Set status bar color
         Utils.setStatusBarColor(this)
 
+        // Initialize BarChart
+        barChart = binding.barchart
+
         // Go Back Button
         val goBackBtn = binding.menuIcon
         goBackBtn.setOnClickListener {
@@ -54,12 +67,134 @@ class SalesReportActivity : AppCompatActivity() {
 
         // Get data from Firestore
         fetchData()
+        fetchAllOrdersForGraph(2024)
 
         binding.sortSalesBtn.setOnClickListener {
             showSortMenu(binding.sortSalesBtn)
         }
 
     }
+
+
+// graph
+
+
+    private fun fetchAllOrdersForGraph(year: Int) {
+        val monthlySales = mutableMapOf<String, Double>().withDefault { 0.0 }
+
+        // Fetch orders for the given year from your data source
+        getOrdersForYear(year) { orders ->
+            // Process each order to sum sales for each month
+            for (order in orders) {
+                // Extract month from orderDate string (assuming it's in "YYYY-MM-DD" format)
+                val month = order.orderDate.substring(5, 7) // Extract month (MM)
+                val salesAmount = order.totalPrice // Use totalPrice for sales amount
+                monthlySales[month] = monthlySales.getValue(month) + salesAmount
+            }
+
+            // Call setupBarChart with the aggregated monthly sales data
+            setupBarChart(monthlySales, year)
+        }
+    }
+
+    // Function to fetch orders from Firestore for the specified year
+    private fun getOrdersForYear(year: Int, callback: (List<Order>) -> Unit) {
+        val ordersList = mutableListOf<Order>()
+        val firestore = FirebaseFirestore.getInstance()
+
+        // Adjust the query to filter by year using whereGreaterThanOrEqualTo and whereLessThan
+        val startDate = "$year-01-01"
+        val endDate = "$year-12-31"
+
+        // Assuming you have an "orders" collection in Firestore
+        firestore.collection("AllOrders")
+            .whereGreaterThanOrEqualTo("orderDate", startDate)
+            .whereLessThanOrEqualTo("orderDate", endDate)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val orderId = document.getString("orderId") ?: ""
+                    val orderDate = document.getString("orderDate") ?: ""
+                    val orderTime = document.getString("orderTime") ?: ""
+                    val orderType = document.getString("orderType") ?: ""
+                    val orderStatus = document.getString("orderStatus") ?: ""
+                    val paymentMethod = document.getString("paymentMethod") ?: ""
+                    val customerName = document.getString("customerName") ?: ""
+                    val supplierName = document.getString("supplierName") ?: ""
+                    val tax = document.getDouble("tax") ?: 0.0
+                    val discount = document.getString("discount") ?: ""
+                    val totalPrice = document.getDouble("totalPrice") ?: 0.0
+                    val totalPaidAmount = document.getDouble("totalPaidAmount") ?: 0.0
+                    val remainingAmount = document.getDouble("remainingAmount") ?: 0.0
+                    val remainingAmtPaidDate = document.getString("remainingAmtPaidDate") ?: ""
+                    val remainingAmtPaidTime = document.getString("remainingAmtPaidTime") ?: ""
+
+                    // Assuming products is a list of ProductOrder objects
+                    val products = document.get("products") as? List<ProductOrder> ?: emptyList()
+
+                    // Create Order object
+                    val order = Order(
+                        orderId, orderDate, orderTime, orderType, orderStatus, paymentMethod,
+                        customerName, supplierName, tax, discount, products, totalPrice,
+                        totalPaidAmount, remainingAmount, remainingAmtPaidDate, remainingAmtPaidTime
+                    )
+                    ordersList.add(order)
+                }
+                // Invoke the callback with the fetched orders
+                callback(ordersList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore Error", "Error getting documents: ", exception)
+                // Invoke the callback with an empty list in case of error
+                callback(emptyList())
+            }
+    }
+
+    // Setup Bar Chart function remains unchanged
+    private fun setupBarChart(monthlySales: Map<String, Double>, year: Int) {
+        val barEntries = ArrayList<BarEntry>()
+
+        for (i in 1..12) {
+            val monthKey = i.toString().padStart(2, '0')
+            val sales = monthlySales[monthKey] ?: 0.0
+            barEntries.add(BarEntry(i.toFloat(), sales.toFloat()))
+        }
+
+        val monthList = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        binding.barchart.xAxis.valueFormatter = IndexAxisValueFormatter(monthList)
+        binding.barchart.xAxis.setCenterAxisLabels(true)
+        binding.barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        binding.barchart.xAxis.granularity = 1f
+        binding.barchart.xAxis.isGranularityEnabled = true
+        binding.barchart.xAxis.labelCount = 12
+
+        val dataSet = BarDataSet(barEntries, "Monthly Sales Report for $year")
+        dataSet.color = ColorTemplate.LIBERTY_COLORS[0]
+        val barData = BarData(dataSet)
+        barData.barWidth = 0.9f
+
+        binding.barchart.data = barData
+        binding.barchart.setScaleEnabled(false)
+
+        binding.barchart.notifyDataSetChanged()
+        binding.barchart.invalidate()
+    }
+
+
+
+
+// graph......
+
+
+
+
+
+
+
+
+
+
+
 
     // Call this function to start the fetching process
     private fun fetchData(timeFrame: String? = null) {
@@ -167,6 +302,10 @@ class SalesReportActivity : AppCompatActivity() {
             query // No filtering
         }
 
+        // Create a map to store sales data by month
+        val monthlySales = mutableMapOf<String, Double>()
+
+
         // firestore.collection("AllOrders")
         orderQuery.get()
             .addOnSuccessListener { documents ->
@@ -228,6 +367,7 @@ class SalesReportActivity : AppCompatActivity() {
                                 ?: ""
                         )
 
+
                         // Add all products to the main list
                         allProductOrders.addAll(productsList)
                         allOrders.add(order)
@@ -266,10 +406,17 @@ class SalesReportActivity : AppCompatActivity() {
                         for (productOrder in productsList) {
                             totalQuantityOfProducts += productOrder.quantity // Add quantity of each product
                         }
+
+
+
                     }
+                    // After fetching all orders, set up the chart
+
 
                     // Now you have all totals calculated
-                    setupAdapter(allProductOrders)
+
+                   // setupAdapter(allProductOrders)
+
                     displayTotals(
                         subTotalSales,
                         totalTax,
@@ -281,6 +428,8 @@ class SalesReportActivity : AppCompatActivity() {
                         totalQuantityOfProducts
                     )
                 }
+
+
             }
             .addOnFailureListener {
                 Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
