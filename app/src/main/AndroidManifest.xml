@@ -25,9 +25,6 @@
             android:name=".report.SalesReportActivity"
             android:exported="false" />
         <activity
-            android:name=".report.GraphReportActivity"
-            android:exported="false" />
-        <activity
             android:name=".report.expensesReport.ExpenseReportActivity"
             android:exported="false" />
         <activity
@@ -40,7 +37,7 @@
             android:name=".orders.supplierOrders.OrdersSupplierActivity"
             android:exported="false" />
         <activity
-            android:name=".orders.OrderDetailsActivity"
+            android:name=".orders.orderDetails.OrderDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".pos.ProductCart"

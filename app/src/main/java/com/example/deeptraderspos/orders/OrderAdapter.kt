@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.deeptraderspos.Constants
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.models.Order
+import com.example.deeptraderspos.orders.orderDetails.OrderDetailsActivity
 import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype
 import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore

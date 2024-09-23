@@ -44,7 +44,7 @@ class ReportActivity : AppCompatActivity() {
 
         setCardClickListener(binding.cardSalesReport, SalesReportActivity::class.java)
         setCardClickListener(binding.cardExpenseReport, ExpenseReportActivity::class.java)
-        setCardClickListener(binding.cardGraphReport, GraphReportActivity::class.java)
+      //  setCardClickListener(binding.cardGraphReport, GraphReportActivity::class.java)
         setCardClickListener(binding.cardExpenseGraph, ExpenseGraphActivity::class.java)
 
     }

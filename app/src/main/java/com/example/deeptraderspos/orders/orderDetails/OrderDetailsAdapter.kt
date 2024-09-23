@@ -1,4 +1,4 @@
-package com.example.deeptraderspos.orders
+package com.example.deeptraderspos.orders.orderDetails
 
 import android.content.Context
 import android.view.LayoutInflater
