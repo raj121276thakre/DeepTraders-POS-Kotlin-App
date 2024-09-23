@@ -17,10 +17,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddProductBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Product
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddProductActivity : AppCompatActivity() {
+class AddProductActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddProductBinding
 
     private var product: Product? = null

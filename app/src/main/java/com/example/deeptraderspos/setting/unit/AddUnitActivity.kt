@@ -9,10 +9,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddUnitBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Units
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddUnitActivity : AppCompatActivity() {
+class AddUnitActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddUnitBinding
 
     private lateinit var db: FirebaseFirestore

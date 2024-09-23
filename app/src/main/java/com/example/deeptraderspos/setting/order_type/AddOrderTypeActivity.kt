@@ -9,10 +9,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddOrderTypeBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.OrderType
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddOrderTypeActivity : AppCompatActivity() {
+class AddOrderTypeActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddOrderTypeBinding
 
     private lateinit var db: FirebaseFirestore

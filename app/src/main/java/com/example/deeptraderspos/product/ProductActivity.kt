@@ -14,10 +14,11 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseBinding
 import com.example.deeptraderspos.databinding.ActivityProductBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Product
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ProductActivity : AppCompatActivity() {
+class ProductActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityProductBinding
     private lateinit var firestore: FirebaseFirestore
     private lateinit var productAdapter: ProductAdapter

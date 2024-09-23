@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseGraphBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarData
@@ -20,7 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ExpenseGraphActivity : AppCompatActivity() {
+class ExpenseGraphActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityExpenseGraphBinding
     private lateinit var db: FirebaseFirestore
 

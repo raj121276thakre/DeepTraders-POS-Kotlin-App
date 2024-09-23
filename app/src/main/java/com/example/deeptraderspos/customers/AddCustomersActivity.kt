@@ -10,11 +10,12 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddCustomersBinding
 import com.example.deeptraderspos.databinding.ActivityCustomersBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Customer
 import com.example.deeptraderspos.models.Supplier
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddCustomersActivity : AppCompatActivity() {
+class AddCustomersActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddCustomersBinding
 
     private var customer: Customer? = null

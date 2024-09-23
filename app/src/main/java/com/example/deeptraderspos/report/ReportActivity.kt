@@ -11,6 +11,7 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityReportBinding
 import com.example.deeptraderspos.databinding.ActivitySettingsBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivity
 import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivityDaily
 import com.example.deeptraderspos.report.expensesReport.ExpenseGraphActivityYearly
@@ -20,7 +21,7 @@ import com.example.deeptraderspos.setting.payment_method.PaymentMethodActivity
 import com.example.deeptraderspos.setting.shop.ShopInformationActivity
 import com.example.deeptraderspos.setting.unit.UnitActivity
 
-class ReportActivity : AppCompatActivity() {
+class ReportActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityReportBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

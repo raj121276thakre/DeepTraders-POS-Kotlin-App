@@ -16,6 +16,7 @@ import com.example.deeptraderspos.Constants
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrderDetailsBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.ShopInformation
@@ -34,7 +35,7 @@ import com.itextpdf.layout.property.UnitValue
 import java.io.File
 import java.text.DecimalFormat
 
-class OrderDetailsActivity : AppCompatActivity() {
+class OrderDetailsActivity : InternetCheckActivity() {
 
     private lateinit var binding: ActivityOrderDetailsBinding
     private lateinit var orderDetailsAdapter: OrderDetailsAdapter

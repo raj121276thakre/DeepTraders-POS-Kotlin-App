@@ -9,10 +9,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddSuppliersBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Supplier
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddSuppliersActivity : AppCompatActivity() {
+class AddSuppliersActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddSuppliersBinding
 
     private var supplier: Supplier? = null

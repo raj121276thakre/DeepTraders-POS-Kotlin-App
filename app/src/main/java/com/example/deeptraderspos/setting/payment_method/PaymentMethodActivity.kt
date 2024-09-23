@@ -13,10 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityPaymentMethodBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.PaymentMethod
 import com.google.firebase.firestore.FirebaseFirestore
 
-class PaymentMethodActivity : AppCompatActivity() {
+class PaymentMethodActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityPaymentMethodBinding
 
     private lateinit var firestore: FirebaseFirestore

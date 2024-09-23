@@ -16,11 +16,12 @@ import com.example.deeptraderspos.databinding.ActivityCategoriesBinding
 import com.example.deeptraderspos.databinding.ActivityExpenseBinding
 import com.example.deeptraderspos.expense.AddExpenseActivity
 import com.example.deeptraderspos.expense.ExpenseAdapter
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Category
 import com.example.deeptraderspos.models.Expense
 import com.google.firebase.firestore.FirebaseFirestore
 
-class CategoriesActivity : AppCompatActivity() {
+class CategoriesActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityCategoriesBinding
 
     private lateinit var firestore: FirebaseFirestore

@@ -18,6 +18,7 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.SalesReportAdapter
 import com.example.deeptraderspos.databinding.ActivitySalesReportBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
@@ -35,7 +36,7 @@ import java.util.Date
 import java.util.Locale
 
 
-class SalesReportActivity : AppCompatActivity() {
+class SalesReportActivity : InternetCheckActivity() {
     private lateinit var binding: ActivitySalesReportBinding
 
     private lateinit var orderDetailsAdapter: SalesReportAdapter

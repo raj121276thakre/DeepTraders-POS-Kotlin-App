@@ -10,10 +10,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrdersMainBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.orders.supplierOrders.OrdersSupplierActivity
 
-class OrdersMainActivity : AppCompatActivity() {
+class OrdersMainActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityOrdersMainBinding
 
 

@@ -10,13 +10,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivitySettingsBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.setting.categories.CategoriesActivity
 import com.example.deeptraderspos.setting.order_type.OrderTypeActivity
 import com.example.deeptraderspos.setting.payment_method.PaymentMethodActivity
 import com.example.deeptraderspos.setting.shop.ShopInformationActivity
 import com.example.deeptraderspos.setting.unit.UnitActivity
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : InternetCheckActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
 

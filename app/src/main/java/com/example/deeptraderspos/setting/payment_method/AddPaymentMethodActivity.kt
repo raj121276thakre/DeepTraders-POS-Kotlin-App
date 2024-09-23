@@ -9,10 +9,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddPaymentMethodBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.PaymentMethod
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddPaymentMethodActivity : AppCompatActivity() {
+class AddPaymentMethodActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddPaymentMethodBinding
     private lateinit var db: FirebaseFirestore
 

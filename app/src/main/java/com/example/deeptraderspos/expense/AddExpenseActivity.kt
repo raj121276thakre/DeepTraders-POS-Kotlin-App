@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityAddExpenseBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -18,7 +19,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class AddExpenseActivity : AppCompatActivity() {
+class AddExpenseActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityAddExpenseBinding
 
     private var expense: Expense? = null

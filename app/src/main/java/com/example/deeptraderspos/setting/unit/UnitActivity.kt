@@ -13,10 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityUnitBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Units
 import com.google.firebase.firestore.FirebaseFirestore
 
-class UnitActivity : AppCompatActivity() {
+class UnitActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityUnitBinding
 
     private lateinit var firestore: FirebaseFirestore

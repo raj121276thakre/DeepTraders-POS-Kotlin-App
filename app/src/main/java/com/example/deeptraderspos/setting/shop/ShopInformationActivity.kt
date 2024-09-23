@@ -18,9 +18,10 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityShopInformationBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ShopInformationActivity : AppCompatActivity() {
+class ShopInformationActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityShopInformationBinding
 
     private val currencyList = listOf("USD", "EUR", "GBP", "INR", "JPY", "AUD") // Add more currencies as needed

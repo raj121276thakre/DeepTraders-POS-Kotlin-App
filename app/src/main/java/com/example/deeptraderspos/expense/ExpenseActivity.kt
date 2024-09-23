@@ -13,10 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ExpenseActivity : AppCompatActivity() {
+class ExpenseActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityExpenseBinding
 
     private lateinit var firestore: FirebaseFirestore

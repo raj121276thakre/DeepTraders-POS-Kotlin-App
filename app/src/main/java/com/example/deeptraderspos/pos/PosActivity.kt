@@ -20,6 +20,7 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.PosProductAdapter
 import com.example.deeptraderspos.adapter.ProductCategoryAdapter
 import com.example.deeptraderspos.databinding.ActivityPosBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.CartItem
 import com.example.deeptraderspos.models.Category
 import com.example.deeptraderspos.models.Product
@@ -29,7 +30,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
-class PosActivity : AppCompatActivity() {
+class PosActivity : InternetCheckActivity() {
 
     private lateinit var binding: ActivityPosBinding
     private lateinit var productAdapter: PosProductAdapter

@@ -22,6 +22,7 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.CartAdapter
 import com.example.deeptraderspos.databinding.ActivityProductCartBinding
 import com.example.deeptraderspos.databinding.DialogPaymentBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.CartItem
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ProductCart : AppCompatActivity() {
+class ProductCart : InternetCheckActivity() {
 
     private lateinit var binding: ActivityProductCartBinding
 
