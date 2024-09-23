@@ -9,13 +9,13 @@
     <color name="statusBarColor">#06B3E4</color>
 
     <color name="activityBackgroundColor">#f7f7f7</color>
+    <color name="grayText">#EAE8E8</color>
+    <color name="grayText2">#6A6767</color>
 
     <color name="textColorPrimaryDark">#757575</color>
     <color name="textColorSecondaryLight">#666666</color>
 
     <color name="windowBackground">#eeeeee</color>
-
-
 
     <color name="grey_5">#f2f2f2</color>
     <color name="grey_60">#666666</color>

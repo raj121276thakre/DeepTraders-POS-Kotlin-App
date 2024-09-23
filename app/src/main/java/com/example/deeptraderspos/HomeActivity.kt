@@ -1,8 +1,13 @@
 package com.example.deeptraderspos
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -43,8 +48,25 @@ class HomeActivity : AppCompatActivity() {
         setCardClickListener(binding.cardExpense, ExpenseActivity::class.java)
         setCardClickListener(binding.cardSettings, SettingsActivity::class.java)
 
+        // Menu icon click listener to show scheduled messages
+        binding.aboutApp.setOnClickListener {
+            showAboutDialog()
+        }
 
+    }
 
+    private fun showAboutDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE) // before
+        dialog.setContentView(R.layout.dialog_about_app)
+        dialog.setCancelable(true)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window!!.attributes)
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog.show()
+        dialog.window!!.attributes = lp
     }
 
 

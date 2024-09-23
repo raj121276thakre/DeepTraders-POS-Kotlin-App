@@ -315,6 +315,7 @@
     <string name="select_date">Select Date</string>
     <string name="daily_expense_graph">Daily Expenses Graph</string>
     <string name="yearly_expense_graph">Yearly Expenses Graph</string>
+    <string name="about_app_text" />
 
 
 </resources>
