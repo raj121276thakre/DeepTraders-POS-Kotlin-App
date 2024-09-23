@@ -35,11 +35,11 @@ class ReportActivity : AppCompatActivity() {
         // Set status bar color
         Utils.setStatusBarColor(this)
 
-//        // Go Back Button
-//        val goBackBtn = binding.menuIcon
-//        goBackBtn.setOnClickListener {
-//            onBackPressed()  // This will take you back to the previous activity
-//        }
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
 
 
         setCardClickListener(binding.cardSalesReport, SalesReportActivity::class.java)
