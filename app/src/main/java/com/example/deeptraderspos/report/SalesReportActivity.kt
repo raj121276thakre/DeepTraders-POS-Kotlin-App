@@ -4,7 +4,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,19 +21,19 @@ import com.example.deeptraderspos.databinding.ActivitySalesReportBinding
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 
 class SalesReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySalesReportBinding
@@ -38,6 +41,7 @@ class SalesReportActivity : AppCompatActivity() {
     private lateinit var orderDetailsAdapter: SalesReportAdapter
     private lateinit var firestore: FirebaseFirestore
     private lateinit var barChart: BarChart
+    private var mYear: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +68,16 @@ class SalesReportActivity : AppCompatActivity() {
 
         // Set up views
         setupViews()
+        chooseYearOnly()
+
+        val currentYear = SimpleDateFormat("yyyy", Locale.ENGLISH).format(Date())
+        binding.txtSelectYear.setText(getString(R.string.year) + " " + currentYear)
+
+        mYear = currentYear.toInt()
 
         // Get data from Firestore
         fetchData()
-        fetchAllOrdersForGraph(2024)
+        fetchAllOrdersForGraph(mYear)
 
         binding.sortSalesBtn.setOnClickListener {
             showSortMenu(binding.sortSalesBtn)
@@ -76,8 +86,48 @@ class SalesReportActivity : AppCompatActivity() {
     }
 
 
-// graph
+    private fun chooseYearOnly() {
+        findViewById<TextView>(R.id.txt_select_year).setOnClickListener {
+            val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+            val yearsList = (2000..currentYear).toList().reversed()
 
+            val builder = MaterialAlertDialogBuilder(this@SalesReportActivity)
+            builder.setTitle(getString(R.string.select_year))
+
+            val yearsArray = yearsList.map { it.toString() }
+
+            // Use custom adapter to style the list items
+            val adapter =
+                object : ArrayAdapter<String>(this, R.layout.dialog_list_item, yearsArray) {
+                    override fun getView(
+                        position: Int,
+                        convertView: View?,
+                        parent: ViewGroup
+                    ): View {
+                        val view = super.getView(position, convertView, parent)
+                        val textView = view.findViewById<TextView>(R.id.textItem)
+                        textView.text = yearsArray[position]
+                        return view
+                    }
+                }
+
+            builder.setAdapter(adapter) { _, which ->
+                val selectedYear = yearsList[which]
+                binding.txtSelectYear.text = getString(R.string.year) + " " + selectedYear
+                mYear = selectedYear
+                fetchAllOrdersForGraph(mYear)
+            }
+
+            builder.setPositiveButton(android.R.string.ok, null)
+            builder.setNegativeButton(android.R.string.cancel, null)
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+    }
+
+
+// graph
 
     private fun fetchAllOrdersForGraph(year: Int) {
         val monthlySales = mutableMapOf<String, Double>().withDefault { 0.0 }
@@ -160,7 +210,20 @@ class SalesReportActivity : AppCompatActivity() {
             barEntries.add(BarEntry(i.toFloat(), sales.toFloat()))
         }
 
-        val monthList = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        val monthList = arrayOf(
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        )
         binding.barchart.xAxis.valueFormatter = IndexAxisValueFormatter(monthList)
         binding.barchart.xAxis.setCenterAxisLabels(true)
         binding.barchart.xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -169,7 +232,23 @@ class SalesReportActivity : AppCompatActivity() {
         binding.barchart.xAxis.labelCount = 12
 
         val dataSet = BarDataSet(barEntries, "Monthly Sales Report for $year")
-        dataSet.color = ColorTemplate.LIBERTY_COLORS[0]
+        //  dataSet.color = ColorTemplate.LIBERTY_COLORS[0]
+        //  dataSet.color = Color.RED
+        dataSet.colors = listOf(
+            Color.RED,
+            Color.BLUE,
+            Color.GREEN,
+            Color.YELLOW,
+            Color.MAGENTA,
+            Color.CYAN,
+            Color.LTGRAY,
+            Color.rgb(255, 165, 0),
+            Color.rgb(128, 0, 128),
+            Color.rgb(255, 20, 147),
+            Color.rgb(0, 128, 128),
+            Color.RED
+        ) // Set an array of colors
+
         val barData = BarData(dataSet)
         barData.barWidth = 0.9f
 
@@ -181,19 +260,7 @@ class SalesReportActivity : AppCompatActivity() {
     }
 
 
-
-
 // graph......
-
-
-
-
-
-
-
-
-
-
 
 
     // Call this function to start the fetching process
@@ -259,7 +326,10 @@ class SalesReportActivity : AppCompatActivity() {
                     set(Calendar.SECOND, 0)
                 }.time)
 
-                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                calendar.set(
+                    Calendar.DAY_OF_MONTH,
+                    calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                )
                 endDate = dateFormat.format(calendar.apply {
                     set(Calendar.HOUR_OF_DAY, 23)
                     set(Calendar.MINUTE, 59)
@@ -408,14 +478,13 @@ class SalesReportActivity : AppCompatActivity() {
                         }
 
 
-
                     }
                     // After fetching all orders, set up the chart
 
 
                     // Now you have all totals calculated
 
-                   // setupAdapter(allProductOrders)
+                    // setupAdapter(allProductOrders)
 
                     displayTotals(
                         subTotalSales,
@@ -450,8 +519,9 @@ class SalesReportActivity : AppCompatActivity() {
     ) {
 
 
-        binding.txtTotalOrders.text = getString(R.string.total_orders) + " "  + totalOrders
-        binding.txtTotalProducts.text = getString(R.string.total_products_qty) + " "  + totalProductsSold
+        binding.txtTotalOrders.text = getString(R.string.total_orders) + " " + totalOrders
+        binding.txtTotalProducts.text =
+            getString(R.string.total_products_qty) + " " + totalProductsSold
 
         // Update your UI with the calculated totals
         // Example:
@@ -466,23 +536,25 @@ class SalesReportActivity : AppCompatActivity() {
 
         // Check if totalProfit is greater than 0
         if (totalProfit > 0) {
-            binding.txtProfit.text = getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
+            binding.txtProfit.text =
+                getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
             // Set background color to green or any desired color for profit
             binding.txtProfit.setBackgroundColor(getColor(R.color.green))
         } else {
-            binding.txtProfit.text = getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit
+            binding.txtProfit.text =
+                getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit
             // Set background color to red for loss
             binding.txtProfit.setBackgroundColor(getColor(R.color.red))
         }
 
 // Check if totalLoss is greater than 0
         if (totalLoss.toInt() > 0) {
-            binding.txtRemaining.text = getString(R.string.remaining) + " " + getString(R.string.currency_symbol) + totalLoss
+            binding.txtRemaining.text =
+                getString(R.string.remaining) + " " + getString(R.string.currency_symbol) + totalLoss
         } else {
             // If totalLoss is 0, null, or empty, hide the text view
             binding.txtRemaining.visibility = View.GONE
         }
-
 
 
     }
