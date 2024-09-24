@@ -41,10 +41,12 @@ class AddOrderTypeActivity : InternetCheckActivity() {
 
     private fun saveOrderTypeData() {
         // Collect order type data from the input field
+        showProgressBar("Saving Order Type...")
         val orderTypeName = binding.etxtOrderTypeName.text.toString().trim()
 
         // Validation check
         if (orderTypeName.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in the order type name", Toast.LENGTH_SHORT).show()
             return
         }
@@ -58,6 +60,7 @@ class AddOrderTypeActivity : InternetCheckActivity() {
         db.collection("AllOrderTypes")
             .add(orderType)
             .addOnSuccessListener { documentReference ->
+                hideProgressBar()
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -76,6 +79,7 @@ class AddOrderTypeActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add order type: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

@@ -39,11 +39,13 @@ class AddPaymentMethodActivity : InternetCheckActivity() {
     }
 
     private fun savePaymentMethodData() {
+        showProgressBar("Saving Payment Information...")
         // Collect payment method data from the input field
         val methodName = binding.etxtPaymentMethodName.text.toString().trim()
 
         // Validation check
         if (methodName.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in the payment method name", Toast.LENGTH_SHORT).show()
             return
         }
@@ -57,6 +59,7 @@ class AddPaymentMethodActivity : InternetCheckActivity() {
         db.collection("AllPaymentMethods")
             .add(paymentMethod)
             .addOnSuccessListener { documentReference ->
+                hideProgressBar()
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -83,6 +86,7 @@ class AddPaymentMethodActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add payment method: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

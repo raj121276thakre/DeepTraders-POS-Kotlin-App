@@ -40,11 +40,13 @@ class AddUnitActivity : InternetCheckActivity() {
     }
 
     private fun saveUnitData() {
+        showProgressBar("Saving Units...")
         // Collect unit data from the input field
         val unitName = binding.etxtUnitName.text.toString().trim()
 
         // Validation check
         if (unitName.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in the unit name", Toast.LENGTH_SHORT).show()
             return
         }
@@ -58,6 +60,7 @@ class AddUnitActivity : InternetCheckActivity() {
         db.collection("AllUnits")
             .add(unit)
             .addOnSuccessListener { documentReference ->
+                hideProgressBar()
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -76,6 +79,7 @@ class AddUnitActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add Unit: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

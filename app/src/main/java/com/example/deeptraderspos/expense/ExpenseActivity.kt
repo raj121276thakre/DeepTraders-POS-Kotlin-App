@@ -110,9 +110,11 @@ class ExpenseActivity : InternetCheckActivity() {
     }
 
     private fun fetchExpensesFromFirebase() {
+        showProgressBar("Loading Expense information...")
         firestore.collection("AllExpenses")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 expensesList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val expense = document.toObject(Expense::class.java)
@@ -121,6 +123,7 @@ class ExpenseActivity : InternetCheckActivity() {
                 expenseAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
     }

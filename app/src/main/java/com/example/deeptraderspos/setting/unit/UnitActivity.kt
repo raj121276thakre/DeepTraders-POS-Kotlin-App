@@ -103,9 +103,11 @@ class UnitActivity : InternetCheckActivity() {
     }
 
     private fun fetchUnitsFromFirebase() {
+        showProgressBar("Loading Units...")
         firestore.collection("AllUnits")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 unitList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val unit = document.toObject(Units::class.java)
@@ -114,6 +116,7 @@ class UnitActivity : InternetCheckActivity() {
                 unitAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
     }

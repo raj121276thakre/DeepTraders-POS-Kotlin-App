@@ -47,10 +47,12 @@ class AddCategoryActivity : InternetCheckActivity() {
 
     private fun saveCategoryData() {
         // Collect category data from the input field
+        showProgressBar("Saving Category...")
         val categoryName = binding.etxtCategoryName.text.toString().trim()
 
         // Validation check
         if (categoryName.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in the category name", Toast.LENGTH_SHORT).show()
             return
         }
@@ -64,6 +66,7 @@ class AddCategoryActivity : InternetCheckActivity() {
         db.collection("AllCategories")
             .add(category)
             .addOnSuccessListener { documentReference ->
+                hideProgressBar()
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -90,6 +93,7 @@ class AddCategoryActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add Category: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

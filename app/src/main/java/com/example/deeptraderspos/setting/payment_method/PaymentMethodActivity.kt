@@ -102,9 +102,11 @@ class PaymentMethodActivity : InternetCheckActivity() {
     }
 
     private fun fetchPaymentMethodsFromFirebase() {
+        showProgressBar("Loading Payment methods...")
         firestore.collection("AllPaymentMethods")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 paymentMethodList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val paymentMethod = document.toObject(PaymentMethod::class.java)
@@ -113,6 +115,7 @@ class PaymentMethodActivity : InternetCheckActivity() {
                 paymentMethodAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
     }

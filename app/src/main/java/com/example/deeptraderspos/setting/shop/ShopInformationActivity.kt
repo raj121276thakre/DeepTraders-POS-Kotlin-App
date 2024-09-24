@@ -127,9 +127,11 @@ class ShopInformationActivity : InternetCheckActivity() {
 
     // Fetch shop info from Firestore and display it in the UI
     private fun fetchShopInfo() {
+        showProgressBar("Loading Shop Information...")
         firestore.collection("shops").document("shopInfo")
             .get()
             .addOnSuccessListener { document ->
+                hideProgressBar()
                 if (document != null) {
                     binding.etxtShopName.setText(document.getString("shopName"))
                     binding.etxtShopContact.setText(document.getString("shopContact"))
@@ -140,6 +142,7 @@ class ShopInformationActivity : InternetCheckActivity() {
                 }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 // Handle failure, show error message
                 Toast.makeText(
                     this,
@@ -151,6 +154,7 @@ class ShopInformationActivity : InternetCheckActivity() {
 
     // Update shop info in Firestore
     private fun updateShopInfo() {
+        showProgressBar("Saving Shop Information...")
         val shopInfo = hashMapOf(
             "shopName" to binding.etxtShopName.text.toString(),
             "shopContact" to binding.etxtShopContact.text.toString(),
@@ -163,6 +167,7 @@ class ShopInformationActivity : InternetCheckActivity() {
         firestore.collection("shops").document("shopInfo")
             .set(shopInfo)
             .addOnSuccessListener {
+                hideProgressBar()
                 Toast.makeText(
                     this,
                     "Shop Information Updated successfully",
@@ -171,6 +176,7 @@ class ShopInformationActivity : InternetCheckActivity() {
                 finish() // Close the activity after successful save
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 // Handle failure, show error message
                 Toast.makeText(
                     this,

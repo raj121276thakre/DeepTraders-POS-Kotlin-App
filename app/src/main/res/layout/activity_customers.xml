@@ -51,43 +51,62 @@
             android:contentDescription="Notifications" />
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_below="@id/toolbar"
-        android:layout_margin="16dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/etxt_supplier_search"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/round_border"
-            android:drawableRight="@drawable/ic_search"
-            android:ems="10"
-            android:fontFamily="@font/sailec_regular"
-            android:hint="@string/search_here"
-            android:inputType="textPersonName"
-            android:padding="10dp" />
+            android:orientation="vertical"
+            >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/customers_recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="?android:attr/selectableItemBackground"
-            tools:itemCount="4"
-            tools:listitem="@layout/customer_item">
+            <LinearLayout
+                android:layout_below="@id/toolbar"
+                android:layout_margin="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        </androidx.recyclerview.widget.RecyclerView>
+                <EditText
+                    android:id="@+id/etxt_supplier_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_border"
+                    android:drawableRight="@drawable/ic_search"
+                    android:ems="10"
+                    android:fontFamily="@font/sailec_regular"
+                    android:hint="@string/search_here"
+                    android:inputType="textPersonName"
+                    android:padding="10dp" />
 
-        <ImageView
-            android:id="@+id/image_no_product"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="50dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/customers_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
 
-    </LinearLayout>
+                    android:background="?android:attr/selectableItemBackground"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/customer_item">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <ImageView
+                    android:id="@+id/image_no_product"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginBottom="100dp"
+                    android:layout_marginTop="50dp" />
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"

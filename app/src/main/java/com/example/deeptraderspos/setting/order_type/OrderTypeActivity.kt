@@ -102,9 +102,11 @@ class OrderTypeActivity : InternetCheckActivity() {
     }
 
     private fun fetchOrderTypesFromFirebase() {
+        showProgressBar("Loading Order Types...")
         firestore.collection("AllOrderTypes")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 orderTypeList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val orderType = document.toObject(OrderType::class.java)
@@ -113,6 +115,7 @@ class OrderTypeActivity : InternetCheckActivity() {
                 orderTypeAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
     }

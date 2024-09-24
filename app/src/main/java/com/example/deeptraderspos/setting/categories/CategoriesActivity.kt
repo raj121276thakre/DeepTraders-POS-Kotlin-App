@@ -109,9 +109,11 @@ class CategoriesActivity : InternetCheckActivity() {
     }
 
     private fun fetchCategoriesFromFirebase() {
+        showProgressBar("Loading Categories...")
         firestore.collection("AllCategories")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 categoryList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val category = document.toObject(Category::class.java)
@@ -120,6 +122,7 @@ class CategoriesActivity : InternetCheckActivity() {
                 categoryAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
     }
