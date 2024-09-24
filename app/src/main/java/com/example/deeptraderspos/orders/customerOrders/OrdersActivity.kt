@@ -188,9 +188,11 @@ class OrdersActivity : InternetCheckActivity() {
 
     // Fetch orders from Firestore and update the adapter
     private fun fetchOrders() {
+        showProgressBar("Fetching orders information...")
         firestore.collection("AllOrders")
             .get()
             .addOnSuccessListener { documents ->
+                hideProgressBar()
                 val fetchedOrders = mutableListOf<Order>()
                 for (document in documents) {
                     val order =
@@ -202,6 +204,7 @@ class OrdersActivity : InternetCheckActivity() {
                 updateAdapter(fetchedOrders) // Update the adapter with the new data
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
             }

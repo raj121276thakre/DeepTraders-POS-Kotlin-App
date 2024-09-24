@@ -19,12 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrdersSupplierBinding
+import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.orders.OrderAdapter
 import com.example.deeptraderspos.pos.PosActivity
 import com.google.firebase.firestore.FirebaseFirestore
 
-class OrdersSupplierActivity : AppCompatActivity() {
+class OrdersSupplierActivity : InternetCheckActivity() {
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var orderAdapter: OrderAdapter
@@ -167,9 +168,11 @@ class OrdersSupplierActivity : AppCompatActivity() {
 
     // Fetch orders from Firestore and update the adapter
     private fun fetchOrders() {
+        showProgressBar("fetching Orders information...")
         firestore.collection("AllOrdersSuppliers")
             .get()
             .addOnSuccessListener { documents ->
+                hideProgressBar()
                 val fetchedOrders = mutableListOf<Order>()
                 for (document in documents) {
                     val order = document.toObject(Order::class.java) // Convert Firestore document to Order object
@@ -180,6 +183,7 @@ class OrdersSupplierActivity : AppCompatActivity() {
                 updateAdapter(fetchedOrders) // Update the adapter with the new data
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

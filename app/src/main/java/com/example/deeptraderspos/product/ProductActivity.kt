@@ -116,9 +116,11 @@ class ProductActivity : InternetCheckActivity() {
     }
 
     private fun fetchProductsFromFirebase() {
+        showProgressBar("Fetching Products information...")
         firestore.collection("AllProducts")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 productsList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val product = document.toObject(Product::class.java)
@@ -127,6 +129,7 @@ class ProductActivity : InternetCheckActivity() {
                 productAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 Toast.makeText(this, "Error fetching products: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }

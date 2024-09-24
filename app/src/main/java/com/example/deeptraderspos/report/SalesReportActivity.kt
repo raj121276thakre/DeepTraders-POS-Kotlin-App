@@ -291,6 +291,8 @@ class SalesReportActivity : InternetCheckActivity() {
 
     private fun fetchAllOrdersData(productMap: Map<String, Product>, timeFrame: String?) {
 
+        showProgressBar("fetching sales information...")
+
         val query = firestore.collection("AllOrders")
 
         // Apply filters based on the time frame
@@ -380,6 +382,7 @@ class SalesReportActivity : InternetCheckActivity() {
         // firestore.collection("AllOrders")
         orderQuery.get()
             .addOnSuccessListener { documents ->
+                hideProgressBar()
                 if (documents.isEmpty) {
                     showNoData()
                 } else {
@@ -502,6 +505,7 @@ class SalesReportActivity : InternetCheckActivity() {
 
             }
             .addOnFailureListener {
+                hideProgressBar()
                 Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
                 showNoData()
             }

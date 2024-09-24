@@ -69,6 +69,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
 
 
     private fun saveSupplierData() {
+        showProgressBar("Saving Supplier information...")
         // Collect supplier data from input fields
         val supplierName = binding.etxtSupplierName.text.toString().trim()
         val supplierPhone = binding.etxtSupplierCell.text.toString().trim()
@@ -77,6 +78,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
 
         // Validation check
         if (supplierName.isEmpty() || supplierPhone.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -86,6 +88,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
             .whereEqualTo("supplierPhone", supplierPhone)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                hideProgressBar()
                 if (!querySnapshot.isEmpty) {
                     // Supplier with the same phone number already exists
                     Toast.makeText(this, "Supplier with this phone number already exists.", Toast.LENGTH_SHORT).show()
@@ -130,6 +133,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
                 }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Error checking for existing supplier: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
@@ -205,7 +209,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
 
     private fun updateSupplier() {
         // Collect supplier data from input fields
-
+        showProgressBar("Updating Supplier information...")
 
         val supplierName = binding.etxtSupplierName.text.toString().trim()
         val supplierPhone = binding.etxtSupplierCell.text.toString().trim()
@@ -214,6 +218,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
 
         // Validation check
         if (supplierName.isEmpty() || supplierPhone.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -233,10 +238,12 @@ class AddSuppliersActivity : InternetCheckActivity() {
                     .document(it1)  // Use the existing supplier ID
                     .set(updatedSupplier)
                     .addOnSuccessListener {
+                        hideProgressBar()
                         Toast.makeText(this, "Supplier updated successfully", Toast.LENGTH_SHORT).show()
                         finish() // Close the activity after successful update
                     }
                     .addOnFailureListener { e ->
+                        hideProgressBar()
                         Toast.makeText(this, "Failed to update supplier: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }

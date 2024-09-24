@@ -106,8 +106,10 @@ class PosActivity : InternetCheckActivity() {
     }
 
     private fun loadProducts() {
+        showProgressBar("Loading products...")
         firestore.collection("AllProducts").get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 productsList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val product = document.toObject(Product::class.java)
@@ -137,6 +139,7 @@ class PosActivity : InternetCheckActivity() {
                 productAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 Log.w("Firestore Error", "Error getting products: ", exception)
             }
     }
@@ -221,11 +224,13 @@ class PosActivity : InternetCheckActivity() {
         if (getStock <= 0) {
             Toast.makeText(this, R.string.stock_is_low_please_update_stock, Toast.LENGTH_SHORT).show()
         } else {
+            showProgressBar("Adding product to cart...")
             // Check if the product already exists in the cart
             firestore.collection("carts")
                 .whereEqualTo("productId", productId)
                 .get()
                 .addOnSuccessListener { result ->
+                    hideProgressBar()
                     if (result.isEmpty) {
                         // Product not found, safe to add
                         val cartItem = CartItem(
@@ -257,6 +262,7 @@ class PosActivity : InternetCheckActivity() {
                     }
                 }
                 .addOnFailureListener { e ->
+                    hideProgressBar()
                     Toast.makeText(this, "Error checking cart item", Toast.LENGTH_SHORT).show()
                     Log.e("Firestore", "Error checking cart item", e)
                 }

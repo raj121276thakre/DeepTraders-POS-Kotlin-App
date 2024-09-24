@@ -74,6 +74,8 @@ class AddCustomersActivity : InternetCheckActivity() {
 
     private fun saveSupplierData() {
         // Collect customer data from input fields
+        showProgressBar("Saving Customers information...")
+
         val customerName = binding.etxtCustomerName.text.toString().trim()
         val customerPhone = binding.etxtCustomerCell.text.toString().trim()
         val customerEmail = binding.etxtCustomerEmail.text.toString().trim()
@@ -81,6 +83,7 @@ class AddCustomersActivity : InternetCheckActivity() {
 
         // Validation check
         if (customerName.isEmpty() || customerPhone.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -90,6 +93,7 @@ class AddCustomersActivity : InternetCheckActivity() {
             .whereEqualTo("customerPhone", customerPhone)
             .get()
             .addOnSuccessListener { querySnapshot ->
+                hideProgressBar()
                 if (!querySnapshot.isEmpty) {
                     // Customer with the same phone number already exists
                     Toast.makeText(this, "Customer with this phone number already exists.", Toast.LENGTH_SHORT).show()
@@ -134,6 +138,7 @@ class AddCustomersActivity : InternetCheckActivity() {
                 }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Error checking for existing customer: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
@@ -206,6 +211,7 @@ class AddCustomersActivity : InternetCheckActivity() {
 
 
     private fun updateSupplier() {
+        showProgressBar("Updating Customers information...")
         // Collect supplier data from input fields
         val customerName = binding.etxtCustomerName.text.toString().trim()
         val customerPhone = binding.etxtCustomerCell.text.toString().trim()
@@ -215,6 +221,7 @@ class AddCustomersActivity : InternetCheckActivity() {
 
         // Validation check
         if (customerName.isEmpty() || customerPhone.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -236,10 +243,12 @@ class AddCustomersActivity : InternetCheckActivity() {
                     .document(it1)  // Use the existing supplier ID
                     .set(updatedCustomer)
                     .addOnSuccessListener {
+                        hideProgressBar()
                         Toast.makeText(this, "Customer updated successfully", Toast.LENGTH_SHORT).show()
                         finish() // Close the activity after successful update
                     }
                     .addOnFailureListener { e ->
+                        hideProgressBar()
                         Toast.makeText(this, "Failed to update customer: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }

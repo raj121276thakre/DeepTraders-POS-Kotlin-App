@@ -118,9 +118,12 @@ class CustomersActivity : InternetCheckActivity() {
 
     private fun fetchSuppliersFromFirebase() {
 
+        showProgressBar("Fetching Customers information...")
+
         firestore.collection("AllCustomers")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 customersList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val customer = document.toObject(Customer::class.java)
@@ -130,27 +133,33 @@ class CustomersActivity : InternetCheckActivity() {
             }
             .addOnFailureListener { exception ->
                 // Handle the error
+                hideProgressBar()
             }
 
     }
 
 
     fun deleteSupplier(customer: Customer, callback: (Boolean) -> Unit) {
+        showProgressBar("Deleting Customers information...")
         val supplierId = customer.id ?: run {
+            hideProgressBar()
             Toast.makeText(this, "Customer ID is missing", Toast.LENGTH_SHORT).show()
             callback(false)
             return
         }
+
 
         val db = FirebaseFirestore.getInstance()
 
         db.collection("AllCustomers").document(supplierId)
             .delete()
             .addOnSuccessListener {
+                hideProgressBar()
                 Toast.makeText(this, "Customer deleted successfully", Toast.LENGTH_SHORT).show()
                 callback(true)
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 e.printStackTrace()
                 Toast.makeText(this, "Failed to delete supplier: ${e.message}", Toast.LENGTH_SHORT)
                     .show()

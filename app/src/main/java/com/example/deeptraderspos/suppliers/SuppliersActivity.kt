@@ -115,10 +115,12 @@ class SuppliersActivity : InternetCheckActivity() {
     }
 
     private fun fetchSuppliersFromFirebase() {
+        showProgressBar("fetching supplier information...")
 
         firestore.collection("AllSuppliers")
             .get()
             .addOnSuccessListener { result ->
+                hideProgressBar()
                 suppliersList.clear() // Clear the list before adding new items
                 for (document in result) {
                     val supplier = document.toObject(Supplier::class.java)
@@ -127,6 +129,7 @@ class SuppliersActivity : InternetCheckActivity() {
                 supplierAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 // Handle the error
             }
 

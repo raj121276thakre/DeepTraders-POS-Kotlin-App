@@ -435,7 +435,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
             document.add(footerTable)
 
             document.close()
-            Toast.makeText(context, "Pdf Created: $filePath", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Bill Pdf Created.", Toast.LENGTH_LONG).show()
 
             openPdfPreview(this, file)
 

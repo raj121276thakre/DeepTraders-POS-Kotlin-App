@@ -90,6 +90,7 @@ class AddExpenseActivity : InternetCheckActivity() {
 
 
     private fun saveExpenseData() {
+        showProgressBar("Saving Expense information...")
         // Collect expense data from input fields
         val expenseName = binding.etxtExpenseName.text.toString().trim()
         val expenseNote = binding.etxtExpenseNote.text.toString().trim()
@@ -99,6 +100,7 @@ class AddExpenseActivity : InternetCheckActivity() {
 
         // Validation check
         if (expenseName.isEmpty() || expenseAmount == 0.0 || expenseDate.isEmpty() || expenseTime.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -116,6 +118,7 @@ class AddExpenseActivity : InternetCheckActivity() {
         db.collection("AllExpenses")
             .add(expense)
             .addOnSuccessListener { documentReference ->
+
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -126,14 +129,16 @@ class AddExpenseActivity : InternetCheckActivity() {
                 db.collection("AllExpenses").document(documentId)
                     .set(expenseWithId)
                     .addOnSuccessListener {
+                        hideProgressBar()
                         Toast.makeText(
                             this,
-                            "Expense added successfully with ID",
+                            "Expense added successfully ",
                             Toast.LENGTH_SHORT
                         ).show()
                         finish() // Close the activity after successful save
                     }
                     .addOnFailureListener { e ->
+                        hideProgressBar()
                         Toast.makeText(
                             this,
                             "Failed to update expense: ${e.message}",
@@ -142,6 +147,7 @@ class AddExpenseActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add expense: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -149,6 +155,7 @@ class AddExpenseActivity : InternetCheckActivity() {
 
     private fun updateExpense() {
         // Collect expense data from input fields
+        showProgressBar("Updating Expense information...")
         val expenseName = binding.etxtExpenseName.text.toString().trim()
         val expenseNote = binding.etxtExpenseNote.text.toString().trim()
         val expenseAmount = binding.etxtExpenseAmount.text.toString().toDoubleOrNull() ?: 0.0
@@ -157,6 +164,7 @@ class AddExpenseActivity : InternetCheckActivity() {
 
         // Validation check
         if (expenseName.isEmpty() || expenseAmount == 0.0 || expenseDate.isEmpty() || expenseTime.isEmpty()) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -177,11 +185,13 @@ class AddExpenseActivity : InternetCheckActivity() {
                     .document(documentId)  // Use the existing expense ID
                     .set(updatedExpense)
                     .addOnSuccessListener {
+                        hideProgressBar()
                         Toast.makeText(this, "Expense updated successfully", Toast.LENGTH_SHORT)
                             .show()
                         finish() // Close the activity after successful update
                     }
                     .addOnFailureListener { e ->
+                        hideProgressBar()
                         Toast.makeText(
                             this,
                             "Failed to update expense: ${e.message}",

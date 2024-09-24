@@ -336,6 +336,7 @@ class AddProductActivity : InternetCheckActivity() {
 
 
     private fun saveProductData() {
+        showProgressBar("Saving Product information...")
         // Collect product data from input fields
         val productName = binding.etxtProductName.text.toString().trim()
         val productCode = binding.etxtProductCode.text.toString().trim()
@@ -350,6 +351,7 @@ class AddProductActivity : InternetCheckActivity() {
 
         // Validation check
         if (productName.isEmpty() || productCode.isEmpty() || buyPrice == 0.0 || sellPrice == 0.0 || stock == 0) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -372,6 +374,7 @@ class AddProductActivity : InternetCheckActivity() {
         db.collection("AllProducts")
             .add(product)
             .addOnSuccessListener { documentReference ->
+                hideProgressBar()
                 // Retrieve the generated document ID
                 val documentId = documentReference.id
 
@@ -398,6 +401,7 @@ class AddProductActivity : InternetCheckActivity() {
                     }
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to add product: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -405,6 +409,7 @@ class AddProductActivity : InternetCheckActivity() {
 
 
     private fun updateProduct() {
+        showProgressBar("Updating Product information...")
         // Collect product data from input fields
         val productName = binding.etxtProductName.text.toString().trim()
         val productCode = binding.etxtProductCode.text.toString().trim()
@@ -419,6 +424,7 @@ class AddProductActivity : InternetCheckActivity() {
 
         // Validation check
         if (productName.isEmpty() || productCode.isEmpty() || buyPrice == 0.0 || sellPrice == 0.0 || stock == 0) {
+            hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -444,11 +450,13 @@ class AddProductActivity : InternetCheckActivity() {
                     .document(documentId)  // Use the existing product ID
                     .set(updatedProduct)
                     .addOnSuccessListener {
+                        hideProgressBar()
                         Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT)
                             .show()
                         finish() // Close the activity after successful update
                     }
                     .addOnFailureListener { e ->
+                        hideProgressBar()
                         Toast.makeText(
                             this,
                             "Failed to update product: ${e.message}",

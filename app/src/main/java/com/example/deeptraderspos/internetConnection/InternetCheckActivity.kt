@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.internetConnection
 
+import android.app.ProgressDialog
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -14,6 +15,8 @@ open class InternetCheckActivity : AppCompatActivity() {
 
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
     private var alertDialog: AlertDialog? = null
+
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +62,24 @@ open class InternetCheckActivity : AppCompatActivity() {
                 .create()
             alertDialog?.show()
         }
+    }
+
+
+    // Show progress dialog with a message
+    fun showProgressBar(message: String = "Loading...") {
+        if (progressDialog == null) {
+            progressDialog = ProgressDialog(this).apply {
+                setCancelable(false)  // Make it not cancelable
+                setMessage(message)
+                show()
+            }
+        }
+    }
+
+    // Hide the progress dialog
+    fun hideProgressBar() {
+        progressDialog?.dismiss()
+        progressDialog = null
     }
 
 
