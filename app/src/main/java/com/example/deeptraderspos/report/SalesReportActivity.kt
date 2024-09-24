@@ -559,6 +559,7 @@ class SalesReportActivity : InternetCheckActivity() {
         } else {
             // If totalLoss is 0, null, or empty, hide the text view
             binding.txtRemaining.visibility = View.GONE
+            binding.remainingCard.visibility = View.GONE
         }
 
 

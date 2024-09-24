@@ -1,6 +1,7 @@
 package com.example.deeptraderspos.report.expensesReport
 
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -106,7 +107,22 @@ class ExpenseGraphActivityDaily : InternetCheckActivity() {
         }
 
         val barDataSet = BarDataSet(entries, "Daily Expenses")
-        barDataSet.color = resources.getColor(R.color.colorPrimary)
+      //  barDataSet.color = resources.getColor(R.color.colorPrimary)
+        barDataSet.colors = listOf(
+            Color.RED,
+            Color.BLUE,
+            Color.GREEN,
+            Color.YELLOW,
+            Color.MAGENTA,
+            Color.CYAN,
+            Color.LTGRAY,
+            Color.rgb(255, 165, 0),
+            Color.rgb(128, 0, 128),
+            Color.rgb(255, 20, 147),
+            Color.rgb(0, 128, 128),
+            Color.RED
+        ) // Set an array of colors
+
 
         val barData = BarData(barDataSet)
         binding.barchart.data = barData

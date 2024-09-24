@@ -120,6 +120,7 @@ class ExpenseActivity : InternetCheckActivity() {
                     val expense = document.toObject(Expense::class.java)
                     expensesList.add(expense)
                 }
+                expensesList.reverse()
                 expenseAdapter.notifyDataSetChanged() // Notify adapter of data change
             }
             .addOnFailureListener { exception ->

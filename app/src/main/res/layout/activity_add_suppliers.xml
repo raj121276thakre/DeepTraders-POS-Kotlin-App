@@ -66,6 +66,7 @@
                 android:fontFamily="@font/sailec_regular"
                 android:hint="@string/supplier_contact_person"
                 android:inputType="phone"
+                android:maxLength="10"
                 android:padding="16dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16dp" />
