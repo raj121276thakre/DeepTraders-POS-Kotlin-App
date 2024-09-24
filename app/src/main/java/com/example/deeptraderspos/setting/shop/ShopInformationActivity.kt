@@ -12,7 +12,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
@@ -24,7 +23,54 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ShopInformationActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityShopInformationBinding
 
-    private val currencyList = listOf("USD", "EUR", "GBP", "INR", "JPY", "AUD") // Add more currencies as needed
+    // private val currencyList = listOf("USD", "EUR", "GBP", "INR", "JPY", "AUD") // Add more currencies as needed
+
+    private val currencyList = listOf(
+        "$ USD",      // United States Dollar
+        "€ EUR",      // Euro
+        "₹ INR",      // Indian Rupee
+        "£ GBP",      // British Pound Sterling
+        "¥ JPY",      // Japanese Yen
+        "A$ AUD",     // Australian Dollar
+        "C$ CAD",     // Canadian Dollar
+        "CHF CHF",    // Swiss Franc
+        "¥ CNY",      // Chinese Yuan Renminbi
+        "kr SEK",     // Swedish Krona
+        "NZ$ NZD",    // New Zealand Dollar
+        "R ZAR",      // South African Rand
+        "$ MXN",      // Mexican Peso
+        "S$ SGD",     // Singapore Dollar
+        "HK$ HKD",    // Hong Kong Dollar
+        "kr NOK",     // Norwegian Krone
+        "₩ KRW",      // South Korean Won
+        "₺ TRY",      // Turkish Lira
+        "₽ RUB",      // Russian Ruble
+        "R$ BRL",     // Brazilian Real
+        "zł PLN",     // Polish Zloty
+        "kr DKK",     // Danish Krone
+        "฿ THB",      // Thai Baht
+        "Rp IDR",     // Indonesian Rupiah
+        "RM MYR",     // Malaysian Ringgit
+        "₱ PHP",      // Philippine Peso
+        "₫ VND",      // Vietnamese Dong
+        "₪ ILS",      // Israeli New Shekel
+        "ر.س SAR",    // Saudi Riyal
+        "د.إ AED",    // United Arab Emirates Dirham
+        "ج.م EGP",    // Egyptian Pound
+        "₦ NGN",      // Nigerian Naira
+        "د.ك KWD",    // Kuwaiti Dinar
+        "₨ PKR",      // Pakistani Rupee
+        "৳ BDT",      // Bangladeshi Taka
+        "₨ LKR",      // Sri Lankan Rupee
+        "د.م. MAD",   // Moroccan Dirham
+        "Kč CZK",     // Czech Koruna
+        "Ft HUF",     // Hungarian Forint
+        "kr ISK",     // Icelandic Krona
+        "₴ UAH",      // Ukrainian Hryvnia
+        "lei RON"     // Romanian Leu
+    )
+
+
 
     private val firestore = FirebaseFirestore.getInstance()
 
@@ -73,7 +119,8 @@ class ShopInformationActivity : InternetCheckActivity() {
     }
 
     private fun showCurrencyListDialog() {
-        val currencyAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, currencyList)
+        val currencyAdapter =
+            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, currencyList)
 
         val dialog = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
@@ -91,7 +138,12 @@ class ShopInformationActivity : InternetCheckActivity() {
         dialogInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+            override fun onTextChanged(
+                charSequence: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
                 currencyAdapter.filter.filter(charSequence)
             }
 
@@ -108,11 +160,13 @@ class ShopInformationActivity : InternetCheckActivity() {
 
         dialogList.setOnItemClickListener { parent, view, position, id ->
             alertDialog.dismiss()
-            val selectedCurrency = currencyAdapter.getItem(position) ?: return@setOnItemClickListener
+
+            val selectedCurrency =
+                currencyAdapter.getItem(position) ?: return@setOnItemClickListener
+
             binding.etxtShopCurrency.setText(selectedCurrency)
         }
     }
-
 
 
     // Function to make EditTexts editable or non-editable
@@ -185,8 +239,6 @@ class ShopInformationActivity : InternetCheckActivity() {
                 ).show()
             }
     }
-
-
 
 
 }

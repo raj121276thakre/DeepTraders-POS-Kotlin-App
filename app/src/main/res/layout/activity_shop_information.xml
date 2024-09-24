@@ -176,7 +176,6 @@
                 android:fontFamily="@font/sailec_regular"
                 android:hint="@string/shop_currency"
                 android:inputType="none"
-                android:maxLength="4"
                 android:padding="16dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16dp" />
