@@ -52,7 +52,6 @@
             android:contentDescription="Notifications" />
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/layout_year"
         android:layout_width="wrap_content"
@@ -93,12 +92,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/barchart"
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/piechart"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" >
-
-            </com.github.mikephil.charting.charts.BarChart>
+                android:layout_height="400dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

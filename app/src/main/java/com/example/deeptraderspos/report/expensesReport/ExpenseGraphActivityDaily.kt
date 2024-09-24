@@ -13,11 +13,11 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseGraphDailyBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
@@ -89,48 +89,28 @@ class ExpenseGraphActivityDaily : InternetCheckActivity() {
                     totalExpense += expense.expenseAmount
                 }
                 Log.d("ExpenseGraphActivityDaily", "Fetched ${documents.size()} documents.")
-                updateBarChart(expensesList)
-                binding.txtTotalSales.text = getString(R.string.total_sales) +getString(R.string.currency_symbol) + String.format("%.2f", totalExpense)
+                updatePieChart(expensesList)
+                binding.txtTotalSales.text = getString(R.string.total_sales) + getString(R.string.currency_symbol) + String.format("%.2f", totalExpense)
             }
             .addOnFailureListener { exception ->
                 Log.w("ExpenseGraphActivityDaily", "Error getting documents: ", exception)
             }
     }
 
-    private fun updateBarChart(expensesList: List<Expense>) {
-        val entries = ArrayList<BarEntry>()
-        val labels = ArrayList<String>()
+    private fun updatePieChart(expensesList: List<Expense>) {
+        val entries = ArrayList<PieEntry>()
 
-        for ((index, expense) in expensesList.withIndex()) {
-            entries.add(BarEntry(index.toFloat(), expense.expenseAmount.toFloat()))
-            labels.add(expense.expenseName) // Add expense names to labels
+        for (expense in expensesList) {
+            entries.add(PieEntry(expense.expenseAmount.toFloat(), expense.expenseName))
         }
 
-        val barDataSet = BarDataSet(entries, "Daily Expenses")
-      //  barDataSet.color = resources.getColor(R.color.colorPrimary)
-        barDataSet.colors = listOf(
-            Color.RED,
-            Color.BLUE,
-            Color.GREEN,
-            Color.YELLOW,
-            Color.MAGENTA,
-            Color.CYAN,
-            Color.LTGRAY,
-            Color.rgb(255, 165, 0),
-            Color.rgb(128, 0, 128),
-            Color.rgb(255, 20, 147),
-            Color.rgb(0, 128, 128),
-            Color.RED
-        ) // Set an array of colors
+        val pieDataSet = PieDataSet(entries, "Daily Expenses")
+        pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList() // Set default color template
+        pieDataSet.valueTextColor = Color.BLACK
+        pieDataSet.valueTextSize = 16f
 
-
-        val barData = BarData(barDataSet)
-        binding.barchart.data = barData
-        binding.barchart.xAxis.valueFormatter = object : ValueFormatter() {
-            override fun getAxisLabel(value: Float, axis: com.github.mikephil.charting.components.AxisBase?): String {
-                return labels.getOrNull(value.toInt()) ?: ""
-            }
-        }
+        val pieData = PieData(pieDataSet)
+        binding.barchart.data = pieData // Reusing the binding variable for the PieChart
         binding.barchart.invalidate() // Refresh the chart
     }
 }

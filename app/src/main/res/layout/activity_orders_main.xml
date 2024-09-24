@@ -107,7 +107,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    android:src="@drawable/customer" />
+                                    android:src="@drawable/ic_customers" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -169,10 +169,10 @@
                                 android:orientation="vertical">
 
                                 <ImageView
-                                    android:layout_width="70dp"
+                                    android:layout_width="82dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    android:src="@drawable/supplier" />
+                                    android:src="@drawable/ic_suppliers" />
 
                                 <TextView
                                     android:layout_width="wrap_content"

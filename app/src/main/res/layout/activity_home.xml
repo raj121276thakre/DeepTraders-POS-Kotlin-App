@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:id="@+id/home"
     android:layout_height="match_parent"
-    android:background="@color/activityBackgroundColor"
+    android:background="#f0f5ff"
     android:orientation="vertical">
 
     <!-- Toolbar -->
@@ -18,7 +18,7 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="10dp"
         android:gravity="center_vertical"
-        android:background="@drawable/actionbar_gradient"
+        android:background="#006199"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -164,7 +164,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    app:srcCompat="@drawable/customer" />
+                                    app:srcCompat="@drawable/ic_customers" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -174,7 +174,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/customers"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -252,7 +252,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    app:srcCompat="@drawable/supplier" />
+                                    app:srcCompat="@drawable/ic_suppliers" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -262,7 +262,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/suppliers"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -319,7 +319,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    android:src="@drawable/products" />
+                                    android:src="@drawable/ic_products" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -329,7 +329,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/products"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -388,7 +388,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/pos"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -444,7 +444,7 @@
                                     android:layout_width="67dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    app:srcCompat="@drawable/expense" />
+                                    app:srcCompat="@drawable/ic_expenses" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -454,7 +454,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/expense"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -500,8 +500,8 @@
                                 android:orientation="vertical">
 
                                 <ImageView
-                                    android:layout_width="67dp"
-                                    android:layout_height="70dp"
+                                    android:layout_width="63dp"
+                                    android:layout_height="47dp"
                                     android:layout_marginTop="25dp"
                                     app:srcCompat="@drawable/order" />
 
@@ -514,7 +514,7 @@
                                     android:gravity="center"
                                     android:text="@string/all_orders"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -571,7 +571,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    app:srcCompat="@drawable/report" />
+                                    app:srcCompat="@drawable/ic_report" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -581,7 +581,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/report"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -629,7 +629,7 @@
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:layout_marginTop="25dp"
-                                    app:srcCompat="@drawable/stock" />
+                                    app:srcCompat="@drawable/ic_settings" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -639,7 +639,7 @@
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/action_settings"
                                     android:textAllCaps="true"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>

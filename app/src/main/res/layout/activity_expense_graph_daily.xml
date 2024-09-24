@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.github.mikephil.charting.charts.BarChart
+            <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/barchart"
                 android:layout_width="match_parent"
                 android:layout_height="400dp" />
@@ -102,5 +102,4 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

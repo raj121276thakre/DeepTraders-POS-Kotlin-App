@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.widget.NumberPicker
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.deeptraderspos.R
@@ -15,12 +14,11 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseGraphYearlyBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
@@ -33,11 +31,7 @@ class ExpenseGraphActivityYearly : InternetCheckActivity() {
         enableEdgeToEdge()
         binding = ActivityExpenseGraphYearlyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.yearlyExpenseGraph)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setupWindowInsets()
 
         // Set the status bar color
         Utils.setStatusBarColor(this)
@@ -45,23 +39,27 @@ class ExpenseGraphActivityYearly : InternetCheckActivity() {
         db = FirebaseFirestore.getInstance()
 
         // Trigger year picker
-        binding.layoutYear.setOnClickListener {
-            showYearPicker()
-        }
+        binding.layoutYear.setOnClickListener { showYearPicker() }
 
         // Initialize with the current year data
-        val now = Calendar.getInstance()
-        fetchYearlyExpenses(now.get(Calendar.YEAR))
+        fetchYearlyExpenses(Calendar.getInstance().get(Calendar.YEAR))
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.yearlyExpenseGraph) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     private fun showYearPicker() {
-        val now = Calendar.getInstance()
-        val currentYear = now.get(Calendar.YEAR)
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
         // Create a NumberPicker for selecting the year
         val yearPicker = NumberPicker(this).apply {
-            minValue = currentYear - 10 // Change to desired range
-            maxValue = currentYear + 10 // Change to desired range
+            minValue = currentYear - 10
+            maxValue = currentYear + 10
             value = currentYear
         }
 
@@ -96,48 +94,37 @@ class ExpenseGraphActivityYearly : InternetCheckActivity() {
                     expensesList.add(expense)
                     totalExpense += expense.expenseAmount
                 }
-                updateBarChart(expensesList)
-                binding.txtTotalSales.text = getString(R.string.total_sales) +getString(R.string.currency_symbol) + String.format("%.2f", totalExpense)
+                updatePieChart(expensesList)
+                binding.txtTotalSales.text = getString(R.string.total_sales) + getString(R.string.currency_symbol) + String.format("%.2f", totalExpense)
             }
             .addOnFailureListener { exception ->
                 Log.w("ExpenseGraphActivityYearly", "Error getting documents: ", exception)
+                showErrorDialog(exception.message ?: "Error fetching data")
             }
     }
 
-    private fun updateBarChart(expensesList: List<Expense>) {
-        val entries = ArrayList<BarEntry>()
-        val labels = ArrayList<String>()
+    private fun showErrorDialog(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Error")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
+    }
 
-        for ((index, expense) in expensesList.withIndex()) {
-            entries.add(BarEntry(index.toFloat(), expense.expenseAmount.toFloat()))
-            labels.add(expense.expenseName) // Add expense names to labels
+    private fun updatePieChart(expensesList: List<Expense>) {
+        val entries = expensesList.map { PieEntry(it.expenseAmount.toFloat(), it.expenseName) }
+
+        val pieDataSet = PieDataSet(entries, "Expenses").apply {
+            colors = ColorTemplate.createColors(ColorTemplate.VORDIPLOM_COLORS)
+            valueTextColor = Color.BLACK
+            valueTextSize = 16f
         }
 
-        val barDataSet = BarDataSet(entries, "Expenses")
-       // barDataSet.color = resources.getColor(R.color.colorPrimary)
-        barDataSet.colors = listOf(
-            Color.RED,
-            Color.BLUE,
-            Color.GREEN,
-            Color.YELLOW,
-            Color.MAGENTA,
-            Color.CYAN,
-            Color.LTGRAY,
-            Color.rgb(255, 165, 0),
-            Color.rgb(128, 0, 128),
-            Color.rgb(255, 20, 147),
-            Color.rgb(0, 128, 128),
-            Color.RED
-        ) // Set an array of colors
+        val pieData = PieData(pieDataSet)
 
-
-        val barData = BarData(barDataSet)
-        binding.barchart.data = barData
-        binding.barchart.xAxis.valueFormatter = object : ValueFormatter() {
-            override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                return labels.getOrNull(value.toInt()) ?: ""
-            }
-        }
-        binding.barchart.invalidate() // Refresh the chart
+        // Use the correct PieChart reference
+        val pieChart: PieChart = binding.piechart as PieChart
+        pieChart.data = pieData
+        pieChart.invalidate() // Refresh the chart
     }
 }

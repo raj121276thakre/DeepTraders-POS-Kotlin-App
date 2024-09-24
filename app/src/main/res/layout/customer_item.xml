@@ -41,7 +41,7 @@
                     android:contentDescription="TODO"
                     android:padding="10dp"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/customer" />
+                    app:srcCompat="@drawable/single_customer" />
             </LinearLayout>
 
             <LinearLayout
