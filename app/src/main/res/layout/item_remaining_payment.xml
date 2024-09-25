@@ -1,54 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="16dp">
+    android:layout_margin="8dp"
+>
 
-    <TextView
-        android:id="@+id/text_paid_amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:gravity="left"
-        tools:text="The Remaining Amount 500 is paid at 12:45 PM 2024-09-12"
-        android:textSize="16sp" />
-
-    <LinearLayout
-        android:layout_marginTop="4dp"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2"
-        android:orientation="horizontal">
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="10dp"
+        app:cardPreventCornerOverlap="false">
 
-        <TextView
-            android:layout_margin="3dp"
-            android:background="@drawable/round_border"
-            android:id="@+id/text_remaining_amount"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:gravity="center"
-            android:layout_weight="1"
-            tools:text="Remaining Amount : "
-            android:textSize="16sp" />
+        <LinearLayout
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:layout_margin="3dp"
-            android:id="@+id/button_download_pdf"
-            android:layout_width="0dp"
-            android:background="@drawable/round_border"
-            android:layout_weight="1"
-           android:gravity="center"
-            android:layout_height="match_parent"
-            android:text="Download PDF"
-         />
+            <TextView
+                android:id="@+id/text_paid_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:text="The Remaining Amount 500 is paid at 12:45 PM 2024-09-12" />
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/text_remaining_amount"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="3dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_border"
+                    android:gravity="center"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="Remaining Amount : " />
+
+                <Button
+                    android:id="@+id/button_download_pdf"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:background="@drawable/round_border"
+                    android:gravity="center"
+                    android:text="Download PDF" />
+
+            </LinearLayout>
 
 
-</LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>

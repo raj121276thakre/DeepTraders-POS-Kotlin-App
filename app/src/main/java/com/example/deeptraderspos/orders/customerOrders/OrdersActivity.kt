@@ -84,6 +84,10 @@ class OrdersActivity : InternetCheckActivity() {
 
 
 
+
+
+
+
     private fun showCustomersList(dialogCustomer: TextView) {
         val customerAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
 

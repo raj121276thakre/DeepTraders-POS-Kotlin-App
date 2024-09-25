@@ -588,8 +588,10 @@ class ProductCart : InternetCheckActivity() {
                     // Create a new Map<String, String> to store supplier data
                     val supplierInfo = mutableMapOf<String, String>()
                     for ((key, value) in document.data) {
-                        supplierInfo[key] = value.toString() // Convert each value to String
+                        supplierInfo[key] = value?.toString() ?: "N/A"
+                        //supplierInfo[key] = value.toString() // Convert each value to String
                     }
+
                     supplierData.add(supplierInfo)
                 }
 

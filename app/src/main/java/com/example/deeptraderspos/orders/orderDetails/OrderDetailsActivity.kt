@@ -2,6 +2,7 @@ package com.example.deeptraderspos.orders.orderDetails
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
@@ -26,6 +27,7 @@ import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.RemainingPayment
 import com.example.deeptraderspos.models.ShopInformation
+import com.example.deeptraderspos.orders.OrderAdapter.MyViewHolder
 import com.google.firebase.firestore.FirebaseFirestore
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.geom.PageSize
@@ -51,9 +53,10 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
     private val firestore = FirebaseFirestore.getInstance()
     private lateinit var f: DecimalFormat
-    private lateinit var order: Order
+    private lateinit var intentOrder: Order
     private lateinit var firebaseOrder: Order
     private var currency: String = ""
+    private var isSupplier: Boolean = false
 
     private var shopInfo: ShopInformation = ShopInformation()
 
@@ -81,22 +84,27 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
 
         // Retrieve the order from the intent
-        order = intent.getParcelableExtra<Order>("order") ?: return
-        val isSupplier =
+        intentOrder = intent.getParcelableExtra<Order>("order") ?: return
+        isSupplier =
             intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
 
-        fetchOrdersByOrderId()
+        fetchOrdersByOrderId(isSupplier)
+
+
+
 
         // Initialize DecimalFormat
         f = DecimalFormat("#0.00")
 
         val name = if (isSupplier) {
-            order.supplierName
+            intentOrder.supplierName
         } else {
-            order.customerName
+            intentOrder.customerName
         }
 
-        setToolbarDetails(name, order.orderId)
+        setToolbarDetails(name, intentOrder.orderId)
+
+
 
         // Set up action bar
         supportActionBar?.apply {
@@ -113,7 +121,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
 
         // Retrieve products from order and pass to the adapter
-        val productList: List<ProductOrder> = order.products
+        val productList: List<ProductOrder> = intentOrder.products
         if (productList.isEmpty()) {
             Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
         } else {
@@ -135,16 +143,43 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
         binding.btnPdfReceipt.setOnClickListener {
             // Handle PDF generation logic
-            createPdf(this, order, name, shopInfo)
+            createPdf(this, intentOrder, name)
         }
 
         binding.btnPayRemaining.setOnClickListener {
-            showDialogAndUpdateToFirestore()
+            showDialogAndUpdateToFirestore(isSupplier)
         }
+
+
+
+
+
     }
 
 
-    private fun showDialogAndUpdateToFirestore() {
+
+    private fun updateOrderStatus(orderId: String, status: String) {
+
+        // Prepare the data to update
+        val updateData = mapOf(
+            "orderStatus" to status,
+        )
+
+        val orderRef = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
+
+        orderRef.document(orderId).update(updateData)
+            .addOnSuccessListener {
+
+            }
+            .addOnFailureListener {
+
+            }
+    }
+
+
+
+
+    private fun showDialogAndUpdateToFirestore(isSupplier: Boolean) {
         val alertDialog = AlertDialog.Builder(this)
         alertDialog.setTitle("Enter Payment Amount")
 
@@ -190,8 +225,13 @@ class OrderDetailsActivity : InternetCheckActivity() {
                 remainingAmount = newRemainingAmount // Remaining after this payment
             )
 
+
+            if (newRemainingAmount.toInt() == 0 ){
+                updateOrderStatus(orderId = intentOrder.orderId,Constants.COMPLETED)
+            }
+
             // Create a mutable list to hold existing payments and add the new payment
-            val updatedPayments = order.remainingPayments.toMutableList()
+            val updatedPayments = intentOrder.remainingPayments.toMutableList()
             updatedPayments.add(newPayment)
 
             // Prepare the data to update Firestore with the new payment and updated remaining amount
@@ -207,19 +247,20 @@ class OrderDetailsActivity : InternetCheckActivity() {
                 "updatedRemainingAmount" to newRemainingAmount, // Update this to reflect the new total
                 "updatedTotalPaidAmount" to newTotalPaidAmount // Update this to reflect the new total
             )
-
+            val collection = if (isSupplier) "AllOrdersSuppliers" else "AllOrders"
             // Update Firestore with the new payment data
-            firestore.collection("AllOrders").document(order.orderId).update(updateData)
+            //firestore.collection("AllOrders").document(order.orderId).update(updateData)
+            firestore.collection(collection).document(intentOrder.orderId).update(updateData)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Payment recorded successfully", Toast.LENGTH_SHORT).show()
                     // Update local order details
-                    order.remainingPayments =
+                    intentOrder.remainingPayments =
                         updatedPayments // Update the local order's payment list
-                    order.updatedRemainingAmount =
+                    intentOrder.updatedRemainingAmount =
                         newRemainingAmount // Update the local order's remaining amount
-                    order.updatedTotalPaidAmount =
+                    intentOrder.updatedTotalPaidAmount =
                         newTotalPaidAmount // Update the local order's remaining amount
-                    fetchOrdersByOrderId() // Refresh orders from Firestore if needed
+                    fetchOrdersByOrderId(isSupplier) // Refresh orders from Firestore if needed
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "Failed to record payment", Toast.LENGTH_SHORT).show()
@@ -234,16 +275,14 @@ class OrderDetailsActivity : InternetCheckActivity() {
     }
 
 
-    //remaining
+    private fun fetchOrdersByOrderId(isSupplier: Boolean) {
+        val collection = if (isSupplier) "AllOrdersSuppliers" else "AllOrders"
 
-
-    //remaining
-
-    private fun fetchOrdersByOrderId() {
-        firestore.collection("AllOrders")
+//        firestore.collection("AllOrders")
+        firestore.collection(collection)
             .whereEqualTo(
                 "orderId",
-                order.orderId
+                intentOrder.orderId
             ) // Adjust this field name based on your Firestore structure
             .get()
             .addOnSuccessListener { documents ->
@@ -286,8 +325,11 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
                     // Sort payments by date and time (latest on top)
                     val sortedPaymentsList = paymentsList.sortedByDescending { payment ->
-                        val dateTimeString = "${payment.paidDate} ${payment.paidTime}" // Combine date and time
-                        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(dateTimeString)
+                        val dateTimeString =
+                            "${payment.paidDate} ${payment.paidTime}" // Combine date and time
+                        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(
+                            dateTimeString
+                        )
                     }
 
 
@@ -356,76 +398,285 @@ class OrderDetailsActivity : InternetCheckActivity() {
         binding.txtTotalRemaining.text =
             getString(R.string.total_remaining) + currency + f.format(totalRemaining)
 
+        if (firebaseOrder.orderStatus == Constants.COMPLETED) {
+            binding.btnPayRemaining.visibility = View.GONE
+            binding.txtOrderStatus.setTextColor(getColor(R.color.green))
 
-        val totalCalculedRemaining =
-            totalPrice - totalPaid // Assuming totalPrice is calculated as shown earlier
 
-        if (!order.remainingAmtPaidDate.isNullOrEmpty() && totalRemaining == 0.0) {
-            binding.txtRemainingPaidDateTime.visibility = View.VISIBLE
-            binding.txtRemainingPaidDateTime.text =
-                "The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate
         } else {
-            binding.txtRemainingPaidDateTime.visibility = View.GONE
+            binding.btnPayRemaining.visibility = View.VISIBLE
         }
+        binding.txtOrderStatus.text = getString(R.string.order_status) +" "+ "${firebaseOrder.orderStatus}"
+
+
+
+//        val totalCalculedRemaining =
+//            totalPrice - totalPaid // Assuming totalPrice is calculated as shown earlier
+
+//        if (!order.remainingAmtPaidDate.isNullOrEmpty() && totalRemaining == 0.0) {
+//            binding.txtRemainingPaidDateTime.visibility = View.VISIBLE
+//            binding.txtRemainingPaidDateTime.text =
+//                "The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate
+//        } else {
+//            binding.txtRemainingPaidDateTime.visibility = View.GONE
+//        }
 
 
         // remaining recyclerview
 
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerView) // Assuming you have a RecyclerView in your layout
+        val recyclerView: RecyclerView =
+            findViewById(R.id.recyclerView) // Assuming you have a RecyclerView in your layout
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        val name = if (isSupplier) {
+            order.supplierName
+        } else {
+            order.customerName
+        }
         // Pass the remainingPayments list to the adapter
         val adapter = RemainingPaymentsAdapter(order.remainingPayments, "₹") { payment ->
             // Handle the download PDF click here
-            // Implement the download PDF functionality
+            createPdfForPayment(this, order, name, payment)
         }
 
         recyclerView.adapter = adapter
 
 
-
-
     }
 
+    private fun createPdfForPayment(
+        context: Context,
+        order: Order,
+        name: String,
+        payment: RemainingPayment
+    ) {
+        val directoryPath =
+            context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
+        if (directoryPath == null) {
+            Toast.makeText(context, "Unable to access storage", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-    private fun setToolbarDetails(customerName: String, orderId: String) {
-        binding.txtCustomerName.text = customerName
-        binding.txtOrderId.text = "Order ID :#$orderId"
+        val filePath =
+            "$directoryPath/Invoice_${order.orderId}.pdf" // Use a unique identifier from the order
+        val file = File(filePath)
 
-    }
+        try {
+            val pdfWriter = PdfWriter(file)
+            val pdfDocument = PdfDocument(pdfWriter)
+            val document = Document(pdfDocument, PageSize.A4)
 
-    private fun fetchShopInfo() {
-        firestore.collection("shops").document("shopInfo")
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    // Create an instance of ShopInformation from the fetched data
+            // Set margins
+            document.setMargins(20f, 20f, 20f, 20f)
 
-                    val shopTaxString = document.getString("shopTax") ?: ""
-                    shopInfo = ShopInformation(
-                        shopName = document.getString("shopName") ?: "",
-                        contactNumber = document.getString("shopContact") ?: "",
-                        email = document.getString("shopEmail") ?: "",
-                        address = document.getString("shopAddress") ?: "",
-                        currencySymbol = document.getString("shopCurrency") ?: "",
-                        taxPercentage = shopTaxString.toDouble(),
-                        id = document.id // Optional ID field
+            // Header - Company Information with Blue Background
+            val headerTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 1f)))
+                .useAllAvailableWidth()
+                .setBackgroundColor(ColorConstants.BLUE)
+                .setFontColor(ColorConstants.WHITE)
+
+            headerTable.addCell(
+                Cell().add(Paragraph("BlueBird Industries")) // shop name
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setFontSize(16f)
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            headerTable.addCell(
+                Cell().add(Paragraph("Invoice"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontSize(24f)
+                    .setBold()
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            document.add(headerTable)
+
+            // Sub-header - Contact Information
+            val subHeaderTable = Table(UnitValue.createPercentArray(floatArrayOf(3f, 1f, 1f)))
+                .useAllAvailableWidth()
+                .setMarginBottom(10f)
+
+            subHeaderTable.addCell(
+                Cell(1, 2).add(
+                    Paragraph(
+                        """
+            |Name: Dipak Shinde
+            |Address: Market Yard, Satara 415002
+            |Phone: +917972504022 / 9270004942
+            """.trimMargin()
                     )
+                )
+                    .setBorder(Border.NO_BORDER)
+            )
 
-                }
+            subHeaderTable.addCell(
+                Cell().add(Paragraph("Invoice No: ${order.orderId}\nOrder created Date: ${order.orderDate}"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            subHeaderTable.addCell(
+                Cell().add(Paragraph("Payment Date: ${payment.paidDate}"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            document.add(subHeaderTable)
+
+            // Bill To Section
+            val billToTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
+                .useAllAvailableWidth()
+                .setMarginBottom(10f)
+
+            billToTable.addCell(
+                Cell().add(Paragraph("Bill To\n${name}")) // Assuming customerName is in Order
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(14f)
+                    .setBold()
+            )
+
+            document.add(billToTable)
+
+            // Item Table Header
+            val itemTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 2f, 2f, 2f, 2f)))
+                .useAllAvailableWidth()
+                .setBackgroundColor(ColorConstants.BLUE)
+                .setFontColor(ColorConstants.WHITE)
+                .setMarginBottom(10f)
+
+
+            itemTable.addHeaderCell("Item Name")
+            itemTable.addHeaderCell("Quantity")
+            itemTable.addHeaderCell("Weight")
+            itemTable.addHeaderCell("Price/Unit")
+            itemTable.addHeaderCell("Amount")
+
+            // Calculate total price
+            var subTotalPrice = 0.0
+
+            // Add item rows from order.products
+            intentOrder.products.forEach { product ->
+
+                val amount = product.quantity * product.productPrice
+                subTotalPrice += amount // Accumulate total price
+
+                itemTable.addCell(product.productName) // Assuming ProductOrder has name
+                itemTable.addCell(product.quantity.toString())
+                // itemTable.addCell("Box") // Assuming unit is Box for simplicity
+                itemTable.addCell(product.productWeight.toString()) // Assuming unit is Box for simplicity
+                itemTable.addCell(product.productPrice.toString()) // Assuming price is a property in ProductOrder
+                itemTable.addCell((product.quantity * product.productPrice).toString()) // Calculate amount
             }
-            .addOnFailureListener { e ->
-                // Handle failure, show error message
-                Toast.makeText(
-                    this,
-                    "Failed to fetch shop information: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+
+            // Add Total Row
+            itemTable.addCell(
+                Cell(1, 4).add(Paragraph("Sub Total"))
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBold()
+            )
+            itemTable.addCell(Cell().add(Paragraph(subTotalPrice.toString()))) // Use calculated totalPrice
+
+            // itemTable.addCell(Cell().add(Paragraph(order.totalPrice.toString()))) // Assuming totalPrice is a property in Order
+
+            document.add(itemTable)
+
+            // Footer - Payment Details
+            val footerTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
+                .useAllAvailableWidth()
+                .setMarginTop(20f)
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Pay To:"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(
+                    Paragraph(
+                        """
+            |Bank Name: The Satara District Central Co Operative Bank
+            |Account No: 01197026000288
+            |Bank IFSC code: SDC0001197
+            |Account Holder's Name: Pawar Udyog Samuh
+            """.trimMargin()
+                    )
+                )
+                    .setBorder(Border.NO_BORDER)
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Sub Total Amount : $subTotalPrice"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Total tax(${shopInfo.taxPercentage}%) : ${order.tax}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Discount : ${order.discount}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Total Amount : ${order.totalPrice}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(16f)
+                    .setBold()
+            )
+
+
+
+
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Paid Amount : ${payment.paidAmount}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setBold()
+            )
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Total Remaining  Amount : ${payment.remainingAmount}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(16f)
+                    .setBold()
+            )
+
+
+
+            footerTable.addCell(
+                Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(16f)
+                    .setBold()
+            )
+
+            // Add any additional footer details here...
+
+            document.add(footerTable)
+
+            document.close()
+            Toast.makeText(context, "Bill Pdf Created.", Toast.LENGTH_LONG).show()
+
+            openPdfPreview(this, file)
+
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
 
-    private fun createPdf(context: Context, order: Order, name: String, shopInfo: ShopInformation) {
+    //original bill pdf
+    private fun createPdf(context: Context, order: Order, name: String) {
         val directoryPath =
             context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
         if (directoryPath == null) {
@@ -680,246 +931,43 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
     }
 
-//23 sep
-    /*
-        private fun createPdf(context: Context, order: Order, name: String) {
-        val directoryPath =
-            context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
-        if (directoryPath == null) {
-            Toast.makeText(context, "Unable to access storage", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        val filePath =
-            "$directoryPath/Invoice_${order.orderId}.pdf" // Use a unique identifier from the order
-        val file = File(filePath)
+    private fun setToolbarDetails(customerName: String, orderId: String) {
+        binding.txtCustomerName.text = customerName
+        binding.txtOrderId.text = "Order ID :#$orderId"
 
-        try {
-            val pdfWriter = PdfWriter(file)
-            val pdfDocument = PdfDocument(pdfWriter)
-            val document = Document(pdfDocument, PageSize.A4)
-
-            // Set margins
-            document.setMargins(20f, 20f, 20f, 20f)
-
-            // Header - Company Information with Blue Background
-            val headerTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 1f)))
-                .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
-
-            headerTable.addCell(
-                Cell().add(Paragraph("BlueBird Industries")) // shop name
-                    .setTextAlignment(TextAlignment.LEFT)
-                    .setFontSize(16f)
-                    .setBorder(Border.NO_BORDER)
-            )
-
-            headerTable.addCell(
-                Cell().add(Paragraph("INVOICE"))
-                    .setTextAlignment(TextAlignment.RIGHT)
-                    .setFontSize(24f)
-                    .setBold()
-                    .setBorder(Border.NO_BORDER)
-            )
-
-            document.add(headerTable)
-
-            // Sub-header - Contact Information
-            val subHeaderTable = Table(UnitValue.createPercentArray(floatArrayOf(3f, 1f, 1f)))
-                .useAllAvailableWidth()
-                .setMarginBottom(10f)
-
-            subHeaderTable.addCell(
-                Cell(1, 2).add(
-                    Paragraph(
-                        """
-            |G no. 328/1 Kaloshi, Khandala
-            |Rahimatpur road side, Satara 415002
-            |Phone: +919775240422
-            |Email: pawaraj87@gmail.com
-            """.trimMargin()
-                    )
-                )
-                    .setBorder(Border.NO_BORDER)
-            )
-
-            subHeaderTable.addCell(
-                Cell().add(Paragraph("Invoice No: ${order.orderId}\nDate: ${order.orderDate}"))
-                    .setTextAlignment(TextAlignment.RIGHT)
-                    .setBorder(Border.NO_BORDER)
-            )
-
-            document.add(subHeaderTable)
-
-            // Bill To Section
-            val billToTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
-                .useAllAvailableWidth()
-                .setMarginBottom(10f)
-
-            billToTable.addCell(
-                Cell().add(Paragraph("Bill To\n${name}")) // Assuming customerName is in Order
-                    .setTextAlignment(TextAlignment.LEFT)
-                    .setBorder(Border.NO_BORDER)
-                    .setFontSize(14f)
-                    .setBold()
-            )
-
-            document.add(billToTable)
-
-            // Item Table Header
-            val itemTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 2f, 2f, 2f, 2f)))
-                .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
-                .setMarginBottom(10f)
-
-
-            itemTable.addHeaderCell("Item Name")
-            itemTable.addHeaderCell("Quantity")
-            itemTable.addHeaderCell("Weight")
-            itemTable.addHeaderCell("Price/Unit")
-            itemTable.addHeaderCell("Amount")
-
-            // Calculate total price
-            var subTotalPrice = 0.0
-
-            // Add item rows from order.products
-            order.products.forEach { product ->
-
-                val amount = product.quantity * product.productPrice
-                subTotalPrice += amount // Accumulate total price
-
-                itemTable.addCell(product.productName) // Assuming ProductOrder has name
-                itemTable.addCell(product.quantity.toString())
-                // itemTable.addCell("Box") // Assuming unit is Box for simplicity
-                itemTable.addCell(product.productWeight.toString()) // Assuming unit is Box for simplicity
-                itemTable.addCell(product.productPrice.toString()) // Assuming price is a property in ProductOrder
-                itemTable.addCell((product.quantity * product.productPrice).toString()) // Calculate amount
-            }
-
-            // Add Total Row
-            itemTable.addCell(
-                Cell(1, 4).add(Paragraph("Sub Total"))
-                    .setTextAlignment(TextAlignment.RIGHT)
-                    .setBold()
-            )
-            itemTable.addCell(Cell().add(Paragraph(subTotalPrice.toString()))) // Use calculated totalPrice
-
-            // itemTable.addCell(Cell().add(Paragraph(order.totalPrice.toString()))) // Assuming totalPrice is a property in Order
-
-            document.add(itemTable)
-
-            // Footer - Payment Details
-            val footerTable = Table(UnitValue.createPercentArray(floatArrayOf(1f)))
-                .useAllAvailableWidth()
-                .setMarginTop(20f)
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Pay To:"))
-                    .setBorder(Border.NO_BORDER)
-                    .setBold()
-            )
-
-            footerTable.addCell(
-                Cell().add(
-                    Paragraph(
-                        """
-            |Bank Name: The Satara District Central Co Operative Bank
-            |Account No: 01197026000288
-            |Bank IFSC code: SDC0001197
-            |Account Holder's Name: Pawar Udyog Samuh
-            """.trimMargin()
-                    )
-                )
-                    .setBorder(Border.NO_BORDER)
-            )
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Sub Total Amount : $subTotalPrice"))
-                    .setBorder(Border.NO_BORDER)
-                    .setBold()
-            )
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Total tax : ${order.tax}"))
-                    .setBorder(Border.NO_BORDER)
-                    .setBold()
-            )
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Discount : ${order.discount}"))
-                    .setBorder(Border.NO_BORDER)
-                    .setBold()
-            )
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Total Amount : ${order.totalPrice}"))
-                    .setBorder(Border.NO_BORDER)
-                    .setFontSize(16f)
-                    .setBold()
-            )
-
-
-
-            if (order.orderStatus == Constants.PENDING) {
-
-                footerTable.addCell(
-                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
-                        .setBorder(Border.NO_BORDER)
-                        .setBold()
-                )
-
-                footerTable.addCell(
-                    Cell().add(Paragraph("Total Remaining  Amount : ${order.remainingAmount}"))
-                        .setBorder(Border.NO_BORDER)
-                        .setFontSize(16f)
-                        .setBold()
-                )
-
-            } else {
-
-                footerTable.addCell(
-                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
-                        .setBorder(Border.NO_BORDER)
-                        .setBold()
-                )
-
-                val totalCalculedRemaining = (order.totalPrice - order.totalPaidAmount).toDouble()
-
-                footerTable.addCell(
-                    Cell().add(Paragraph("The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate))
-                        .setBorder(Border.NO_BORDER)
-                        .setFontSize(16f)
-                        .setBold()
-                )
-
-            }
-
-
-
-            footerTable.addCell(
-                Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
-                    .setBorder(Border.NO_BORDER)
-                    .setFontSize(16f)
-                    .setBold()
-            )
-
-            // Add any additional footer details here...
-
-            document.add(footerTable)
-
-            document.close()
-            Toast.makeText(context, "Pdf Created: $filePath", Toast.LENGTH_LONG).show()
-
-            openPdfPreview(this, file)
-
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
-        }
     }
-     */
+
+    // not used will be use in future
+
+    private fun fetchShopInfo() {
+        firestore.collection("shops").document("shopInfo")
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    // Create an instance of ShopInformation from the fetched data
+
+                    val shopTaxString = document.getString("shopTax") ?: ""
+                    shopInfo = ShopInformation(
+                        shopName = document.getString("shopName") ?: "",
+                        contactNumber = document.getString("shopContact") ?: "",
+                        email = document.getString("shopEmail") ?: "",
+                        address = document.getString("shopAddress") ?: "",
+                        currencySymbol = document.getString("shopCurrency") ?: "",
+                        taxPercentage = shopTaxString.toDouble(),
+                        id = document.id // Optional ID field
+                    )
+
+                }
+            }
+            .addOnFailureListener { e ->
+                // Handle failure, show error message
+                Toast.makeText(
+                    this,
+                    "Failed to fetch shop information: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
 
 }

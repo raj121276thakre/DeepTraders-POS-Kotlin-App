@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/orderDetails"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/orderDetails"
-    tools:context=".orders.orderDetails.OrderDetailsActivity"
-    android:background="@color/grey_5">
+    android:background="@color/grey_5"
+    android:orientation="vertical"
+    tools:context=".orders.orderDetails.OrderDetailsActivity">
 
     <!-- Toolbar -->
     <LinearLayout
@@ -39,10 +39,10 @@
             android:layout_weight="1"
             android:fontFamily="@font/sailec_regular"
             android:paddingStart="12dp"
-            tools:text="Customer"
             android:textColor="#ffffff"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Customer" />
 
         <TextView
             android:id="@+id/txt_orderId"
@@ -50,41 +50,41 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/sailec_regular"
-            android:paddingStart="12dp"
-            tools:text="Order ID : 1234"
             android:gravity="end"
+            android:paddingStart="12dp"
             android:textColor="#ffffff"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Order ID : 1234" />
 
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                tools:listitem="@layout/order_details_item"
+                android:background="?android:attr/selectableItemBackground"
                 tools:itemCount="3"
-                android:background="?android:attr/selectableItemBackground">
+                tools:listitem="@layout/order_details_item">
 
             </androidx.recyclerview.widget.RecyclerView>
 
             <LinearLayout
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/image_no_product"
@@ -112,11 +112,11 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="5dp"
                     android:id="@+id/txt_subtotal_price"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="5dp"
                     android:background="@color/colorPrimary"
                     android:gravity="right"
                     android:padding="5dp"
@@ -197,40 +197,87 @@
                     app:fontFamily="@font/sailec_regular" />
 
                 <TextView
-                    android:id="@+id/txt_remaining_paid_DateTime"
+                    android:id="@+id/txt_order_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@color/green"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/round_border"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="Remaining amount paid"
-                    android:textColor="#fff"
+                    android:textStyle="bold"
+                    android:text="@string/order_status"
+                    android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
                     app:fontFamily="@font/sailec_regular" />
 
+<!--                <TextView-->
+<!--                    android:id="@+id/txt_remaining_paid_DateTime"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="16dp"-->
+<!--                    android:layout_marginTop="12dp"-->
+<!--                    android:background="@color/green"-->
+<!--                    android:gravity="center"-->
+<!--                    android:padding="5dp"-->
+<!--                    android:text="Remaining amount paid"-->
+<!--                    android:textColor="#fff"-->
+<!--                    android:textSize="16sp"-->
+<!--                    app:fontFamily="@font/sailec_regular" />-->
 
-                    <Button
-                        android:layout_marginHorizontal="16dp"
-                        android:layout_marginVertical="16dp"
-                        android:id="@+id/btn_pdf_receipt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:background="@drawable/rounded_button"
-                        android:backgroundTint="@color/colorPrimary"
-                        android:fontFamily="@font/sailec_regular"
-                        android:text="@string/generate_pdf_receipt"
-                        android:textColor="#fff"
-                        android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_margin="10dp"
+                    tools:listitem="@layout/item_remaining_payment"
+                    tools:itemCount="3"
+                    android:background="?android:attr/selectableItemBackground">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="100dp"
+                >
 
                 <Button
+                    android:id="@+id/btn_pdf_receipt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_marginVertical="5dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/rounded_button"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:fontFamily="@font/sailec_regular"
+                    android:text="@string/generate_pdf_receipt"
+                    android:textColor="#fff"
+                    android:textStyle="bold" />
+
+                <Button
                     android:id="@+id/btn_pay_remaining"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginVertical="5dp"
                     android:layout_marginTop="2dp"
                     android:background="@drawable/rounded_button"
                     android:backgroundTint="@color/colorPrimary"
@@ -242,20 +289,12 @@
 
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                tools:listitem="@layout/item_remaining_payment"
-                tools:itemCount="3"
-                android:background="?android:attr/selectableItemBackground">
-
-            </androidx.recyclerview.widget.RecyclerView>
-
-
-
         </LinearLayout>
-    </ScrollView>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+
+
 
 </LinearLayout>
