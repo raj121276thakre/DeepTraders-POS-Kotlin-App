@@ -22,6 +22,7 @@ data class Order(
     val remainingAmtPaidTime: String = "",
     var remainingPayments: List<RemainingPayment> = emptyList(),
     var updatedRemainingAmount: Double= 0.0,
+    var updatedTotalPaidAmount: Double= 0.0,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -41,6 +42,7 @@ data class Order(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.createTypedArrayList(RemainingPayment.CREATOR)?: emptyList(),
+        parcel.readDouble(),
         parcel.readDouble(),
     ) {
     }
@@ -63,6 +65,7 @@ data class Order(
         parcel.writeString(remainingAmtPaidDate)
         parcel.writeString(remainingAmtPaidTime)
         parcel.writeDouble(updatedRemainingAmount)
+        parcel.writeDouble(updatedTotalPaidAmount)
     }
 
     override fun describeContents(): Int {

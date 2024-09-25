@@ -475,6 +475,7 @@ class ProductCart : InternetCheckActivity() {
                     totalPaidAmount = totalPaidAmountDouble ?: 0.0,
                     remainingAmount = totalRemaining ?: 0.0,
                     updatedRemainingAmount = totalRemaining ?: 0.0,
+                    updatedTotalPaidAmount = totalPaidAmountDouble ?: 0.0,
                     orderStatus = orderStatus,
                 )
 

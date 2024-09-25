@@ -107,7 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="400dp"
+                android:layout_marginBottom="10dp"
                 android:gravity="right"
                 android:orientation="vertical">
 
@@ -173,7 +173,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="14dp"
                     android:background="@color/colorPrimary"
                     android:gravity="right"
                     android:padding="5dp"
@@ -241,6 +241,17 @@
 
 
             </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                tools:listitem="@layout/item_remaining_payment"
+                tools:itemCount="3"
+                android:background="?android:attr/selectableItemBackground">
+
+            </androidx.recyclerview.widget.RecyclerView>
 
 
 
