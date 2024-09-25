@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardBackgroundColor="@color/white"
+
         app:cardCornerRadius="5dp"
         app:cardElevation="10dp"
         app:cardPreventCornerOverlap="false">
@@ -21,6 +22,7 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
             android:orientation="vertical"
+            android:background="@drawable/actionbar_gradient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -29,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:textColor="@android:color/black"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 tools:text="The Remaining Amount 500 is paid at 12:45 PM 2024-09-12" />
 
@@ -49,7 +51,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/round_border"
                     android:gravity="center"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="Remaining Amount : " />

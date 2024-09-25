@@ -10,7 +10,6 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -438,7 +437,11 @@ class SalesReportActivity : InternetCheckActivity() {
                             remainingAmtPaidDate = orderData["remainingAmtPaidDate"] as? String
                                 ?: "",
                             remainingAmtPaidTime = orderData["remainingAmtPaidTime"] as? String
-                                ?: ""
+                                ?: "",
+                            updatedTotalPaidAmount = (orderData["updatedTotalPaidAmount"] as? Number)?.toDouble()
+                                ?: 0.0,
+                            updatedRemainingAmount = (orderData["updatedRemainingAmount"] as? Number)?.toDouble()
+                                ?: 0.0
                         )
 
 
@@ -468,14 +471,14 @@ class SalesReportActivity : InternetCheckActivity() {
                             if (product != null) {
                                 val buyCost = product.buyPrice * productOrder.quantity
                                 val sellCost = productOrder.productPrice * productOrder.quantity
-                                totalProfit += (sellCost - buyCost) - order.remainingAmount
+                                totalProfit += (sellCost - buyCost) - order.updatedRemainingAmount
 
                                 //totalProfit += (productOrder.productPrice - cost) * productOrder.quantity
                             }
                         }
 
                         // Total loss if there's any unpaid amount
-                        totalLoss += if (order.remainingAmount > 0) order.remainingAmount else 0.0
+                        totalLoss += if (order.updatedRemainingAmount > 0) order.updatedRemainingAmount else 0.0
 
                         for (productOrder in productsList) {
                             totalQuantityOfProducts += productOrder.quantity // Add quantity of each product
@@ -545,11 +548,15 @@ class SalesReportActivity : InternetCheckActivity() {
                 getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
             // Set background color to green or any desired color for profit
             binding.txtProfit.setBackgroundColor(getColor(R.color.green))
+
+
         } else {
             binding.txtProfit.text =
                 getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit
             // Set background color to red for loss
             binding.txtProfit.setBackgroundColor(getColor(R.color.red))
+
+
         }
 
 // Check if totalLoss is greater than 0
