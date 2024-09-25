@@ -79,7 +79,7 @@ dependencies {
     // implementation ("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
 
     // firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-analytics")
 
 

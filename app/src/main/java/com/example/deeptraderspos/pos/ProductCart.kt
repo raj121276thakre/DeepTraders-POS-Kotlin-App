@@ -474,7 +474,8 @@ class ProductCart : InternetCheckActivity() {
                     totalPrice = totalCost ?: 0.0,
                     totalPaidAmount = totalPaidAmountDouble ?: 0.0,
                     remainingAmount = totalRemaining ?: 0.0,
-                    orderStatus = orderStatus
+                    updatedRemainingAmount = totalRemaining ?: 0.0,
+                    orderStatus = orderStatus,
                 )
 
                 val collection = if (isSupplier) "AllOrdersSuppliers" else "AllOrders"

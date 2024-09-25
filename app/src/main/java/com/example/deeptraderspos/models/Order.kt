@@ -20,6 +20,8 @@ data class Order(
     val remainingAmount: Double = 0.0,
     val remainingAmtPaidDate: String = "",
     val remainingAmtPaidTime: String = "",
+    var remainingPayments: List<RemainingPayment> = emptyList(),
+    var updatedRemainingAmount: Double= 0.0,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -32,13 +34,16 @@ data class Order(
         parcel.readString() ?: "",
         parcel.readDouble(),
         parcel.readString() ?: "",
-        parcel.createTypedArrayList(ProductOrder) ?: emptyList(),
+        parcel.createTypedArrayList(ProductOrder.CREATOR) ?: emptyList(),
         parcel.readDouble(),
         parcel.readDouble(),
         parcel.readDouble(),
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
-    )
+        parcel.readString() ?: "",
+        parcel.createTypedArrayList(RemainingPayment.CREATOR)?: emptyList(),
+        parcel.readDouble(),
+    ) {
+    }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(orderId)
@@ -57,6 +62,7 @@ data class Order(
         parcel.writeDouble(remainingAmount)
         parcel.writeString(remainingAmtPaidDate)
         parcel.writeString(remainingAmtPaidTime)
+        parcel.writeDouble(updatedRemainingAmount)
     }
 
     override fun describeContents(): Int {
@@ -73,6 +79,10 @@ data class Order(
         }
     }
 }
+
+
+
+
 
 data class ProductOrder(
     val productId: String = "",
@@ -107,6 +117,41 @@ data class ProductOrder(
         }
 
         override fun newArray(size: Int): Array<ProductOrder?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
+data class RemainingPayment(
+    var paidAmount: Double = 0.0,
+    var paidDate: String? = null,
+    var paidTime: String? = null,
+    var remainingAmount: Double = 0.0
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readDouble(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readDouble()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeDouble(paidAmount)
+        parcel.writeString(paidDate)
+        parcel.writeString(paidTime)
+        parcel.writeDouble(remainingAmount)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<RemainingPayment> {
+        override fun createFromParcel(parcel: Parcel): RemainingPayment {
+            return RemainingPayment(parcel)
+        }
+
+        override fun newArray(size: Int): Array<RemainingPayment?> {
             return arrayOfNulls(size)
         }
     }

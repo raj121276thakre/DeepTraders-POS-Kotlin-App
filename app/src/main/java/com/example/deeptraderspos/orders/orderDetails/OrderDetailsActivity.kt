@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
+import android.text.InputType
+import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +22,7 @@ import com.example.deeptraderspos.databinding.ActivityOrderDetailsBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
+import com.example.deeptraderspos.models.RemainingPayment
 import com.example.deeptraderspos.models.ShopInformation
 import com.google.firebase.firestore.FirebaseFirestore
 import com.itextpdf.kernel.colors.ColorConstants
@@ -34,6 +38,9 @@ import com.itextpdf.layout.property.TextAlignment
 import com.itextpdf.layout.property.UnitValue
 import java.io.File
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class OrderDetailsActivity : InternetCheckActivity() {
 
@@ -43,9 +50,12 @@ class OrderDetailsActivity : InternetCheckActivity() {
     private val firestore = FirebaseFirestore.getInstance()
     private lateinit var f: DecimalFormat
     private lateinit var order: Order
+    private lateinit var firebaseOrder: Order
     private var currency: String = ""
 
     private var shopInfo: ShopInformation = ShopInformation()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +81,10 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
         // Retrieve the order from the intent
         order = intent.getParcelableExtra<Order>("order") ?: return
-        val isSupplier = intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
+        val isSupplier =
+            intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
+
+        fetchOrdersByOrderId()
 
         // Initialize DecimalFormat
         f = DecimalFormat("#0.00")
@@ -79,7 +92,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         val name = if (isSupplier) {
             order.supplierName
         } else {
-              order.customerName
+            order.customerName
         }
 
         setToolbarDetails(name, order.orderId)
@@ -92,7 +105,6 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
 
 
-
         // Set up RecyclerView with adapter
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(this@OrderDetailsActivity)
@@ -103,8 +115,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         val productList: List<ProductOrder> = order.products
         if (productList.isEmpty()) {
             Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
-        }
-        else {
+        } else {
             orderDetailsAdapter = OrderDetailsAdapter(this, productList)
             binding.recycler.adapter = orderDetailsAdapter
 
@@ -119,18 +130,263 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
 
 
-        setOrderDetails()
+       // setOrderDetails(order)
 
 
         binding.btnPdfReceipt.setOnClickListener {
             // Handle PDF generation logic
-            createPdf(this, order,name,shopInfo)
+            createPdf(this, order, name, shopInfo)
         }
 
+        binding.btnPayRemaining.setOnClickListener {
+            showDialogAndUpdateToFirestore()
+        }
+    }
+
+
+    private fun showDialogAndUpdateToFirestore() {
+        val alertDialog = AlertDialog.Builder(this)
+        alertDialog.setTitle("Enter Payment Amount")
+
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        alertDialog.setView(input)
+
+        alertDialog.setPositiveButton("Pay") { dialog, _ ->
+            val userPaidAmount = input.text.toString().toDoubleOrNull() ?: 0.0
+
+            // Validate input amount
+            if (userPaidAmount <= 0.0) {
+                Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+
+            val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
+            val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
+
+            // Calculate the new remaining amount
+            val newRemainingAmount = firebaseOrder.updatedRemainingAmount - userPaidAmount
+
+            // Logging values for debugging
+            Log.d("PaymentCheck", "User paid: $userPaidAmount, Previous Remaining Amount: ${firebaseOrder.updatedRemainingAmount}, New Remaining Amount: $newRemainingAmount")
+
+            // Check if the user is attempting to pay more than the remaining amount
+            if (newRemainingAmount < 0) {
+                Toast.makeText(this, "Paid amount exceeds remaining balance", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+
+            // Create a new RemainingPayment object
+            val newPayment = RemainingPayment(
+                paidAmount = userPaidAmount,
+                paidDate = currentDate,
+                paidTime = currentTime,
+                remainingAmount = newRemainingAmount // Remaining after this payment
+            )
+
+            // Create a mutable list to hold existing payments and add the new payment
+            val updatedPayments = order.remainingPayments.toMutableList()
+            updatedPayments.add(newPayment)
+
+            // Prepare the data to update Firestore with the new payment and updated remaining amount
+            val updateData = mapOf(
+                "remainingPayments" to updatedPayments.map {
+                    mapOf(
+                        "paidAmount" to it.paidAmount,
+                        "paidDate" to it.paidDate,
+                        "paidTime" to it.paidTime,
+                        "remainingAmount" to it.remainingAmount // Include remaining amount here
+                    )
+                },
+                "updatedRemainingAmount" to newRemainingAmount // Update this to reflect the new total
+            )
+
+            // Update Firestore with the new payment data
+            firestore.collection("AllOrders").document(order.orderId).update(updateData)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Payment recorded successfully", Toast.LENGTH_SHORT).show()
+                    // Update local order details
+                    order.remainingPayments = updatedPayments // Update the local order's payment list
+                    order.updatedRemainingAmount = newRemainingAmount // Update the local order's remaining amount
+                    fetchOrdersByOrderId() // Refresh orders from Firestore if needed
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to record payment", Toast.LENGTH_SHORT).show()
+                }
+
+            dialog.dismiss()
+        }
+
+        alertDialog.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+
+        alertDialog.show()
+    }
+
+
+
+
+
+
+
+
+
+
+    //remaining
+
+    /*
+     private fun showDialogAndUpdateToFirestore() {
+        val alertDialog = AlertDialog.Builder(this)
+        alertDialog.setTitle("Enter Payment Amount")
+
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        alertDialog.setView(input)
+
+        alertDialog.setPositiveButton("Pay") { dialog, _ ->
+            val userPaidAmount = input.text.toString().toDoubleOrNull() ?: 0.0
+            if (userPaidAmount <= 0.0) {
+                Toast.makeText(this, "Invalid amount", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+
+            val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
+            val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
+            val newRemainingAmount = order.remainingAmount - userPaidAmount
+
+            if (newRemainingAmount < 0) {
+                Toast.makeText(this, "Paid amount exceeds remaining balance", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+
+            // Create a new RemainingPayment object
+            val newPayment = RemainingPayment(
+                paidAmount = userPaidAmount,
+                paidDate = currentDate,
+                paidTime = currentTime,
+                remainingAmount = newRemainingAmount // Set the remaining amount after this payment
+            )
+
+            // Filter out null or invalid values from remainingPayments list
+            val updatedPayments = order.remainingPayments
+                ?.filterNot { it == null || it.paidAmount <= 0 || it.paidDate.isNullOrEmpty() || it.paidTime.isNullOrEmpty() }
+                ?.toMutableList() ?: mutableListOf()
+
+            // Add the new payment to the list
+            updatedPayments.add(newPayment)
+
+            // Prepare the data to update Firestore with the new payment and remaining amount
+            val updateData = mapOf(
+                "remainingPayments" to updatedPayments.map {
+                    mapOf(
+                        "paidAmount" to it.paidAmount,
+                        "paidDate" to it.paidDate,
+                        "paidTime" to it.paidTime,
+                        "remainingAmount" to it.remainingAmount // Include remaining amount here
+                    )
+                },
+                "remainingAmount" to newRemainingAmount // Update the remaining amount in Firestore
+            )
+
+            // Update Firestore with the new payment data
+            firestore.collection("AllOrders").document(order.orderId).update(updateData)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Payment recorded successfully", Toast.LENGTH_SHORT).show()
+                    // Update the local order object with new remaining amount and payment history
+                    order.remainingAmount = newRemainingAmount
+                    order.remainingPayments = updatedPayments // Ensure this is updated
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to record payment", Toast.LENGTH_SHORT).show()
+                }
+
+            dialog.dismiss()
+        }
+
+        alertDialog.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
+     */
+
+    //remaining
+
+    private fun fetchOrdersByOrderId() {
+        firestore.collection("AllOrders")
+            .whereEqualTo("orderId", order.orderId) // Adjust this field name based on your Firestore structure
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val document = documents.documents[0] // Assuming orderId is unique and will return one document
+
+                    // Extract data from the document
+                    val orderId = document.getString("orderId") ?: ""
+                    val orderDate = document.getString("orderDate") ?: ""
+                    val orderTime = document.getString("orderTime") ?: ""
+                    val orderType = document.getString("orderType") ?: ""
+                    val orderStatus = document.getString("orderStatus") ?: ""
+                    val paymentMethod = document.getString("paymentMethod") ?: ""
+                    val customerName = document.getString("customerName") ?: ""
+                    val supplierName = document.getString("supplierName") ?: ""
+                    val tax = document.getDouble("tax") ?: 0.0
+                    val discount = document.getString("discount") ?: ""
+                    val totalPrice = document.getDouble("totalPrice") ?: 0.0
+                    val totalPaidAmount = document.getDouble("totalPaidAmount") ?: 0.0
+                    val remainingAmount = document.getDouble("remainingAmount") ?: 0.0
+                    val remainingAmtPaidDate = document.getString("remainingAmtPaidDate") ?: ""
+                    val remainingAmtPaidTime = document.getString("remainingAmtPaidTime") ?: ""
+                    val updatedRemainingAmount = document.getDouble("updatedRemainingAmount") ?: 0.0
+
+                    // Fetch remaining payments
+                    val remainingPayments = document.get("remainingPayments") as? List<Map<String, Any>> ?: emptyList()
+                    val paymentsList = remainingPayments.map { payment ->
+                        RemainingPayment(
+                            paidAmount = (payment["paidAmount"] as? Number)?.toDouble() ?: 0.0,
+                            paidDate = payment["paidDate"] as? String,
+                            paidTime = payment["paidTime"] as? String,
+                            remainingAmount = (payment["remainingAmount"] as? Number)?.toDouble() ?: 0.0
+                        )
+                    }
+
+                    // Create the local Order object
+                     firebaseOrder = Order(
+                        orderId = orderId,
+                        orderDate = orderDate,
+                        orderTime = orderTime,
+                        orderType = orderType,
+                        orderStatus = orderStatus,
+                        paymentMethod = paymentMethod,
+                        customerName = customerName,
+                        supplierName = supplierName,
+                        tax = tax,
+                        discount = discount,
+                        totalPrice = totalPrice,
+                        totalPaidAmount = totalPaidAmount,
+                        remainingAmount = remainingAmount, // Original field remains unchanged
+                        remainingAmtPaidDate = remainingAmtPaidDate,
+                        remainingAmtPaidTime = remainingAmtPaidTime,
+                        remainingPayments = paymentsList, // List of RemainingPayment objects
+                        updatedRemainingAmount = updatedRemainingAmount // New field for updated remaining amount
+                    )
+
+                    // Now you can set the order details
+                    setOrderDetails(firebaseOrder)
+
+                } else {
+                    Toast.makeText(this, "No order found with the given ID.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error fetching order: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
 
     }
 
-    private fun setOrderDetails() {
+
+
+    private fun setOrderDetails(order: Order) {
         // Get tax, discount, and currency
         val tax = (order.tax).toDouble() ?: 0.0
         val discount = order.discount.toDoubleOrNull() ?: 0.0
@@ -151,7 +407,11 @@ class OrderDetailsActivity : InternetCheckActivity() {
         binding.txtTotalPaid.text =
             getString(R.string.total_paid) + currency + f.format(totalPaid)
 
-        val totalRemaining = order.remainingAmount
+//        val totalRemaining = order.remainingAmount
+//        binding.txtTotalRemaining.text =
+//            getString(R.string.total_remaining) + currency + f.format(totalRemaining)
+
+        val totalRemaining = order.updatedRemainingAmount
         binding.txtTotalRemaining.text =
             getString(R.string.total_remaining) + currency + f.format(totalRemaining)
 
@@ -184,7 +444,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
                     // Create an instance of ShopInformation from the fetched data
 
                     val shopTaxString = document.getString("shopTax") ?: ""
-                     shopInfo = ShopInformation(
+                    shopInfo = ShopInformation(
                         shopName = document.getString("shopName") ?: "",
                         contactNumber = document.getString("shopContact") ?: "",
                         email = document.getString("shopEmail") ?: "",
@@ -205,7 +465,6 @@ class OrderDetailsActivity : InternetCheckActivity() {
                 ).show()
             }
     }
-
 
 
     private fun createPdf(context: Context, order: Order, name: String, shopInfo: ShopInformation) {
@@ -445,7 +704,6 @@ class OrderDetailsActivity : InternetCheckActivity() {
             Toast.makeText(context, "Error creating PDF: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
-
 
 
     private fun openPdfPreview(context: Context, file: File) {
