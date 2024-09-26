@@ -31,7 +31,7 @@ class CustomerAdapter(
 
 
                 binding.imgCall.setOnClickListener {
-                    val phone = "tel:${customer.customerAddress}"
+                    val phone = "tel:${customer.customerPhone}"
                     val callIntent = Intent(Intent.ACTION_DIAL).apply {
                         data = Uri.parse(phone)
                     }

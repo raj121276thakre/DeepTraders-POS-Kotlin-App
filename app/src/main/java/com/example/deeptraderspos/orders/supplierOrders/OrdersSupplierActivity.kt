@@ -20,20 +20,23 @@ import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityOrdersSupplierBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
+import com.example.deeptraderspos.models.CustomerWithOrders
 import com.example.deeptraderspos.models.Order
+import com.example.deeptraderspos.models.Supplier
+import com.example.deeptraderspos.models.SupplierWithOrders
 import com.example.deeptraderspos.orders.OrderAdapter
 import com.example.deeptraderspos.pos.PosActivity
 import com.google.firebase.firestore.FirebaseFirestore
 
 class OrdersSupplierActivity : InternetCheckActivity() {
 
+
     private lateinit var firestore: FirebaseFirestore
     private lateinit var orderAdapter: OrderAdapter
-    private val ordersList = mutableListOf<Order>() // List to hold fetched orders
-    private val filteredOrdersList = mutableListOf<Order>()
+    private val supplierWithOrdersList = mutableListOf<SupplierWithOrders>()
     private lateinit var binding: ActivityOrdersSupplierBinding // ViewBinding
 
-    private var selectedSupplierID: String = "0" // Store selected supplier ID
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,172 +55,76 @@ class OrdersSupplierActivity : InternetCheckActivity() {
         firestore = FirebaseFirestore.getInstance()
 
         // Go Back Button
-        val goBackBtn = binding.goBackBtn
-        goBackBtn.setOnClickListener {
-            onBackPressed()  // This will take you back to the previous activity
+        binding.goBackBtn.setOnClickListener {
+            onBackPressed()
         }
 
         // Go to POS Activity Button
-        val gotoPosBtn = binding.gotoPosBtn
-        gotoPosBtn.setOnClickListener {
+        binding.gotoPosBtn.setOnClickListener {
             val intent = Intent(this, PosActivity::class.java)  // Replace with your POS Activity class name
             startActivity(intent)
         }
 
         // Setup RecyclerView and Adapter
         setupRecyclerView()
-        // Fetch orders from Firestore
-        fetchOrders()
+        // Fetch suppliers and their orders from Firestore
+        fetchSuppliersWithOrders()
 
-        binding.etxtSortOrder.setOnClickListener {
-            showSuppliersList(binding.etxtSortOrder)
-        }
-
-        binding.resetFilterBtn.setOnClickListener {
-            // Fetch orders from Firestore
-            fetchOrders()
-            binding.etxtSortOrder.hint = getString(R.string.sort_order_supplier)
-            binding.etxtSortOrder.text?.clear() // Clear the text to show hint
-        }
     }
 
-    private fun showSuppliersList(dialogSupplier: TextView) {
-        val supplierAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
-
-        // Fetch suppliers from Firestore
-        firestore.collection("AllSuppliers")
-            .get()
-            .addOnSuccessListener { documents ->
-                val supplierNames = mutableListOf<String>()
-                val supplierData = mutableListOf<Map<String, String>>()
-
-                for (document in documents) {
-                    val supplierName = document.getString("supplierName") ?: ""
-                    supplierNames.add(supplierName)
-
-                    // Create a new Map<String, String> to store supplier data
-                    val supplierInfo = mutableMapOf<String, String>()
-                    for ((key, value) in document.data) {
-                        supplierInfo[key] = value.toString() // Convert each value to String
-                    }
-                    supplierData.add(supplierInfo)
-                }
-
-                supplierAdapter.addAll(supplierNames)
-
-                val dialog = AlertDialog.Builder(this)
-                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
-                dialog.setView(dialogView)
-                dialog.setCancelable(false)
-
-                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
-                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
-                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
-                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
-
-                dialogTitle.setText(R.string.suppliers)
-                dialogList.adapter = supplierAdapter
-
-                // Implement search functionality
-                dialogInput.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
-                        supplierAdapter.filter.filter(charSequence)
-                    }
-                    override fun afterTextChanged(s: Editable?) {}
-                })
-
-                val alertDialog = dialog.create()
-
-                dialogButton.setOnClickListener {
-                    alertDialog.dismiss()
-                }
-
-                alertDialog.show()
-
-                dialogList.setOnItemClickListener { parent, view, position, id ->
-                    alertDialog.dismiss()
-                    val selectedItem = supplierAdapter.getItem(position) ?: return@setOnItemClickListener
-
-                    dialogSupplier.text = selectedItem
-
-                    var supplierId = "0"
-                    for (i in supplierNames.indices) {
-                        if (supplierNames[i].equals(selectedItem, ignoreCase = true)) {
-                            supplierId = supplierData[i]["supplier_id"] ?: "0"
-                        }
-                    }
-
-                    selectedSupplierID = selectedItem
-
-                    // Filter orders based on selected supplier ID
-                    filterOrdersBySupplier(selectedSupplierID)
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to fetch suppliers: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    // Setup RecyclerView and attach Adapter.
+    // Setup RecyclerView and attach Adapter
     private fun setupRecyclerView() {
-        orderAdapter = OrderAdapter(this, ordersList, true)
+        orderAdapter = OrderAdapter(this, supplierWithOrdersList, true) // Pass true to indicate it's for suppliers
         binding.ordersRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.ordersRecyclerView.adapter = orderAdapter
     }
 
-    // Fetch orders from Firestore and update the adapter
-    private fun fetchOrders() {
-        showProgressBar("fetching Orders information...")
-        firestore.collection("AllOrdersSuppliers")
-            .get()
-            .addOnSuccessListener { documents ->
-                hideProgressBar()
-                val fetchedOrders = mutableListOf<Order>()
-                for (document in documents) {
-                    val order = document.toObject(Order::class.java) // Convert Firestore document to Order object
-                    fetchedOrders.add(order) // Add order to list
+    // Fetch all suppliers and their orders from Firestore
+    private fun fetchSuppliersWithOrders() {
+        showProgressBar("Fetching suppliers and their orders...")
+
+        firestore.collection("AllSuppliers").get() // Fetch from 'AllSuppliers' collection
+            .addOnSuccessListener { supplierDocuments ->
+                val suppliers = supplierDocuments.toObjects(Supplier::class.java)
+                supplierWithOrdersList.clear()
+
+                // For each supplier, fetch their orders from AllOrders collection
+                for (supplier in suppliers) {
+                    fetchOrdersForSupplier(supplier)
                 }
-                // Reverse the order to show the latest orders at the top
-                fetchedOrders.reverse()
-                updateAdapter(fetchedOrders) // Update the adapter with the new data
+
             }
             .addOnFailureListener { e ->
                 hideProgressBar()
-                Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error fetching suppliers: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun filterOrdersBySupplier(supplierName: String) {
-        filteredOrdersList.clear() // Clear previous filtered orders
 
-        // Fetch orders from Firestore for the selected supplier name
+
+    // Fetch orders for a specific supplier
+    private fun fetchOrdersForSupplier(supplier: Supplier) {
         firestore.collection("AllOrdersSuppliers")
-            .whereEqualTo("supplierName", supplierName) // Adjust this field name based on your Firestore structure
+            .whereEqualTo("supplierName", supplier.supplierName) // Assuming `supplierName` is the matching field
             .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val order = document.toObject(Order::class.java)
-                    filteredOrdersList.add(order) // Add the order to the filtered list
-                }
-                // Reverse the order to show the latest orders at the top
-                filteredOrdersList.reverse()
-                // Update the adapter with the filtered list
-                updateAdapter(filteredOrdersList)
+            .addOnSuccessListener { orderDocuments ->
+                val orders = orderDocuments.toObjects(Order::class.java)
+                val supplierWithOrders = SupplierWithOrders(supplier, orders)
 
-                // Show a message if no orders were found
-                if (filteredOrdersList.isEmpty()) {
-                    Toast.makeText(this, "No orders found for $supplierName", Toast.LENGTH_SHORT).show()
+                // Add supplier with orders to the list only if they have orders
+                if (orders.isNotEmpty()) {
+                    supplierWithOrdersList.add(supplierWithOrders)
                 }
+
+                // Notify adapter about data change
+                orderAdapter.updateEntityWithOrdersData(supplierWithOrdersList)
+                hideProgressBar()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
+                Toast.makeText(this, "Error fetching orders for ${supplier.supplierName}: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Update the adapter with fetched orders
-    private fun updateAdapter(orders: List<Order>) {
-        orderAdapter.updateOrderData(orders)
-        orderAdapter.notifyDataSetChanged() // Notify the adapter that data has changed
-    }
+
 }

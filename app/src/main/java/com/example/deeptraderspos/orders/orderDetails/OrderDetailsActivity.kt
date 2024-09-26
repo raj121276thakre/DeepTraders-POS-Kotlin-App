@@ -359,7 +359,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
                     setOrderDetails(firebaseOrder)
 
                 } else {
-                    Toast.makeText(this, "No order found with the given ID.", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "No order found with the given ID. ${intentOrder.orderId}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
