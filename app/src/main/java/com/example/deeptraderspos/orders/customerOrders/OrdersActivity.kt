@@ -2,6 +2,8 @@ package com.example.deeptraderspos.orders.customerOrders
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
@@ -58,7 +60,49 @@ class OrdersActivity : InternetCheckActivity() {
         setupRecyclerView()
         // Fetch customers and their orders from Firestore
         fetchCustomersWithOrders()
+
+        binding.etxtSearchCustomer.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val searchText = s.toString().trim()
+                filterCustomersByName(searchText)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No action needed
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // No action needed
+            }
+        })
+
+        binding.resetFilterBtn.setOnClickListener {
+            fetchCustomersWithOrders()
+            binding.etxtSearchCustomer.text.clear()
+        }
+
+
     }
+
+
+    // Filter customers by name and update the RecyclerView
+    private fun filterCustomersByName(searchText: String) {
+        if (searchText.isEmpty()) {
+            orderAdapter.updateEntityWithOrdersData(customerWithOrdersList)
+        } else {
+            val filteredList = customerWithOrdersList.filter { customerWithOrders ->
+                customerWithOrders.customer.customerName.contains(searchText, ignoreCase = true)
+            }
+            orderAdapter.updateEntityWithOrdersData(filteredList)
+        }
+
+        orderAdapter.notifyDataSetChanged()
+    }
+
+
+
+
+
 
     // Setup RecyclerView and attach Adapter
     private fun setupRecyclerView() {

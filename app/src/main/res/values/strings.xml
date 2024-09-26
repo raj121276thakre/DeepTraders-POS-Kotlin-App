@@ -12,16 +12,6 @@
 
     <string name="price_rupee">₹ %s</string>
 
-
-    <!--Replace your adMob application ID here -->
-    <string name="admob_application_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
-
-    <!--Replace your adMob Banner Ads ID here -->
-    <string name="admob_banner_ads_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-
-    <!--Replace your admob Interstitial Ads ID here -->
-    <string name="admob_interstitial_ads_id" translatable="false">"ca-app-pub-3940256099942544/1033173712"</string>
-
     <string name="action_settings">Settings</string>
     <string name="products">Products</string>
     <string name="suppliers">Suppliers</string>

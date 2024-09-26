@@ -67,7 +67,7 @@ class PersonOrderAdapter(
         } else if (order.orderStatus == Constants.PENDING) {
             holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
             holder.txtOrderStatus.setTextColor(Color.WHITE)
-            holder.imgStatus.visibility = View.VISIBLE
+            holder.imgStatus.visibility = View.GONE
         }
 
 
@@ -82,69 +82,69 @@ class PersonOrderAdapter(
 
 
         holder.imgStatus.setOnClickListener {
-            val dialogBuilder = NiftyDialogBuilder.getInstance(context)
-            dialogBuilder
-                .withTitle(context.getString(R.string.change_order_status))
-                .withTitleColor("#FFFFFF")
-                .withMessage(context.getString(R.string.please_change_order_status_to_complete_or_cancel) + "\n\nRemaining Payment amount : ₹${order.remainingAmount}")
-                .withMessageColor("#FFFFFF")
-                .withEffect(Effectstype.Slidetop)
-                .withDialogColor("#04C7FF") // Use color code for dialog
-                .withButton1Text("Cancel\n")
-                .withButtonDrawable(R.drawable.rounded_button)
-                .withButton2Text(context.getString(R.string.pay_remaining))
-                .withDividerColor("#FFFFFF")
-
-                .setButton1Click {
-                    dialogBuilder.dismiss()
-                }
-                .setButton2Click {
-                    updateOrderStatus(order.orderId, Constants.COMPLETED, holder)
-                    dialogBuilder.dismiss()
-                }
-                .show()
+//            val dialogBuilder = NiftyDialogBuilder.getInstance(context)
+//            dialogBuilder
+//                .withTitle(context.getString(R.string.change_order_status))
+//                .withTitleColor("#FFFFFF")
+//                .withMessage(context.getString(R.string.please_change_order_status_to_complete_or_cancel) + "\n\nRemaining Payment amount : ₹${order.remainingAmount}")
+//                .withMessageColor("#FFFFFF")
+//                .withEffect(Effectstype.Slidetop)
+//                .withDialogColor("#04C7FF") // Use color code for dialog
+//                .withButton1Text("Cancel\n")
+//                .withButtonDrawable(R.drawable.rounded_button)
+//                .withButton2Text(context.getString(R.string.pay_remaining))
+//                .withDividerColor("#FFFFFF")
+//
+//                .setButton1Click {
+//                    dialogBuilder.dismiss()
+//                }
+//                .setButton2Click {
+//                    updateOrderStatus(order.orderId, Constants.COMPLETED, holder)
+//                    dialogBuilder.dismiss()
+//                }
+//                .show()
         }
 
 
     }
 
 
-    private fun updateOrderStatus(orderId: String, status: String, holder: MyViewHolder) {
-
-        // Get current date in the required format
-        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
-        val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
-
-        // Prepare the data to update
-        val updateData = mapOf(
-            "orderStatus" to status,
-            "remainingAmtPaidDate" to currentDate,
-            "remainingAmtPaidTime" to currentTime,
-            "remainingAmount" to 0.0
-        )
-
-        val orderRef = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
-
-        orderRef.document(orderId).update(updateData)
-            .addOnSuccessListener {
-                if (status == Constants.COMPLETED) {
-                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
-                    holder.txtOrderStatus.text = Constants.COMPLETED
-                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#43a047"))
-                    holder.txtOrderStatus.setTextColor(Color.WHITE)
-                    holder.imgStatus.visibility = View.GONE
-                } else {
-                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
-                    holder.txtOrderStatus.text = Constants.PENDING
-                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
-                    holder.txtOrderStatus.setTextColor(Color.WHITE)
-                    holder.imgStatus.visibility = View.GONE
-                }
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, R.string.failed, Toast.LENGTH_SHORT).show()
-            }
-    }
+//    private fun updateOrderStatus(orderId: String, status: String, holder: MyViewHolder) {
+//
+//        // Get current date in the required format
+//        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
+//        val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
+//
+//        // Prepare the data to update
+//        val updateData = mapOf(
+//            "orderStatus" to status,
+//            "remainingAmtPaidDate" to currentDate,
+//            "remainingAmtPaidTime" to currentTime,
+//            "remainingAmount" to 0.0
+//        )
+//
+//        val orderRef = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
+//
+//        orderRef.document(orderId).update(updateData)
+//            .addOnSuccessListener {
+//                if (status == Constants.COMPLETED) {
+//                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
+//                    holder.txtOrderStatus.text = Constants.COMPLETED
+//                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#43a047"))
+//                    holder.txtOrderStatus.setTextColor(Color.WHITE)
+//                    holder.imgStatus.visibility = View.GONE
+//                } else {
+//                    Toast.makeText(context, R.string.order_updated, Toast.LENGTH_SHORT).show()
+//                    holder.txtOrderStatus.text = Constants.PENDING
+//                    holder.txtOrderStatus.setBackgroundColor(Color.parseColor("#757575"))
+//                    holder.txtOrderStatus.setTextColor(Color.WHITE)
+//                    holder.imgStatus.visibility = View.GONE
+//                }
+//            }
+//            .addOnFailureListener {
+//                Toast.makeText(context, R.string.failed, Toast.LENGTH_SHORT).show()
+//            }
+//    }
 
 
     override fun getItemCount(): Int {

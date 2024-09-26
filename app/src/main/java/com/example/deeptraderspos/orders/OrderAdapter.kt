@@ -72,9 +72,9 @@ class OrderAdapter(
         val totalPaid = orders.sumOf { it.updatedTotalPaidAmount }
         val totalRemaining = orders.sumOf { it.updatedRemainingAmount }
 
-        holder.txtTotalAmount.text = "Total Amount: $totalAmount"
-        holder.txtTotalPaid.text = "Total Paid: $totalPaid"
-        holder.txtTotalRemaining.text = "Total Remaining: $totalRemaining"
+        holder.txtTotalAmount.text = "Total Amount: ₹$totalAmount"
+        holder.txtTotalPaid.text = "Total Paid: ₹$totalPaid"
+        holder.txtTotalRemaining.text = "Total Remaining: ₹$totalRemaining"
 
         // Logic for completed or pending orders
         if (totalRemaining.toInt() == 0) {

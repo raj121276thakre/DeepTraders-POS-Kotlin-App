@@ -70,7 +70,49 @@ class OrdersSupplierActivity : InternetCheckActivity() {
         // Fetch suppliers and their orders from Firestore
         fetchSuppliersWithOrders()
 
+        binding.etxtSearchSupplier.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val searchText = s.toString().trim()
+                filterSuppliersByName(searchText)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No action needed
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // No action needed
+            }
+        })
+
+        binding.resetFilterBtn.setOnClickListener {
+            fetchSuppliersWithOrders()
+            binding.etxtSearchSupplier.text.clear()
+        }
+
     }
+
+
+    private fun filterSuppliersByName(searchText: String) {
+        if (searchText.isEmpty()) {
+            // If search text is empty, show all suppliers
+            orderAdapter.updateEntityWithOrdersData(supplierWithOrdersList)
+        } else {
+            // Filter supplier list based on search text
+            val filteredList = supplierWithOrdersList.filter { supplierWithOrders ->
+                supplierWithOrders.supplier.supplierName.contains(searchText, ignoreCase = true)
+            }
+
+            // Update the adapter with the filtered list
+            orderAdapter.updateEntityWithOrdersData(filteredList)
+        }
+
+        // Notify the adapter that the data has changed
+        orderAdapter.notifyDataSetChanged()
+    }
+
+
+
 
     // Setup RecyclerView and attach Adapter
     private fun setupRecyclerView() {
