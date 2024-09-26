@@ -180,7 +180,7 @@
                                     android:layout_marginTop="10dp"
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
-                                    android:text="@string/all_suppliers_orders"
+                                    android:text="@string/all_suppliers"
                                     android:textColor="#bcbcbc"
                                     android:textSize="18sp" />
 

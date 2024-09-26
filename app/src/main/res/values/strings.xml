@@ -16,7 +16,7 @@
     <string name="products">Products</string>
     <string name="suppliers">Suppliers</string>
     <string name="customers">Customers</string>
-    <string name="pos">POS</string>
+    <string name="pos">Place Orders</string>
     <string name="expense">Expense</string>
     <string name="report">Report</string>
     <string name="all_orders">All Orders</string>
