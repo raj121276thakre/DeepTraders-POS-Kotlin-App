@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.orders
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -14,6 +15,10 @@ import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.pos.PosActivity
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class PersonWiseOrdersActivity : InternetCheckActivity() {
 
@@ -24,7 +29,7 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityPersonWiseOrdersBinding // ViewBinding
 
 
-   // private lateinit var order: Order
+    // private lateinit var order: Order
     private lateinit var name: String
     private var isSupplier: Boolean = false
 
@@ -43,19 +48,14 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
 
         firestore = FirebaseFirestore.getInstance()
         // Retrieve the order from the intent
-       // order = intent.getParcelableExtra<Order>("order") ?: return
+        // order = intent.getParcelableExtra<Order>("order") ?: return
         name = intent.getStringExtra("name").toString()
         isSupplier =
             intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
 
-//        val name = if (isSupplier) {
-//            order.supplierName
-//        } else {
-//            order.customerName
-//        }
 
 
-     setToolBarTitle(name)
+        setToolBarTitle(name)
 
 
         // Go Back Button
@@ -82,16 +82,100 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             // Fetch orders from Firestore
             // Filter orders based on selected customer ID
             fetchOrdersByPersonName(name)
+            // Clear the date text from the TextView
+            binding.txtSelectDate.text = getString(R.string.select_date)
+        }
 
+        binding.txtSelectDate.setOnClickListener {
+            showDatePickerDialog()
         }
 
     }
+
+
+    private fun showDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, selectedYear, selectedMonth, selectedDay ->
+                // Format the selected date as yyyy-MM-dd
+                val selectedDate = String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+
+                // Update the TextView with the selected date
+                binding.txtSelectDate.text = selectedDate
+
+                // Filter the orders by the selected date
+                filterOrdersByDate(selectedDate)
+            },
+            year, month, day
+        )
+        datePickerDialog.show()
+    }
+
+
+
+    private fun filterOrdersByDate(selectedDate: String) {
+        filteredOrdersList.clear() // Clear previous filtered orders
+
+        val orderRef = firestore.collection(if (isSupplier) "AllOrdersSuppliers" else "AllOrders")
+
+        // Parse the selectedDate to a Date object (assuming date format is yyyy-MM-dd)
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date: Date? = simpleDateFormat.parse(selectedDate)
+
+
+
+        if (date != null) {
+
+            val query = if (isSupplier) {
+                // Filter by supplier name and date (assuming orderDate is stored as String "yyyy-MM-dd")
+                orderRef.whereEqualTo("supplierName", name)
+                    .whereEqualTo("orderDate", selectedDate)
+            } else {
+                // Filter by customer name and date (assuming orderDate is stored as String "yyyy-MM-dd")
+                orderRef.whereEqualTo("customerName", name)
+                    .whereEqualTo("orderDate", selectedDate)
+            }
+
+            query.get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        val order = document.toObject(Order::class.java)
+                        filteredOrdersList.add(order) // Add the order to the filtered list
+                    }
+
+                    // Sort the filtered orders by orderDate (optional if already sorted by Firestore)
+                    filteredOrdersList.sortByDescending { it.orderDate }
+
+                    // Update the adapter with the filtered list
+                    updateAdapter(filteredOrdersList)
+
+                    // Show a message if no orders were found
+                    if (filteredOrdersList.isEmpty()) {
+                        Toast.makeText(this, "No orders found for the selected date", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        } else {
+            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 
     private fun setToolBarTitle(name: String) {
         if (isSupplier) {
             binding.toolbarTitle.text = getString(R.string.suppliers_wise_orders) + " " + name
         } else {
-            binding.toolbarTitle.text = getString(R.string.customers_wise_orders)  + " " + name
+            binding.toolbarTitle.text = getString(R.string.customers_wise_orders) + " " + name
         }
     }
 
