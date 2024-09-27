@@ -71,7 +71,7 @@ class AddUnitActivity : InternetCheckActivity() {
                 db.collection("AllUnits").document(documentId)
                     .set(unitWithId)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Unit added successfully with ID", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Unit added successfully", Toast.LENGTH_SHORT).show()
                         finish() // Close the activity after successful save
                     }
                     .addOnFailureListener { e ->

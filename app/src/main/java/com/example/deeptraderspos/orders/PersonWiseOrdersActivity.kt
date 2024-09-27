@@ -14,6 +14,7 @@ import com.example.deeptraderspos.databinding.ActivityPersonWiseOrdersBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.pos.PosActivity
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -202,22 +203,28 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             orderRef.whereEqualTo("customerName", name) // Filter by customerName otherwise
         }
 
+
+
         query.get()
             .addOnSuccessListener { documents ->
+
                 for (document in documents) {
                     val order = document.toObject(Order::class.java)
                     filteredOrdersList.add(order) // Add the order to the filtered list
                 }
-                // Reverse the order to show the latest orders at the top
-                filteredOrdersList.reverse()
-                // Update the adapter with the filtered list
-                updateAdapter(filteredOrdersList)
 
                 // Show a message if no orders were found
                 if (filteredOrdersList.isEmpty()) {
                     Toast.makeText(this, "No orders found for $name", Toast.LENGTH_SHORT)
                         .show()
                 }
+
+                // Reverse the order to show the latest orders at the top
+                filteredOrdersList.reverse()
+                // Update the adapter with the filtered list
+                updateAdapter(filteredOrdersList)
+
+
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error fetching orders: ${e.message}", Toast.LENGTH_SHORT)

@@ -79,7 +79,7 @@ class AddCategoryActivity : InternetCheckActivity() {
                     .addOnSuccessListener {
                         Toast.makeText(
                             this,
-                            "Category added successfully with ID",
+                            "Category added successfully",
                             Toast.LENGTH_SHORT
                         ).show()
                         finish() // Close the activity after successful save

@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.report
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,8 @@ import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
+import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
+import com.example.deeptraderspos.pos.PosActivity
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -58,6 +61,11 @@ class SalesReportActivity : InternetCheckActivity() {
 
         // Initialize BarChart
         barChart = binding.barchart
+
+        binding.totalOrderBtn.setOnClickListener {
+            val intent = Intent(this, OrdersActivity::class.java)  // Replace with your POS Activity class name
+            startActivity(intent)
+        }
 
         // Go Back Button
         val goBackBtn = binding.menuIcon
@@ -464,18 +472,46 @@ class SalesReportActivity : InternetCheckActivity() {
                         // Net sales
                         netSales += order.totalPrice
 
-                        // Calculate profit and loss based on products' buy prices
-                        for (productOrder in productsList) {
-                            val product =
-                                productMap[productOrder.productId] // Ensure productMap is populated
-                            if (product != null) {
-                                val buyCost = product.buyPrice * productOrder.quantity
-                                val sellCost = productOrder.productPrice * productOrder.quantity
-                                totalProfit += (sellCost - buyCost) - order.updatedRemainingAmount
+                        // Calculate totals for the current order
+                        var orderSellingPrice = 0.0
+                        var orderCostPrice = 0.0
+                        var discount = order.discount.toDoubleOrNull() ?: 0.0
 
-                                //totalProfit += (productOrder.productPrice - cost) * productOrder.quantity
+
+                        for (productOrder in productsList) {
+                            val product = productMap[productOrder.productId]
+
+                            if (product != null) {
+                                // Cost price and selling price calculations
+                                val costPrice = product.buyPrice * productOrder.quantity
+                                val sellingPrice = productOrder.productPrice * productOrder.quantity
+
+                                orderCostPrice += costPrice
+                                orderSellingPrice += sellingPrice
                             }
                         }
+
+                        // Apply discount to total selling price
+                        orderSellingPrice -= discount
+
+
+                        // Calculate profit and loss for the order
+                        val profit = orderSellingPrice - orderCostPrice
+                        totalProfit += profit
+
+
+//                        // Calculate profit and loss based on products' buy prices
+//                        for (productOrder in productsList) {
+//                            val product =
+//                                productMap[productOrder.productId] // Ensure productMap is populated
+//                            if (product != null) {
+//                                val buyCost = product.buyPrice * productOrder.quantity
+//                                val sellCost = productOrder.productPrice * productOrder.quantity
+//                                totalProfit += (sellCost - buyCost)  // - order.updatedRemainingAmount
+//
+//                                //totalProfit += (productOrder.productPrice - cost) * productOrder.quantity
+//                            }
+//                        }
 
                         // Total loss if there's any unpaid amount
                         totalLoss += if (order.updatedRemainingAmount > 0) order.updatedRemainingAmount else 0.0

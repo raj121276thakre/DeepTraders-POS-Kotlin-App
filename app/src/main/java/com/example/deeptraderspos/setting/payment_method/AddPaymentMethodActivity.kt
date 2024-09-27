@@ -72,7 +72,7 @@ class AddPaymentMethodActivity : InternetCheckActivity() {
                     .addOnSuccessListener {
                         Toast.makeText(
                             this,
-                            "Payment method added successfully with ID",
+                            "Payment method added successfully",
                             Toast.LENGTH_SHORT
                         ).show()
                         finish() // Close the activity after successful save

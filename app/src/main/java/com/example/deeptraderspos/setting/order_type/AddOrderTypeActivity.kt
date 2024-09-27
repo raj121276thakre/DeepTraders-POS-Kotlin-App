@@ -71,7 +71,7 @@ class AddOrderTypeActivity : InternetCheckActivity() {
                 db.collection("AllOrderTypes").document(documentId)
                     .set(orderTypeWithId)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "com.example.deeptraderspos.models.Order type added successfully with ID", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Order type added successfully", Toast.LENGTH_SHORT).show()
                         finish() // Close the activity after successful save
                     }
                     .addOnFailureListener { e ->

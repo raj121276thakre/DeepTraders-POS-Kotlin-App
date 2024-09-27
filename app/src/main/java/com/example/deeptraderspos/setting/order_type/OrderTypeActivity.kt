@@ -122,7 +122,7 @@ class OrderTypeActivity : InternetCheckActivity() {
 
     fun deleteOrderType(orderType: OrderType, callback: (Boolean) -> Unit) {
         val orderTypeId = orderType.id ?: run {
-            Toast.makeText(this, "com.example.deeptraderspos.models.Order Type ID is missing", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Order Type ID is missing", Toast.LENGTH_SHORT).show()
             callback(false)
             return
         }
@@ -130,12 +130,12 @@ class OrderTypeActivity : InternetCheckActivity() {
         firestore.collection("AllOrderTypes").document(orderTypeId)
             .delete()
             .addOnSuccessListener {
-                Toast.makeText(this, "com.example.deeptraderspos.models.Order Type deleted successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Order Type deleted successfully", Toast.LENGTH_SHORT).show()
                 callback(true)
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
-                Toast.makeText(this, "Failed to delete com.example.deeptraderspos.models.Order Type: ${e.message}", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Failed to delete Order Type: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
                 callback(false)
             }

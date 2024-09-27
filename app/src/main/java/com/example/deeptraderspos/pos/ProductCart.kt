@@ -144,7 +144,8 @@ class ProductCart : InternetCheckActivity() {
                         email = document.getString("shopEmail") ?: "",
                         address = document.getString("shopAddress") ?: "",
                         currencySymbol = document.getString("shopCurrency") ?: "",
-                        taxPercentage = (document.getString("shopTax"))!!.toDouble(),
+                       // taxPercentage = (document.getString("shopTax"))!!.toDouble(),
+                        taxPercentage = document.getString("shopTax")?.toDoubleOrNull() ?: 0.0,
                         id = document.id // Get the document ID
                     )
 
@@ -665,7 +666,7 @@ class ProductCart : InternetCheckActivity() {
                     // Create a new Map<String, String> to store customer data
                     val customerInfo = mutableMapOf<String, String>()
                     for ((key, value) in document.data) {
-                        customerInfo[key] = value.toString() // Convert each value to String
+                        customerInfo[key] = value?.toString() ?: "N/A" // Convert each value to String
                     }
                     customerData.add(customerInfo)
                 }

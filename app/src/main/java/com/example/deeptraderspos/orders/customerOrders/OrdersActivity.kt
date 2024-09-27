@@ -117,6 +117,7 @@ class OrdersActivity : InternetCheckActivity() {
 
         firestore.collection("AllCustomers").get()
             .addOnSuccessListener { customerDocuments ->
+                hideProgressBar()
                 val customers = customerDocuments.toObjects(Customer::class.java)
                 customerWithOrdersList.clear()
 
@@ -145,10 +146,10 @@ class OrdersActivity : InternetCheckActivity() {
 
                 // Notify adapter about data change
                 orderAdapter.updateEntityWithOrdersData(customerWithOrdersList)
-                hideProgressBar()
+
             }
             .addOnFailureListener { e ->
-                hideProgressBar()
+
                 Toast.makeText(this, "Error fetching orders for ${customer.customerName}: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }

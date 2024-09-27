@@ -66,6 +66,32 @@ class PosActivity : InternetCheckActivity() {
             onBackPressed()  // This will take you back to the previous activity
         }
 
+        // Initialize productAdapter with an empty list
+        productAdapter = PosProductAdapter(
+            productsList,
+            this,
+            onAddtocartClick = { product -> addToCartProduct(product) },
+            onEditClicked = { product -> editProduct(product) }
+        )
+
+        binding.recycler.adapter = productAdapter // Set the adapter
+        binding.recycler.layoutManager = GridLayoutManager(this, spanCount)
+        binding.recycler.setHasFixedSize(true)
+
+
+        // Initialize categoryAdapter with an empty list
+        categoryAdapter = ProductCategoryAdapter(categoryList, this) { category ->
+            loadProductsByCategory(category.categoryName!!)
+        }
+
+        // Set the adapter to the RecyclerView
+        binding.categoryRecyclerview.adapter = categoryAdapter
+        binding.categoryRecyclerview.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.categoryRecyclerview.setHasFixedSize(true)
+
+
+
         binding.txtNoProducts.visibility = View.GONE
 
         // Set up RecyclerViews
@@ -76,9 +102,9 @@ class PosActivity : InternetCheckActivity() {
             loadProducts()
         }
 
-        binding.categoryRecyclerview.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.categoryRecyclerview.setHasFixedSize(true)
+//        binding.categoryRecyclerview.layoutManager =
+//            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        binding.categoryRecyclerview.setHasFixedSize(true)
 
         loadCategories()
         getCartItemCount()
