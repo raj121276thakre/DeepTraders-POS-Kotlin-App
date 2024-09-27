@@ -115,7 +115,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/all_sales_report"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -174,7 +174,7 @@
                                 android:layout_marginBottom="20dp"
                                 android:fontFamily="@font/sailec_regular"
                                 android:text="@string/monthly_expense_graph"
-                                android:textColor="#bcbcbc"
+                                android:textColor="#000000"
                                 android:textSize="18sp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -226,7 +226,7 @@
                                 android:layout_marginBottom="20dp"
                                 android:fontFamily="@font/sailec_regular"
                                 android:text="@string/daily_expense_graph"
-                                android:textColor="#bcbcbc"
+                                android:textColor="#000000"
                                 android:textSize="18sp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -278,7 +278,7 @@
                                 android:layout_marginBottom="20dp"
                                 android:fontFamily="@font/sailec_regular"
                                 android:text="@string/yearly_expense_graph"
-                                android:textColor="#bcbcbc"
+                                android:textColor="#000000"
                                 android:textSize="18sp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>

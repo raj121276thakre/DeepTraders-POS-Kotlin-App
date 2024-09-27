@@ -40,6 +40,12 @@ class ExpenseGraphActivity : InternetCheckActivity() {
         // Set the status bar color
         Utils.setStatusBarColor(this)
 
+        // Go Back Button
+        val goBackBtn = binding.menuIcon
+        goBackBtn.setOnClickListener {
+            onBackPressed()  // This will take you back to the previous activity
+        }
+
         db = FirebaseFirestore.getInstance()
 
         // Trigger month picker

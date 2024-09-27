@@ -116,7 +116,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/all_customers_orders"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -181,7 +181,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/all_suppliers"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>

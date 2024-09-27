@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -30,6 +31,7 @@ import com.example.deeptraderspos.models.ShopInformation
 import com.example.deeptraderspos.orders.OrderAdapter.MyViewHolder
 import com.google.firebase.firestore.FirebaseFirestore
 import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
@@ -469,16 +471,26 @@ class OrderDetailsActivity : InternetCheckActivity() {
             // Set margins
             document.setMargins(20f, 20f, 20f, 20f)
 
+            // Retrieve the custom color from resources
+            val customBlue = ContextCompat.getColor(this, R.color.pdf_Background_Color)
+
+          // Convert it to RGB for use with iText
+            val red = Color.red(customBlue)
+            val green = Color.green(customBlue)
+            val blue = Color.blue(customBlue)
+            val customPdfColor = DeviceRgb(red, green, blue)
+
             // Header - Company Information with Blue Background
             val headerTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 1f)))
                 .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
+                .setBackgroundColor(customPdfColor)
+                .setFontColor(ColorConstants.BLACK)
 
             headerTable.addCell(
-                Cell().add(Paragraph("BlueBird Industries")) // shop name
+                Cell().add(Paragraph(shopInfo.shopName)) // shop name
                     .setTextAlignment(TextAlignment.LEFT)
-                    .setFontSize(16f)
+                    .setFontSize(20f)
+                    .setBold()
                     .setBorder(Border.NO_BORDER)
             )
 
@@ -542,8 +554,8 @@ class OrderDetailsActivity : InternetCheckActivity() {
             // Item Table Header
             val itemTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 2f, 2f, 2f, 2f)))
                 .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
+                .setBackgroundColor(customPdfColor)
+                .setFontColor(ColorConstants.BLACK)
                 .setMarginBottom(10f)
 
 
@@ -649,10 +661,16 @@ class OrderDetailsActivity : InternetCheckActivity() {
                     .setBold()
             )
 
+            val status =
+                if (payment.remainingAmount.toInt() == 0) {
+                    Constants.COMPLETED
+                } else {
+                    Constants.PENDING
 
+                }
 
             footerTable.addCell(
-                Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
+                Cell().add(Paragraph("Order Status : $status"))
                     .setBorder(Border.NO_BORDER)
                     .setFontSize(16f)
                     .setBold()
@@ -693,17 +711,26 @@ class OrderDetailsActivity : InternetCheckActivity() {
             val pdfDocument = PdfDocument(pdfWriter)
             val document = Document(pdfDocument, PageSize.A4)
 
+            // Retrieve the custom color from resources
+            val customBlue = ContextCompat.getColor(this, R.color.pdf_Background_Color)
+
+            // Convert it to RGB for use with iText
+            val red = Color.red(customBlue)
+            val green = Color.green(customBlue)
+            val blue = Color.blue(customBlue)
+            val customPdfColor = DeviceRgb(red, green, blue)
+
             // Set margins
             document.setMargins(20f, 20f, 20f, 20f)
 
             // Header - Company Information with Blue Background
             val headerTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 1f)))
                 .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
+                .setBackgroundColor(customPdfColor)
+                .setFontColor(ColorConstants.BLACK)
 
             headerTable.addCell(
-                Cell().add(Paragraph("BlueBird Industries")) // shop name
+                Cell().add(Paragraph(shopInfo.shopName)) // shop name
                     .setTextAlignment(TextAlignment.LEFT)
                     .setFontSize(16f)
                     .setBorder(Border.NO_BORDER)
@@ -763,8 +790,8 @@ class OrderDetailsActivity : InternetCheckActivity() {
             // Item Table Header
             val itemTable = Table(UnitValue.createPercentArray(floatArrayOf(4f, 2f, 2f, 2f, 2f)))
                 .useAllAvailableWidth()
-                .setBackgroundColor(ColorConstants.BLUE)
-                .setFontColor(ColorConstants.WHITE)
+                .setBackgroundColor(customPdfColor)
+                .setFontColor(ColorConstants.BLACK)
                 .setMarginBottom(10f)
 
 

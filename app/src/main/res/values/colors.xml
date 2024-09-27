@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#01baef</color>
     <color name="actionBarColor">#006199</color>
+    <color name="pdf_Background_Color">#CCDDFF</color>
     <color name="colorPrimaryDark">#01baef</color>
     <color name="colorAccent">#01baef</color>
     <color name="white">#FFFFFF</color>

@@ -172,7 +172,8 @@ class AddProductActivity : InternetCheckActivity() {
                         // Create a new Map<String, String> to store supplier data
                         val supplierData = mutableMapOf<String, String>()
                         for ((key, value) in document.data) {
-                            supplierData[key] = value.toString() // Convert each value to String
+                          //  supplierData[key] = value.toString() // Convert each value to String
+                            supplierData[key] = value?.toString() ?: "N/A"
                         }
                         productSupplier.add(supplierData) // Add the new map to productSupplier
                     }

@@ -116,7 +116,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/shop_information"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -180,7 +180,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/categories"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -245,7 +245,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/payment_methods"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -309,7 +309,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/order_type"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
@@ -374,7 +374,7 @@
                                     android:layout_marginBottom="20dp"
                                     android:fontFamily="@font/sailec_regular"
                                     android:text="@string/unit"
-                                    android:textColor="#bcbcbc"
+                                    android:textColor="#000000"
                                     android:textSize="18sp" />
 
                             </LinearLayout>
