@@ -43,11 +43,11 @@ class ReportActivity : InternetCheckActivity() {
             onBackPressed()  // This will take you back to the previous activity
         }
 
-
-        setCardClickListener(binding.cardSalesReport, SalesReportActivity::class.java)
         setCardClickListener(binding.cardExpenseGraph, ExpenseGraphActivity::class.java)
-        setCardClickListener(binding.cardDailyExpenseGraph, ExpenseGraphActivityDaily::class.java)
         setCardClickListener(binding.cardYearlyExpenseGraph, ExpenseGraphActivityYearly::class.java)
+
+//        setCardClickListener(binding.cardDailyExpenseGraph, ExpenseGraphActivityDaily::class.java)
+//        setCardClickListener(binding.cardSalesReport, SalesReportActivity::class.java)
 
     }
 
