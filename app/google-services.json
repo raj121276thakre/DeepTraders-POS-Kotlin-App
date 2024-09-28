@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "917831093546",
-    "firebase_url": "https://diptraders-sahyadri-app-default-rtdb.firebaseio.com",
-    "project_id": "diptraders-sahyadri-app",
-    "storage_bucket": "diptraders-sahyadri-app.appspot.com"
+    "project_number": "188751637933",
+    "project_id": "deeptraders-app",
+    "storage_bucket": "deeptraders-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:917831093546:android:984bb6f14e42ee0db82253",
+        "mobilesdk_app_id": "1:188751637933:android:a614b1b639df758c29c524",
         "android_client_info": {
           "package_name": "com.example.deeptraderspos"
         }
@@ -16,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAmp00AuCoXIGj3lBYGOTRpgz-jDWPVwC8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:917831093546:android:12a8ce204b66a319b82253",
-        "android_client_info": {
-          "package_name": "com.example.diptradersapp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAmp00AuCoXIGj3lBYGOTRpgz-jDWPVwC8"
+          "current_key": "AIzaSyCks9BBhYxR2sN__omOSOVzubExf45SX3s"
         }
       ],
       "services": {

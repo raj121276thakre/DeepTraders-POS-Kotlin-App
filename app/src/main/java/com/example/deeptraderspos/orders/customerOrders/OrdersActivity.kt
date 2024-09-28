@@ -85,6 +85,8 @@ class OrdersActivity : InternetCheckActivity() {
     }
 
 
+
+
     // Filter customers by name and update the RecyclerView
     private fun filterCustomersByName(searchText: String) {
         if (searchText.isEmpty()) {

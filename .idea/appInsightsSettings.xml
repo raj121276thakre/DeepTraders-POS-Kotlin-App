@@ -23,9 +23,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.deeptraderspos" />
-                  <option name="mobileSdkAppId" value="1:917831093546:android:984bb6f14e42ee0db82253" />
-                  <option name="projectId" value="diptraders-sahyadri-app" />
-                  <option name="projectNumber" value="917831093546" />
+                  <option name="mobileSdkAppId" value="1:188751637933:android:a614b1b639df758c29c524" />
+                  <option name="projectId" value="deeptraders-app" />
+                  <option name="projectNumber" value="188751637933" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
