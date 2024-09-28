@@ -44,6 +44,7 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -53,6 +54,7 @@
                 android:text="@string/product_code" />
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -87,6 +89,7 @@
             </LinearLayout>
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -96,6 +99,7 @@
                 android:text="@string/product_category" />
 
             <EditText
+                android:visibility="gone"
                 android:id="@+id/etxt_product_category"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -209,6 +213,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -218,6 +223,7 @@
                 android:text="@string/product_weight" />
 
             <EditText
+                android:visibility="gone"
                 android:id="@+id/etxt_product_weight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -233,6 +239,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -242,6 +249,7 @@
                 android:text="@string/select_product_weight_unit" />
 
             <EditText
+                android:visibility="gone"
                 android:id="@+id/etxt_product_weight_unit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -258,6 +266,7 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -267,6 +276,7 @@
                 android:text="@string/select_supplier" />
 
             <EditText
+                android:visibility="gone"
                 android:id="@+id/etxt_supplier"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

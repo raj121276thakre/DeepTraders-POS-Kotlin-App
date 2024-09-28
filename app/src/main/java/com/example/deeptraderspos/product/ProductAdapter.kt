@@ -23,9 +23,9 @@ class ProductAdapter(
             with(binding) {
                 // Set product data to the views
                 txtProductName.text = product.productName
-                txtProductSupplier.text = product.supplier
-                txtProductBuyPrice.text = product.buyPrice.toString()
-                txtProductSellPrice.text = product.sellPrice.toString()
+               // txtProductSupplier.text = product.supplier
+                txtProductBuyPrice.text = "Buy price: ₹${product.buyPrice}"
+                txtProductSellPrice.text ="Sell price: ₹${product.sellPrice}"
 
                 // Set delete button listener
                 imgDelete.setOnClickListener {
