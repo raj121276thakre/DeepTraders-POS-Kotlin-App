@@ -307,23 +307,23 @@ class SalesReportActivity : InternetCheckActivity() {
         val endDate: String?
 
         when (timeFrame) {
-            "daily" -> {
-                // Get today's date in "yyyy-MM-dd" format
-                val calendar = Calendar.getInstance()
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-
-                startDate = dateFormat.format(calendar.apply {
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                }.time)
-
-                endDate = dateFormat.format(calendar.apply {
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                    set(Calendar.SECOND, 59)
-                }.time)
-            }
+//            "daily" -> {
+//                // Get today's date in "yyyy-MM-dd" format
+//                val calendar = Calendar.getInstance()
+//                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+//
+//                startDate = dateFormat.format(calendar.apply {
+//                    set(Calendar.HOUR_OF_DAY, 0)
+//                    set(Calendar.MINUTE, 0)
+//                    set(Calendar.SECOND, 0)
+//                }.time)
+//
+//                endDate = dateFormat.format(calendar.apply {
+//                    set(Calendar.HOUR_OF_DAY, 23)
+//                    set(Calendar.MINUTE, 59)
+//                    set(Calendar.SECOND, 59)
+//                }.time)
+//            }
 
             "monthly" -> {
                 val calendar = Calendar.getInstance()
@@ -655,11 +655,11 @@ class SalesReportActivity : InternetCheckActivity() {
                     true
                 }
 
-                R.id.menu_daily -> {
-                    setToolbarTitle("Daily Sales Report")
-                    fetchData("daily")
-                    true
-                }
+//                R.id.menu_daily -> {
+//                    setToolbarTitle("Daily Sales Report")
+//                   // fetchData("daily")
+//                    true
+//                }
 
                 R.id.menu_monthly -> {
                     setToolbarTitle("Monthly Sales Report")

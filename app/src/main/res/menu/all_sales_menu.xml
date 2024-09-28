@@ -6,9 +6,9 @@
         android:id="@+id/menu_all_sales"
         android:title="@string/all_sales" />
 
-    <item
-        android:id="@+id/menu_daily"
-        android:title="@string/daily" />
+<!--    <item-->
+<!--        android:id="@+id/menu_daily"-->
+<!--        android:title="@string/daily" />-->
 
     <item
         android:id="@+id/menu_monthly"
