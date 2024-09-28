@@ -2,25 +2,29 @@ package com.example.deeptraderspos.expense
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.databinding.ActivityExpenseBinding
-import com.example.deeptraderspos.expense.AddExpenseActivity
-import com.example.deeptraderspos.expense.ExpenseAdapter
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Expense
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class ExpenseActivity : InternetCheckActivity() {
     private lateinit var binding: ActivityExpenseBinding
@@ -65,18 +69,81 @@ class ExpenseActivity : InternetCheckActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 filterExpenses(s.toString())
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
         // Set up the calendar icon to select a date
         binding.imgCalendar.setOnClickListener { showDatePicker() }
+
+        // Optionally initialize with today's data
+        val now = Calendar.getInstance()
+        fetchDailyExpenses(now)
+
     }
+
+
+    private fun fetchDailyExpenses(selectedDate: Calendar) {
+        // Format selected date to "YYYY-MM-DD"
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate = dateFormat.format(selectedDate.time)
+
+        Log.d("ExpenseGraphActivityDaily", "Fetching expenses for date: $formattedDate")
+
+        firestore.collection("AllExpenses")
+            .whereEqualTo("expenseDate", formattedDate)
+            .get()
+            .addOnSuccessListener { documents ->
+                val expensesList = mutableListOf<Expense>()
+                var totalExpense = 0.0
+                for (document in documents) {
+                    val expense = document.toObject(Expense::class.java)
+                    expensesList.add(expense)
+                    totalExpense += expense.expenseAmount
+                }
+                Log.d("ExpenseGraphActivityDaily", "Fetched ${documents.size()} documents.")
+                binding.txtSelectDate.text = formattedDate
+                updatePieChart(expensesList)
+                binding.txtTotalSales.text =
+                    getString(R.string.total_sales) + getString(R.string.currency_symbol) + String.format(
+                        "%.2f",
+                        totalExpense
+                    )
+            }
+            .addOnFailureListener { exception ->
+                Log.w("ExpenseGraphActivityDaily", "Error getting documents: ", exception)
+            }
+    }
+
+    private fun updatePieChart(expensesList: List<Expense>) {
+        val entries = ArrayList<PieEntry>()
+
+        for (expense in expensesList) {
+            entries.add(PieEntry(expense.expenseAmount.toFloat(), expense.expenseName))
+        }
+
+        val pieDataSet = PieDataSet(entries, "Daily Expenses")
+        pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList() // Set default color template
+        pieDataSet.valueTextColor = Color.BLACK
+        pieDataSet.valueTextSize = 16f
+
+        val pieData = PieData(pieDataSet)
+        binding.barchart.data = pieData // Reusing the binding variable for the PieChart
+        binding.barchart.invalidate() // Refresh the chart
+    }
+
 
     private fun setupRecyclerview() {
         expenseAdapter = ExpenseAdapter(
             expenses = expensesList,
             this,
-            onDeleteClicked = { expense -> deleteExpense(expense) { if (it) expenseAdapter.removeItem(expense) } },
+            onDeleteClicked = { expense ->
+                deleteExpense(expense) {
+                    if (it) expenseAdapter.removeItem(
+                        expense
+                    )
+                }
+            },
             onEditClicked = { expense -> editExpense(expense) }
         )
 
@@ -123,16 +190,31 @@ class ExpenseActivity : InternetCheckActivity() {
             }
             .addOnFailureListener {
                 hideProgressBar()
-                Toast.makeText(this, "Failed to load expenses for $selectedDate", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Failed to load expenses for $selectedDate",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
-        val datePickerDialog = DatePickerDialog(this,
+        val datePickerDialog = DatePickerDialog(
+            this,
             { _, year, month, dayOfMonth ->
-                val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
-                fetchExpensesByDate(selectedDate) // Fetch expenses based on selected date
+
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+                val selectedDateString =
+                    String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                fetchExpensesByDate(selectedDateString) // Fetch expenses based on selected date
+                fetchDailyExpenses(selectedDate)
+                binding.txtSelectDate.text =
+                    SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(selectedDate.time)
+
+
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -173,11 +255,18 @@ class ExpenseActivity : InternetCheckActivity() {
     }
 
     private fun filterExpenses(query: String) {
-        val filteredList = expensesList.filter { it.expenseName?.contains(query, true) == true }.toMutableList()
+        val filteredList =
+            expensesList.filter { it.expenseName?.contains(query, true) == true }.toMutableList()
         expenseAdapter = ExpenseAdapter(
             expenses = filteredList,
             this@ExpenseActivity,
-            onDeleteClicked = { expense -> deleteExpense(expense) { if (it) expenseAdapter.removeItem(expense) } },
+            onDeleteClicked = { expense ->
+                deleteExpense(expense) {
+                    if (it) expenseAdapter.removeItem(
+                        expense
+                    )
+                }
+            },
             onEditClicked = { expense -> editExpense(expense) }
         )
         binding.expensesRecyclerview.adapter = expenseAdapter

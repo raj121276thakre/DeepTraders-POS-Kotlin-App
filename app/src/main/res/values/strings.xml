@@ -17,7 +17,7 @@
     <string name="suppliers">Suppliers</string>
     <string name="customers">Customers</string>
     <string name="pos">Place Orders</string>
-    <string name="expense">Expense</string>
+    <string name="expense">Daily Expense</string>
     <string name="report">Report</string>
     <string name="all_orders">All Orders</string>
     <string name="all_sales">All Sales</string>

@@ -34,7 +34,7 @@
             android:id="@+id/toolbar_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:fontFamily="@font/sailec_regular"
             android:paddingStart="12dp"
             android:text="@string/all_expense"
@@ -42,15 +42,21 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/bell_icon"
+        <TextView
+            android:layout_weight="1"
+            android:id="@+id/txtSelectDate"
             android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:contentDescription="Notifications" />
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:gravity="right"
+            tools:text="Date: yyyy-mm-dd"
+
+         />
     </LinearLayout>
 
     <!-- ScrollView with Expenses -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar">
@@ -91,6 +97,39 @@
 
             </LinearLayout>
 
+
+            <LinearLayout
+                android:layout_marginBottom="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/barchart"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_total_sales"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        android:fontFamily="@font/sailec_regular"
+                        android:padding="10dp"
+                        android:text="@string/total_sales"
+                        android:textColor="#fff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/expenses_recyclerview"
                 android:layout_width="match_parent"
@@ -107,7 +146,7 @@
                 android:layout_marginBottom="100dp" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Floating Action Button -->
     <LinearLayout
