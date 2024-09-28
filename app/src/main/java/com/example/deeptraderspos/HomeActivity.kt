@@ -21,6 +21,7 @@ import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.pos.PosActivity
 import com.example.deeptraderspos.product.ProductActivity
 import com.example.deeptraderspos.report.ReportActivity
+import com.example.deeptraderspos.report.SalesReportActivity
 import com.example.deeptraderspos.setting.SettingsActivity
 import com.example.deeptraderspos.suppliers.SuppliersActivity
 
@@ -42,13 +43,19 @@ class HomeActivity : InternetCheckActivity() {
 
         setCardClickListener(binding.cardCustomers, CustomersActivity::class.java)
         setCardClickListener(binding.cardSuppliers, SuppliersActivity::class.java)
-        setCardClickListener(binding.cardProducts, ProductActivity::class.java)
-        setCardClickListener(binding.cardPos, PosActivity::class.java)
-        setCardClickListener(binding.cardOrderList, OrdersMainActivity::class.java)
-        setCardClickListener(binding.cardReport, ReportActivity::class.java)
-        setCardClickListener(binding.cardExpense, ExpenseActivity::class.java)
-        setCardClickListener(binding.cardSettings, SettingsActivity::class.java)
 
+        setCardClickListener(binding.cardProducts, ProductActivity::class.java)
+        setCardClickListener(binding.cardExpense, ExpenseActivity::class.java)
+
+        setCardClickListener(binding.cardReport, ReportActivity::class.java)
+        setCardClickListener(binding.cardWaterValley, SalesReportActivity::class.java)
+
+
+//        setCardClickListener(binding.cardPos, PosActivity::class.java)
+//        setCardClickListener(binding.cardOrderList, OrdersMainActivity::class.java)
+
+
+        setCardClickListener(binding.settingBtn, SettingsActivity::class.java)
         // Menu icon click listener to show scheduled messages
         binding.aboutApp.setOnClickListener {
             showAboutDialog()
