@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.SalesReportAdapter
+import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivitySalesReportBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
@@ -63,7 +64,7 @@ class SalesReportActivity : InternetCheckActivity() {
         barChart = binding.barchart
 
         binding.totalOrderBtn.setOnClickListener {
-            val intent = Intent(this, OrdersActivity::class.java)  // Replace with your POS Activity class name
+            val intent = Intent(this, CustomersActivity::class.java)  // Replace with your POS Activity class name
             startActivity(intent)
         }
 
@@ -581,14 +582,14 @@ class SalesReportActivity : InternetCheckActivity() {
         // Check if totalProfit is greater than 0
         if (totalProfit > 0) {
             binding.txtProfit.text =
-                getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit
+                getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
             // Set background color to green or any desired color for profit
             binding.txtProfit.setBackgroundColor(getColor(R.color.green))
 
 
         } else {
             binding.txtProfit.text =
-                getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit
+                getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
             // Set background color to red for loss
             binding.txtProfit.setBackgroundColor(getColor(R.color.red))
 
@@ -598,7 +599,7 @@ class SalesReportActivity : InternetCheckActivity() {
 // Check if totalLoss is greater than 0
         if (totalLoss.toInt() > 0) {
             binding.txtRemaining.text =
-                getString(R.string.remaining) + " " + getString(R.string.currency_symbol) + totalLoss
+                getString(R.string.remaining) + " " + getString(R.string.currency_symbol) + totalLoss.toInt()
         } else {
             // If totalLoss is 0, null, or empty, hide the text view
             binding.txtRemaining.visibility = View.GONE

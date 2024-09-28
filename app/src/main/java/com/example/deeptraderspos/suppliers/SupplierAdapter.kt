@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.deeptraderspos.databinding.SupplierItemBinding
 import com.example.deeptraderspos.models.Supplier
-
+import com.example.deeptraderspos.orders.PersonWiseOrdersActivity
 
 
 class SupplierAdapter(
@@ -40,6 +40,14 @@ class SupplierAdapter(
                     context.startActivity(callIntent)
                 }
 
+                // Click listener for the item
+                binding.root.setOnClickListener {
+                    val intent = Intent(context, PersonWiseOrdersActivity::class.java)
+                    intent.putExtra("name", supplier.supplierName)
+                    //  intent.putExtra("phone", customer.customerPhone)
+                    intent.putExtra("isSupplier", true) // customer
+                    context.startActivity(intent)
+                }
 
 
                 binding.imgDelete.setOnClickListener {
@@ -47,7 +55,7 @@ class SupplierAdapter(
                     onDeleteClicked(supplier)
                 }
 
-                binding.editCardButton.setOnClickListener {
+                binding.imgEdit.setOnClickListener {
                     onEditClicked(supplier)
                 }
 

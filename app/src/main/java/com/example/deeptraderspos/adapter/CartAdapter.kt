@@ -30,7 +30,7 @@ class CartAdapter(
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtItemName: TextView = view.findViewById(R.id.txt_item_name)
         val txtPrice: TextView = view.findViewById(R.id.txt_price)
-        val txtWeight: TextView = view.findViewById(R.id.txt_weight)
+        val txtStock: TextView = view.findViewById(R.id.txt_stock)
         val txtQtyNumber: TextView = view.findViewById(R.id.txt_number)
         val imgProduct: ImageView = view.findViewById(R.id.cart_product_image)
         val imgDelete: ImageView = view.findViewById(R.id.img_delete)
@@ -47,15 +47,18 @@ class CartAdapter(
         val cartItem = cartItems[position]
 
         holder.txtItemName.text = cartItem.productName // Update this based on how you retrieve the product name
-        holder.txtWeight.text = "${cartItem.productWeight} ${cartItem.weightUnitId}"
+        holder.txtStock.text = "Stock : ${cartItem.productStock}"
         holder.txtQtyNumber.text = cartItem.quantity.toString()
 
         val productTotalPrice = cartItem.productPrice * cartItem.quantity
-        holder.txtPrice.text = "₹${f.format(productTotalPrice)}"
+       // holder.txtPrice.text = "₹${f.format(productTotalPrice)}"
+        holder.txtPrice.text =  "${cartItem.productPrice} x ${cartItem.quantity} = ₹${f.format(productTotalPrice)}"
 
         // Update total price
         total_price += productTotalPrice
-        txtTotalPrice.text = context.getString(R.string.total_price) + "₹${f.format(total_price)}"
+        txtTotalPrice.text = context.getString(R.string.total_price) + " ₹${f.format(total_price)}"
+
+
 
         // Delete product from cart
         holder.imgDelete.setOnClickListener {
@@ -64,7 +67,14 @@ class CartAdapter(
 
         // Increase quantity
         holder.txtPlus.setOnClickListener {
-            updateProductQuantity(cartItem, cartItem.quantity + 1, holder)
+
+            if (cartItem.quantity < cartItem.productStock) {
+                updateProductQuantity(cartItem, cartItem.quantity + 1, holder)
+            }
+            else{
+                Toast.makeText(context, "Products Stock is ${cartItem.productStock}", Toast.LENGTH_SHORT).show()
+                updateProductQuantity(cartItem, cartItem.quantity, holder)
+            }
         }
 
         // Decrease quantity
@@ -72,6 +82,7 @@ class CartAdapter(
             if (cartItem.quantity > 1) {
                 updateProductQuantity(cartItem, cartItem.quantity - 1, holder)
             }
+
         }
     }
 
@@ -115,7 +126,7 @@ class CartAdapter(
                 cartItem.quantity = newQty
                 holder.txtQtyNumber.text = newQty.toString()
                 val newPrice = cartItem.productPrice * newQty
-                holder.txtPrice.text = "₹${f.format(newPrice)}"
+                holder.txtPrice.text =  "${cartItem.productPrice} x ${cartItem.quantity} = ₹${f.format(newPrice)}"
 
                 // Recalculate total price
                 recalculateTotalPrice()

@@ -10,6 +10,7 @@ import com.example.deeptraderspos.databinding.CustomerItemBinding
 import com.example.deeptraderspos.databinding.SupplierItemBinding
 import com.example.deeptraderspos.models.Customer
 import com.example.deeptraderspos.models.Supplier
+import com.example.deeptraderspos.orders.PersonWiseOrdersActivity
 
 class CustomerAdapter(
     private val customers: MutableList<Customer>,
@@ -29,6 +30,15 @@ class CustomerAdapter(
                 txtCustomerEmail.text = customer.customerEmail
                 txtCustomerAddress.text = customer.customerAddress
 
+                // Click listener for the item
+                binding.root.setOnClickListener {
+                    val intent = Intent(context, PersonWiseOrdersActivity::class.java)
+                    intent.putExtra("name", customer.customerName)
+                  //  intent.putExtra("phone", customer.customerPhone)
+                    intent.putExtra("isSupplier", false) // customer
+                    context.startActivity(intent)
+                }
+
 
                 binding.imgCall.setOnClickListener {
                     val phone = "tel:${customer.customerPhone}"
@@ -45,7 +55,7 @@ class CustomerAdapter(
                     onDeleteClicked(customer)
                 }
 
-                binding.editCardButton.setOnClickListener {
+                binding.imgEdit.setOnClickListener {
                     onEditClicked(customer)
                 }
 

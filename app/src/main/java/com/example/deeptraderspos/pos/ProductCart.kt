@@ -13,13 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.CartAdapter
+import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivityProductCartBinding
 import com.example.deeptraderspos.databinding.DialogPaymentBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
@@ -29,6 +29,7 @@ import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.ShopInformation
 import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
 import com.example.deeptraderspos.orders.supplierOrders.OrdersSupplierActivity
+import com.example.deeptraderspos.suppliers.SuppliersActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -47,6 +48,9 @@ class ProductCart : InternetCheckActivity() {
     private var selectedSupplierID: String = "0" // Store selected supplier ID
     private var tax: Double = 0.0 //
 
+    // private lateinit var order: Order
+    private lateinit var name: String
+    private var isSupplier: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +71,11 @@ class ProductCart : InternetCheckActivity() {
 
         f = DecimalFormat("#0.00")
 
+        name = intent.getStringExtra("name").toString()
+        isSupplier =
+            intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
+
+
         // Initialize Firestore
         firestore = FirebaseFirestore.getInstance()
 
@@ -78,7 +87,7 @@ class ProductCart : InternetCheckActivity() {
         fetchCartProducts()
         fetchShopInfo()
 
-        binding.btnSubmitOrder.setOnClickListener { dialog() }
+        binding.btnSubmitOrder.setOnClickListener { dialog(name,isSupplier) }
 
 
     }
@@ -166,7 +175,7 @@ class ProductCart : InternetCheckActivity() {
     }
 
 
-    private fun dialog() {
+    private fun dialog(name: String, isSupplier: Boolean) {
         val dialogBinding = DialogPaymentBinding.inflate(layoutInflater)
         val dialog = AlertDialog.Builder(this)
             .setView(dialogBinding.root)
@@ -275,7 +284,26 @@ class ProductCart : InternetCheckActivity() {
          */
 
         // by default customer is checked
-        dialogBinding.checkboxCustomer.isChecked = true
+        if (isSupplier){
+            dialogBinding.selectCustomer.visibility = View.GONE
+            dialogBinding.selectSupplier.visibility = View.VISIBLE
+            dialogBinding.dialogSupplier.text = name
+            dialogBinding.checkboxSupplier.isChecked = true
+            // Uncheck the supplier checkbox
+            dialogBinding.checkboxCustomer.isChecked = false
+            dialogBinding.dialogCustomer.text = "Select Customer"
+        }
+        if (!isSupplier){
+            dialogBinding.selectCustomer.visibility = View.VISIBLE
+            dialogBinding.selectSupplier.visibility = View.GONE
+            dialogBinding.dialogCustomer.text = name
+            dialogBinding.checkboxCustomer.isChecked = true
+            // Uncheck the supplier checkbox
+            dialogBinding.checkboxSupplier.isChecked = false
+            dialogBinding.dialogSupplier.text = "Select Supplier"
+        }
+
+
 
         // Assuming you have already initialized dialogBinding and your CheckBoxes
         dialogBinding.checkboxCustomer.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -283,33 +311,52 @@ class ProductCart : InternetCheckActivity() {
                 // Show the customer selection dialog and hide supplier dialog
                 dialogBinding.selectCustomer.visibility = View.VISIBLE
                 dialogBinding.selectSupplier.visibility = View.GONE
+                dialogBinding.dialogCustomer.text = name
+                dialogBinding.dialogSupplier.text = "Select Supplier"
+
+
 
                 // Uncheck the supplier checkbox
                 dialogBinding.checkboxSupplier.isChecked = false
             } else {
                 // If the customer checkbox is unchecked, check supplier checkbox
                 if (dialogBinding.checkboxSupplier.isChecked) {
-                    // Hide customer selection dialog and show supplier dialog
                     dialogBinding.selectCustomer.visibility = View.GONE
                     dialogBinding.selectSupplier.visibility = View.VISIBLE
+                    dialogBinding.dialogSupplier.text = name
+                    dialogBinding.dialogCustomer.text = "Select Customer"
+                    // Hide customer selection dialog and show supplier dialo
+
+                    // Uncheck the supplier checkbox
+                    dialogBinding.checkboxCustomer.isChecked = false
                 }
             }
         }
 
         dialogBinding.checkboxSupplier.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                // Show the supplier selection dialog and hide customer dialog
                 dialogBinding.selectSupplier.visibility = View.VISIBLE
                 dialogBinding.selectCustomer.visibility = View.GONE
+                // Show the supplier selection dialog and hide customer dialog
+                dialogBinding.dialogSupplier.text = name
+                dialogBinding.dialogCustomer.text = "Select Customer"
+
+
 
                 // Uncheck the customer checkbox
                 dialogBinding.checkboxCustomer.isChecked = false
             } else {
                 // If the supplier checkbox is unchecked, check customer checkbox
                 if (dialogBinding.checkboxCustomer.isChecked) {
-                    // Hide supplier selection dialog and show customer dialog
                     dialogBinding.selectSupplier.visibility = View.GONE
                     dialogBinding.selectCustomer.visibility = View.VISIBLE
+                    dialogBinding.dialogCustomer.text = name
+                    dialogBinding.dialogSupplier.text = "Select Supplier"
+                    // Hide supplier selection dialog and show customer dialog
+
+                    // Uncheck the supplier checkbox
+                    dialogBinding.checkboxSupplier.isChecked = false
+
                 }
             }
         }
@@ -488,10 +535,10 @@ class ProductCart : InternetCheckActivity() {
                         Toast.makeText(this, "${if (isSupplier) "Supplier" else "Customer"} Order placed successfully!", Toast.LENGTH_SHORT).show()
                         deleteCartItems()
                         if (isSupplier){
-                            startActivity(Intent(this, OrdersSupplierActivity::class.java))
+                            startActivity(Intent(this, SuppliersActivity::class.java))
                             finish()
                         }else{
-                            startActivity(Intent(this, OrdersActivity::class.java))
+                            startActivity(Intent(this, CustomersActivity::class.java))
                             finish()
                         }
 

@@ -113,7 +113,7 @@ class AddSuppliersActivity : InternetCheckActivity() {
                                 .addOnSuccessListener {
                                     Toast.makeText(
                                         this,
-                                        "Supplier added successfully with ID",
+                                        "Supplier added successfully",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     finish() // Close the activity after successful save

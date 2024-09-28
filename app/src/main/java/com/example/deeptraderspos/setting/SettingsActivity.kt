@@ -43,10 +43,11 @@ class SettingsActivity : InternetCheckActivity() {
         //Setting done
 
         setCardClickListener(binding.cardShopInfo, ShopInformationActivity::class.java)
-        setCardClickListener(binding.cardCategory, CategoriesActivity::class.java)
         setCardClickListener(binding.cardPaymentMethod, PaymentMethodActivity::class.java)
         setCardClickListener(binding.cardOrderType, OrderTypeActivity::class.java)
-        setCardClickListener(binding.cardUnit, UnitActivity::class.java)
+
+       // setCardClickListener(binding.cardUnit, UnitActivity::class.java)
+        // setCardClickListener(binding.cardCategory, CategoriesActivity::class.java)
 
 
 

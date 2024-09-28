@@ -102,7 +102,7 @@
         android:layout_margin="10dp"
         android:background="?android:attr/selectableItemBackground"
         tools:itemCount="3"
-        tools:listitem="@layout/person_order_item">
+        tools:listitem="@layout/order_item">
 
     </androidx.recyclerview.widget.RecyclerView>
 

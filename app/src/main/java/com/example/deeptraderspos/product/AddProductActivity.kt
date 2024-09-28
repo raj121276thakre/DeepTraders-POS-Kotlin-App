@@ -114,7 +114,7 @@ class AddProductActivity : InternetCheckActivity() {
         val supplier = binding.etxtSupplier.text.toString().trim()
 
         // Validation check
-        if (productName.isEmpty()  || buyPrice == 0.0 || sellPrice == 0.0 ) {
+        if (productName.isEmpty()  || buyPrice == 0.0 || sellPrice == 0.0 || stock == 0) {
             hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return
@@ -187,7 +187,7 @@ class AddProductActivity : InternetCheckActivity() {
         val supplier = binding.etxtSupplier.text.toString().trim()
 
         // Validation check
-        if (productName.isEmpty()  || buyPrice == 0.0 || sellPrice == 0.0 ) {
+        if (productName.isEmpty()  || buyPrice == 0.0 || sellPrice == 0.0 || stock == 0 ) {
             hideProgressBar()
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
             return

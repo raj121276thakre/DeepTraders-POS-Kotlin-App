@@ -14,7 +14,6 @@ import com.example.deeptraderspos.databinding.ActivityPersonWiseOrdersBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.pos.PosActivity
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -50,10 +49,10 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         firestore = FirebaseFirestore.getInstance()
         // Retrieve the order from the intent
         // order = intent.getParcelableExtra<Order>("order") ?: return
+
         name = intent.getStringExtra("name").toString()
         isSupplier =
             intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
-
 
 
         setToolBarTitle(name)
@@ -69,7 +68,17 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         val gotoPosBtn = binding.gotoPosBtn
         gotoPosBtn.setOnClickListener {
             val intent =
-                Intent(this, PosActivity::class.java)  // Replace with your POS Activity class name
+                Intent(this, PosActivity::class.java)
+            intent.putExtra("name", name)
+            intent.putExtra("isSupplier", isSupplier)// Replace with your POS Activity class name
+            startActivity(intent)
+        }
+
+        binding.fabAddBill.setOnClickListener {
+            val intent =
+                Intent(this, PosActivity::class.java)
+            intent.putExtra("name", name)
+            intent.putExtra("isSupplier", isSupplier)// Replace with your POS Activity class name
             startActivity(intent)
         }
 
@@ -94,8 +103,6 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
     }
 
 
-
-
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -106,7 +113,8 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
                 // Format the selected date as yyyy-MM-dd
-                val selectedDate = String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+                val selectedDate =
+                    String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
 
                 // Update the TextView with the selected date
                 binding.txtSelectDate.text = selectedDate
@@ -118,7 +126,6 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         )
         datePickerDialog.show()
     }
-
 
 
     private fun filterOrdersByDate(selectedDate: String) {
@@ -159,7 +166,11 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
 
                     // Show a message if no orders were found
                     if (filteredOrdersList.isEmpty()) {
-                        Toast.makeText(this, "No orders found for the selected date", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this,
+                            "No orders found for the selected date",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 }
@@ -171,7 +182,6 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
     private fun setToolBarTitle(name: String) {
@@ -197,12 +207,15 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
 
         // Conditionally filter by supplierName or customerName
         val query = if (isSupplier) {
-            orderRef.whereEqualTo(
-                "supplierName",
-                name
-            ) // Filter by supplierName when isSupplier is true
+            orderRef
+                .whereEqualTo(
+                    "supplierName",
+                    name
+                )
         } else {
-            orderRef.whereEqualTo("customerName", name) // Filter by customerName otherwise
+            orderRef
+                .whereEqualTo("customerName", name)
+
         }
 
 

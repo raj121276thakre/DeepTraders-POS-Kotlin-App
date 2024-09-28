@@ -60,12 +60,12 @@
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/txt_weight"
+                    android:id="@+id/txt_stock"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
                     android:padding="2dp"
-                    android:text="1 kg"
+                    android:text="Stock : "
                     android:textColor="#EA1D2C" />
 
                 <TextView
@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/sailec_regular"
                     android:padding="2dp"
-                    android:text="$96.00"
+                    android:text="Total : "
                     android:textColor="#EA1D2C" />
 
             </LinearLayout>
