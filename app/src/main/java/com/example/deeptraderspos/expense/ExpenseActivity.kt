@@ -249,6 +249,8 @@ class ExpenseActivity : InternetCheckActivity() {
         startActivityForResult(intent, REQUEST_CODE_EDIT_EXPENSE)
     }
 
+
+
     override fun onResume() {
         super.onResume()
         fetchExpensesFromFirebase() // Refresh the expenses list after returning from Add/Edit activities

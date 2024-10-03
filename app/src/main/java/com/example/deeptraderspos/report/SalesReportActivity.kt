@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.report
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -19,12 +20,13 @@ import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.SalesReportAdapter
 import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivitySalesReportBinding
+import com.example.deeptraderspos.expense.AddExpenseActivity
+import com.example.deeptraderspos.expense.ExpenseAdapter
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
+import com.example.deeptraderspos.models.Expense
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
-import com.example.deeptraderspos.orders.customerOrders.OrdersActivity
-import com.example.deeptraderspos.pos.PosActivity
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -47,6 +49,9 @@ class SalesReportActivity : InternetCheckActivity() {
     private lateinit var barChart: BarChart
     private var mYear: Int = 0
 
+    private lateinit var expenseAdapter: ExpenseAdapter
+    private val expensesList = mutableListOf<Expense>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -64,7 +69,10 @@ class SalesReportActivity : InternetCheckActivity() {
         barChart = binding.barchart
 
         binding.totalOrderBtn.setOnClickListener {
-            val intent = Intent(this, CustomersActivity::class.java)  // Replace with your POS Activity class name
+            val intent = Intent(
+                this,
+                CustomersActivity::class.java
+            )  // Replace with your POS Activity class name
             startActivity(intent)
         }
 
@@ -77,20 +85,33 @@ class SalesReportActivity : InternetCheckActivity() {
 
         // Set up views
         setupViews()
-        chooseYearOnly()
+        // chooseYearOnly()
 
         val currentYear = SimpleDateFormat("yyyy", Locale.ENGLISH).format(Date())
         binding.txtSelectYear.setText(getString(R.string.year) + " " + currentYear)
 
-        mYear = currentYear.toInt()
+        //  mYear = currentYear.toInt()
 
         // Get data from Firestore
         fetchData()
-        fetchAllOrdersForGraph(mYear)
+        // fetchAllOrdersForGraph(mYear)
 
         binding.sortSalesBtn.setOnClickListener {
             showSortMenu(binding.sortSalesBtn)
         }
+
+        binding.addExpenses.setOnClickListener {
+            val intent = Intent(this@SalesReportActivity, AddExpenseActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Set up RecyclerView
+        setupRecyclerview()
+
+        // Fetch expenses from Firestore
+        fetchExpensesFromFirebase()
+        // Set up the calendar icon to select a date
+        binding.imgCalendar.setOnClickListener { showDatePicker() }
 
     }
 
@@ -124,7 +145,7 @@ class SalesReportActivity : InternetCheckActivity() {
                 val selectedYear = yearsList[which]
                 binding.txtSelectYear.text = getString(R.string.year) + " " + selectedYear
                 mYear = selectedYear
-                fetchAllOrdersForGraph(mYear)
+                //   fetchAllOrdersForGraph(mYear)
             }
 
             builder.setPositiveButton(android.R.string.ok, null)
@@ -133,6 +154,132 @@ class SalesReportActivity : InternetCheckActivity() {
             val dialog = builder.create()
             dialog.show()
         }
+
+
+
+    }
+
+
+    //expense
+
+    private fun setupRecyclerview() {
+        expenseAdapter = ExpenseAdapter(
+            expenses = expensesList,
+            this,
+            onDeleteClicked = { expense ->
+                deleteExpense(expense) {
+                    if (it) expenseAdapter.removeItem(
+                        expense
+                    )
+                }
+            },
+            onEditClicked = { expense -> editExpense(expense) }
+        )
+
+        binding.expensesRecyclerview.apply {
+            layoutManager = LinearLayoutManager(this@SalesReportActivity)
+            adapter = expenseAdapter
+        }
+    }
+
+    private fun fetchExpensesFromFirebase() {
+        showProgressBar("Loading Expense information...")
+        firestore.collection("AllExpenses")
+            .get()
+            .addOnSuccessListener { result ->
+                hideProgressBar()
+                expensesList.clear()
+                for (document in result) {
+                    val expense = document.toObject(Expense::class.java)
+                    expensesList.add(expense)
+                }
+                expensesList.reverse()
+                expenseAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                hideProgressBar()
+                Toast.makeText(this, "Failed to load expenses", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun fetchExpensesByDate(selectedDate: String) {
+        showProgressBar("Loading expenses for $selectedDate...")
+        firestore.collection("AllExpenses")
+            .whereEqualTo("expenseDate", selectedDate)
+            .get()
+            .addOnSuccessListener { result ->
+                hideProgressBar()
+                expensesList.clear()
+                for (document in result) {
+                    val expense = document.toObject(Expense::class.java)
+                    expensesList.add(expense)
+                }
+                expensesList.reverse()
+                expenseAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                hideProgressBar()
+                Toast.makeText(
+                    this,
+                    "Failed to load expenses for $selectedDate",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+                val selectedDateString =
+                    String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                fetchExpensesByDate(selectedDateString) // Fetch expenses based on selected date
+                // fetchDailyExpenses(selectedDate)
+                binding.txtSelectDate.text =
+                    SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(selectedDate.time)
+
+
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.show()
+    }
+
+    private fun deleteExpense(expense: Expense, callback: (Boolean) -> Unit) {
+        val expenseId = expense.id ?: run {
+            Toast.makeText(this, "Expense ID is missing", Toast.LENGTH_SHORT).show()
+            callback(false)
+            return
+        }
+
+        firestore.collection("AllExpenses").document(expenseId)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Expense deleted successfully", Toast.LENGTH_SHORT).show()
+                callback(true)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to delete expense", Toast.LENGTH_SHORT).show()
+                callback(false)
+            }
+    }
+
+    private fun editExpense(expense: Expense) {
+        val intent = Intent(this, AddExpenseActivity::class.java).apply {
+            putExtra("expense", expense)
+        }
+        startActivityForResult(intent, REQUEST_CODE_EDIT_EXPENSE)
+    }
+
+    companion object {
+        private const val REQUEST_CODE_EDIT_EXPENSE = 1001
     }
 
 
@@ -152,7 +299,7 @@ class SalesReportActivity : InternetCheckActivity() {
             }
 
             // Call setupBarChart with the aggregated monthly sales data
-            setupBarChart(monthlySales, year)
+            //  setupBarChart(monthlySales, year)
         }
     }
 
