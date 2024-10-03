@@ -573,11 +573,11 @@ class SalesReportActivity : InternetCheckActivity() {
         binding.txtTotalPrice.text =
             getString(R.string.total_sales) + " " + getString(R.string.currency_symbol) + totalSales
         binding.txtTotalTax.text =
-            getString(R.string.total_tax) + " " + getString(R.string.currency_symbol) + totalTax
+            getString(R.string.total_tax) + " " + getString(R.string.currency_symbol) + totalTax.toInt()
         binding.txtTotalDiscount.text =
             getString(R.string.total_discount) + " " + getString(R.string.currency_symbol) + totalDiscount
         binding.txtNetSales.text =
-            getString(R.string.net_sales) + " " + getString(R.string.currency_symbol) + netSales
+            getString(R.string.net_sales) + " " + getString(R.string.currency_symbol) + netSales.toInt()
 
         // Check if totalProfit is greater than 0
         if (totalProfit > 0) {

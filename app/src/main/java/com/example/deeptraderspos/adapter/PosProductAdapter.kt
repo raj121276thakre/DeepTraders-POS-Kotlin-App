@@ -16,7 +16,7 @@ import com.example.deeptraderspos.databinding.ProductItemBinding
 import com.example.deeptraderspos.models.Product
 
 class PosProductAdapter(
-    private val products: MutableList<Product>,
+    private var products: MutableList<Product>,
     private val context: Context,
     private val onAddtocartClick: (Product) -> Unit,
     private val onEditClicked: (Product) -> Unit
@@ -77,4 +77,13 @@ class PosProductAdapter(
             notifyItemRemoved(position)
         }
     }
+
+    fun updateProducts(newProducts: MutableList<Product>) {
+      //  products.clear()  // Clear the old products
+      //  products.addAll(newProducts)  // Add the new products
+        products = newProducts
+        notifyDataSetChanged()  // Notify the adapter that the data set has changed
+    }
+
+
 }

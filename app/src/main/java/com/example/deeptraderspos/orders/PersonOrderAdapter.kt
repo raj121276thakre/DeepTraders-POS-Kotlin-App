@@ -8,18 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.deeptraderspos.Constants
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.orders.orderDetails.OrderDetailsActivity
-import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype
-import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 class PersonOrderAdapter(
@@ -37,7 +31,8 @@ class PersonOrderAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.person_order_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.person_order_item, parent, false)
         return MyViewHolder(view)
     }
 
@@ -71,13 +66,50 @@ class PersonOrderAdapter(
         }
 
 
-       // goto OrderDetailsActivity
+//       // goto OrderDetailsActivity
+//        holder.itemView.setOnClickListener {
+//            val intent = Intent(context, OrderDetailsActivity::class.java)
+//            intent.putExtra("order", order)  // Pass the Parcelable Order object
+//            intent.putExtra("isSupplier", isSupplier)
+//            context.startActivity(intent)
+//        }
+
+
         holder.itemView.setOnClickListener {
             val intent = Intent(context, OrderDetailsActivity::class.java)
-            intent.putExtra("order", order)  // Pass the Parcelable Order object
+
             intent.putExtra("isSupplier", isSupplier)
+
+            intent.putExtra("orderId", order.orderId)
+            intent.putExtra("orderDate", order.orderDate)
+            intent.putExtra("orderTime", order.orderTime)
+            intent.putExtra("orderType", order.orderType)
+            intent.putExtra("orderStatus", order.orderStatus)
+            intent.putExtra("paymentMethod", order.paymentMethod)
+            intent.putExtra("customerName", order.customerName)
+            intent.putExtra("supplierName", order.supplierName)
+            intent.putExtra("tax", order.tax)
+            intent.putExtra("discount", order.discount)
+            intent.putExtra("totalPrice", order.totalPrice)
+            intent.putExtra("totalPaidAmount", order.totalPaidAmount)
+            intent.putExtra("remainingAmount", order.remainingAmount)
+            intent.putExtra("remainingAmtPaidDate", order.remainingAmtPaidDate)
+            intent.putExtra("remainingAmtPaidTime", order.remainingAmtPaidTime)
+            intent.putExtra("updatedRemainingAmount", order.updatedRemainingAmount)
+            intent.putExtra("updatedTotalPaidAmount", order.updatedTotalPaidAmount)
+
+// Since ProductOrder and RemainingPayment are lists of Parcelable, you can pass them as ArrayLists
+            intent.putParcelableArrayListExtra("products", ArrayList(order.products))
+            intent.putParcelableArrayListExtra(
+                "remainingPayments",
+                ArrayList(order.remainingPayments)
+            )
+
             context.startActivity(intent)
+
+
         }
+
 
 
 

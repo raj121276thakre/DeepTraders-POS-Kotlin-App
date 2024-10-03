@@ -11,7 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.deeptraderspos.HomeActivity
 import com.example.deeptraderspos.R
 import com.example.deeptraderspos.Utils
 import com.example.deeptraderspos.adapter.PosProductAdapter
@@ -19,7 +18,6 @@ import com.example.deeptraderspos.databinding.ActivityPosBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.CartItem
 import com.example.deeptraderspos.models.Product
-import com.example.deeptraderspos.orders.PersonWiseOrdersActivity
 import com.example.deeptraderspos.product.AddProductActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -55,8 +53,8 @@ class PosActivity : InternetCheckActivity() {
         // Set status bar color
         Utils.setStatusBarColor(this)
 
-       // supportActionBar?.setHomeButtonEnabled(true) //for back button
-       // supportActionBar?.setDisplayHomeAsUpEnabled(true) //for back button
+        // supportActionBar?.setHomeButtonEnabled(true) //for back button
+        // supportActionBar?.setDisplayHomeAsUpEnabled(true) //for back button
 //        supportActionBar?.setTitle(R.string.all_product)
 //        supportActionBar?.hide()
 
@@ -68,7 +66,7 @@ class PosActivity : InternetCheckActivity() {
         // Go Back Button
         val goBackBtn = binding.imgBack
         goBackBtn.setOnClickListener {
-             onBackPressed()  // This will take you back to the previous activity
+            onBackPressed()  // This will take you back to the previous activity
         }
 
         // Initialize productAdapter with an empty list
@@ -111,7 +109,7 @@ class PosActivity : InternetCheckActivity() {
         getCartItemCount()
 
         binding.imgCart.setOnClickListener {
-           // startActivity(Intent(this, ProductCart::class.java))
+            // startActivity(Intent(this, ProductCart::class.java))
             val intent =
                 Intent(this, ProductCart::class.java)
             intent.putExtra("name", name)
@@ -124,11 +122,29 @@ class PosActivity : InternetCheckActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchProducts(s.toString())
+                val searchQuery = s.toString()
+
+                if (searchQuery.isEmpty()) {
+                    // If the search query is empty, reset the list to show all products
+                    productAdapter.updateProducts(productsList)
+                } else {
+                    // Filter the productsList based on the search query (case-insensitive)
+                    val filteredList = productsList.filter {
+                        it.productName.contains(searchQuery, ignoreCase = true)
+                    }.toMutableList()
+
+                    // Update the adapter with the filtered list
+                    productAdapter.updateProducts(filteredList)
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        binding.resetBtn.setOnClickListener {
+            binding.etxtSearch.text.clear()
+            loadProducts()
+        }
 
         loadProducts()
     }
@@ -258,42 +274,6 @@ class PosActivity : InternetCheckActivity() {
     }
 
 
-    private fun searchProducts(query: String) {
-        firestore.collection("AllProducts")
-            .whereGreaterThanOrEqualTo("productName", query)
-            .whereLessThan("productName", query + '\uf8ff')
-            .get()
-            .addOnSuccessListener { result ->
-                val searchProductList = productsList
-
-                searchProductList.clear() // Clear the list before adding new items
-                for (document in result) {
-                    val product = document.toObject(Product::class.java)
-                    searchProductList.add(product)
-                }
-                if (searchProductList.isEmpty()) {
-                    binding.recycler.visibility = View.GONE
-                    binding.imageNoProduct.visibility = View.VISIBLE
-                    binding.imageNoProduct.setImageResource(R.drawable.not_found)
-                    binding.txtNoProducts.visibility = View.VISIBLE
-                } else {
-                    binding.recycler.visibility = View.VISIBLE
-                    binding.imageNoProduct.visibility = View.GONE
-                    binding.txtNoProducts.visibility = View.GONE
-
-                    productAdapter = PosProductAdapter(
-                        productsList,
-                        this,
-                        onAddtocartClick = {},
-                        onEditClicked = { product -> editProduct(product) })
-                    binding.recycler.adapter = productAdapter
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w("Firestore Error", "Error searching products: ", exception)
-            }
-    }
-
     private fun editProduct(product: Product) {
         val intent = Intent(this, AddProductActivity::class.java).apply {
             putExtra("product", product)
@@ -301,22 +281,6 @@ class PosActivity : InternetCheckActivity() {
         startActivity(intent)
     }
 
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.menu_cart_button -> {
-//                startActivity(Intent(this, ProductCart::class.java))
-//                true
-//            }
-//
-////            android.R.id.home -> {
-////                finish()
-////                true
-////            }
-//
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()

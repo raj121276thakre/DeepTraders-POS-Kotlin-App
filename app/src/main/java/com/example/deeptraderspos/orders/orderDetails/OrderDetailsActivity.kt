@@ -28,7 +28,6 @@ import com.example.deeptraderspos.models.Order
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.models.RemainingPayment
 import com.example.deeptraderspos.models.ShopInformation
-import com.example.deeptraderspos.orders.OrderAdapter.MyViewHolder
 import com.google.firebase.firestore.FirebaseFirestore
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
@@ -55,12 +54,34 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
     private val firestore = FirebaseFirestore.getInstance()
     private lateinit var f: DecimalFormat
-    private lateinit var intentOrder: Order
+
+    // private lateinit var intentOrder: Order
     private lateinit var firebaseOrder: Order
     private var currency: String = ""
     private var isSupplier: Boolean = false
 
     private var shopInfo: ShopInformation = ShopInformation()
+
+
+    private lateinit var orderId: String
+    private lateinit var orderDate: String
+    private lateinit var orderTime: String
+    private lateinit var orderType: String
+    private lateinit var orderStatus: String
+    private lateinit var paymentMethod: String
+    private lateinit var customerName: String
+    private lateinit var supplierName: String
+    private var tax: Double = 0.0
+    private lateinit var discount: String
+    private var totalPrice: Double = 0.0
+    private var totalPaidAmount: Double = 0.0
+    private var remainingAmount: Double = 0.0
+    private lateinit var remainingAmtPaidDate: String
+    private lateinit var remainingAmtPaidTime: String
+    private var updatedRemainingAmount: Double = 0.0
+    private var updatedTotalPaidAmount: Double = 0.0
+    private lateinit var products: ArrayList<ProductOrder>
+    private lateinit var remainingPayments: MutableList<RemainingPayment>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,27 +106,44 @@ class OrderDetailsActivity : InternetCheckActivity() {
         fetchShopInfo()
 
 
-        // Retrieve the order from the intent
-        intentOrder = intent.getParcelableExtra<Order>("order") ?: return
+        // Retrieve each field from the Intent
+        orderId = intent.getStringExtra("orderId") ?: ""
+        orderDate = intent.getStringExtra("orderDate") ?: ""
+        orderTime = intent.getStringExtra("orderTime") ?: ""
+        orderType = intent.getStringExtra("orderType") ?: ""
+        orderStatus = intent.getStringExtra("orderStatus") ?: ""
+        paymentMethod = intent.getStringExtra("paymentMethod") ?: ""
+        customerName = intent.getStringExtra("customerName") ?: ""
+        supplierName = intent.getStringExtra("supplierName") ?: ""
+        tax = intent.getDoubleExtra("tax", 0.0)
+        discount = intent.getStringExtra("discount") ?: ""
+        totalPrice = intent.getDoubleExtra("totalPrice", 0.0)
+        totalPaidAmount = intent.getDoubleExtra("totalPaidAmount", 0.0)
+        remainingAmount = intent.getDoubleExtra("remainingAmount", 0.0)
+        remainingAmtPaidDate = intent.getStringExtra("remainingAmtPaidDate") ?: ""
+        remainingAmtPaidTime = intent.getStringExtra("remainingAmtPaidTime") ?: ""
+        updatedRemainingAmount = intent.getDoubleExtra("updatedRemainingAmount", 0.0)
+        updatedTotalPaidAmount = intent.getDoubleExtra("updatedTotalPaidAmount", 0.0)
+
+        // Retrieve the Parcelable lists
+        products = intent.getParcelableArrayListExtra("products") ?: arrayListOf()
+        remainingPayments = intent.getParcelableArrayListExtra("remainingPayments") ?: arrayListOf()
         isSupplier =
             intent.getBooleanExtra("isSupplier", false) // Default is false (customer) if not found
 
         fetchOrdersByOrderId(isSupplier)
 
 
-
-
         // Initialize DecimalFormat
         f = DecimalFormat("#0.00")
 
         val name = if (isSupplier) {
-            intentOrder.supplierName
+            supplierName
         } else {
-            intentOrder.customerName
+            customerName
         }
 
-        setToolbarDetails(name, intentOrder.orderId)
-
+        setToolbarDetails(name, orderId)
 
 
         // Set up action bar
@@ -123,7 +161,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
 
         // Retrieve products from order and pass to the adapter
-        val productList: List<ProductOrder> = intentOrder.products
+        val productList: List<ProductOrder> = products
         if (productList.isEmpty()) {
             Toast.makeText(this, R.string.no_data_found, Toast.LENGTH_SHORT).show()
         } else {
@@ -145,7 +183,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
         binding.btnPdfReceipt.setOnClickListener {
             // Handle PDF generation logic
-            createPdf(this, intentOrder, name)
+            createPdf(this, name)
         }
 
         binding.btnPayRemaining.setOnClickListener {
@@ -153,11 +191,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
 
 
-
-
-
     }
-
 
 
     private fun updateOrderStatus(orderId: String, status: String) {
@@ -177,8 +211,6 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
             }
     }
-
-
 
 
     private fun showDialogAndUpdateToFirestore(isSupplier: Boolean) {
@@ -228,12 +260,12 @@ class OrderDetailsActivity : InternetCheckActivity() {
             )
 
 
-            if (newRemainingAmount.toInt() == 0 ){
-                updateOrderStatus(orderId = intentOrder.orderId,Constants.COMPLETED)
+            if (newRemainingAmount.toInt() == 0) {
+                updateOrderStatus(orderId = orderId, Constants.COMPLETED)
             }
 
             // Create a mutable list to hold existing payments and add the new payment
-            val updatedPayments = intentOrder.remainingPayments.toMutableList()
+            val updatedPayments = remainingPayments.toMutableList()
             updatedPayments.add(newPayment)
 
             // Prepare the data to update Firestore with the new payment and updated remaining amount
@@ -252,15 +284,15 @@ class OrderDetailsActivity : InternetCheckActivity() {
             val collection = if (isSupplier) "AllOrdersSuppliers" else "AllOrders"
             // Update Firestore with the new payment data
             //firestore.collection("AllOrders").document(order.orderId).update(updateData)
-            firestore.collection(collection).document(intentOrder.orderId).update(updateData)
+            firestore.collection(collection).document(orderId).update(updateData)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Payment recorded successfully", Toast.LENGTH_SHORT).show()
                     // Update local order details
-                    intentOrder.remainingPayments =
+                    remainingPayments =
                         updatedPayments // Update the local order's payment list
-                    intentOrder.updatedRemainingAmount =
+                    updatedRemainingAmount =
                         newRemainingAmount // Update the local order's remaining amount
-                    intentOrder.updatedTotalPaidAmount =
+                    updatedTotalPaidAmount =
                         newTotalPaidAmount // Update the local order's remaining amount
                     fetchOrdersByOrderId(isSupplier) // Refresh orders from Firestore if needed
                 }
@@ -284,7 +316,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         firestore.collection(collection)
             .whereEqualTo(
                 "orderId",
-                intentOrder.orderId
+                orderId
             ) // Adjust this field name based on your Firestore structure
             .get()
             .addOnSuccessListener { documents ->
@@ -361,7 +393,11 @@ class OrderDetailsActivity : InternetCheckActivity() {
                     setOrderDetails(firebaseOrder)
 
                 } else {
-                    Toast.makeText(this, "No order found with the given ID. ${intentOrder.orderId}", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this,
+                        "No order found with the given ID. ${orderId}",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
@@ -408,8 +444,8 @@ class OrderDetailsActivity : InternetCheckActivity() {
         } else {
             binding.btnPayRemaining.visibility = View.VISIBLE
         }
-        binding.txtOrderStatus.text = getString(R.string.order_status) +" "+ "${firebaseOrder.orderStatus}"
-
+        binding.txtOrderStatus.text =
+            getString(R.string.order_status) + " " + "${firebaseOrder.orderStatus}"
 
 
 //        val totalCalculedRemaining =
@@ -443,8 +479,8 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
         recyclerView.adapter = adapter
 
-
     }
+
 
     private fun createPdfForPayment(
         context: Context,
@@ -474,7 +510,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
             // Retrieve the custom color from resources
             val customBlue = ContextCompat.getColor(this, R.color.pdf_Background_Color)
 
-          // Convert it to RGB for use with iText
+            // Convert it to RGB for use with iText
             val red = Color.red(customBlue)
             val green = Color.green(customBlue)
             val blue = Color.blue(customBlue)
@@ -569,7 +605,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
             var subTotalPrice = 0.0
 
             // Add item rows from order.products
-            intentOrder.products.forEach { product ->
+            products.forEach { product ->
 
                 val amount = product.quantity * product.productPrice
                 subTotalPrice += amount // Accumulate total price
@@ -694,7 +730,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
 
     //original bill pdf
-    private fun createPdf(context: Context, order: Order, name: String) {
+    private fun createPdf(context: Context, name: String) {
         val directoryPath =
             context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
         if (directoryPath == null) {
@@ -703,7 +739,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
         }
 
         val filePath =
-            "$directoryPath/Invoice_${order.orderId}.pdf" // Use a unique identifier from the order
+            "$directoryPath/Invoice_${orderId}.pdf" // Use a unique identifier from the order
         val file = File(filePath)
 
         try {
@@ -765,7 +801,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
             )
 
             subHeaderTable.addCell(
-                Cell().add(Paragraph("Invoice No: ${order.orderId}\nDate: ${order.orderDate}"))
+                Cell().add(Paragraph("Invoice No: ${orderId}\nDate: ${orderDate}"))
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setBorder(Border.NO_BORDER)
             )
@@ -805,7 +841,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
             var subTotalPrice = 0.0
 
             // Add item rows from order.products
-            order.products.forEach { product ->
+            products.forEach { product ->
 
                 val amount = product.quantity * product.productPrice
                 subTotalPrice += amount // Accumulate total price
@@ -862,19 +898,19 @@ class OrderDetailsActivity : InternetCheckActivity() {
             )
 
             footerTable.addCell(
-                Cell().add(Paragraph("Total tax(${shopInfo.taxPercentage}%) : ${order.tax}"))
+                Cell().add(Paragraph("Total tax(${shopInfo.taxPercentage}%) : ${tax}"))
                     .setBorder(Border.NO_BORDER)
                     .setBold()
             )
 
             footerTable.addCell(
-                Cell().add(Paragraph("Discount : ${order.discount}"))
+                Cell().add(Paragraph("Discount : ${discount}"))
                     .setBorder(Border.NO_BORDER)
                     .setBold()
             )
 
             footerTable.addCell(
-                Cell().add(Paragraph("Total Amount : ${order.totalPrice}"))
+                Cell().add(Paragraph("Total Amount : ${totalPrice}"))
                     .setBorder(Border.NO_BORDER)
                     .setFontSize(16f)
                     .setBold()
@@ -882,16 +918,16 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
 
 
-            if (order.orderStatus == Constants.PENDING) {
+            if (orderStatus == Constants.PENDING) {
 
                 footerTable.addCell(
-                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
+                    Cell().add(Paragraph("Total paid : ${totalPaidAmount}"))
                         .setBorder(Border.NO_BORDER)
                         .setBold()
                 )
 
                 footerTable.addCell(
-                    Cell().add(Paragraph("Total Remaining  Amount : ${order.remainingAmount}"))
+                    Cell().add(Paragraph("Total Remaining  Amount : ${remainingAmount}"))
                         .setBorder(Border.NO_BORDER)
                         .setFontSize(16f)
                         .setBold()
@@ -900,15 +936,15 @@ class OrderDetailsActivity : InternetCheckActivity() {
             } else {
 
                 footerTable.addCell(
-                    Cell().add(Paragraph("Total paid : ${order.totalPaidAmount}"))
+                    Cell().add(Paragraph("Total paid : ${totalPaidAmount}"))
                         .setBorder(Border.NO_BORDER)
                         .setBold()
                 )
 
-                val totalCalculedRemaining = (order.totalPrice - order.totalPaidAmount).toDouble()
+                val totalCalculedRemaining = (totalPrice - totalPaidAmount).toDouble()
 
                 footerTable.addCell(
-                    Cell().add(Paragraph("The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + order.orderTime + " " + order.orderDate))
+                    Cell().add(Paragraph("The Remaining Amount " + currency + (totalCalculedRemaining) + " is paid at " + orderTime + " " + orderDate))
                         .setBorder(Border.NO_BORDER)
                         .setFontSize(16f)
                         .setBold()
@@ -919,7 +955,7 @@ class OrderDetailsActivity : InternetCheckActivity() {
 
 
             footerTable.addCell(
-                Cell().add(Paragraph("Order Status : ${order.orderStatus}"))
+                Cell().add(Paragraph("Order Status : ${orderStatus}"))
                     .setBorder(Border.NO_BORDER)
                     .setFontSize(16f)
                     .setBold()

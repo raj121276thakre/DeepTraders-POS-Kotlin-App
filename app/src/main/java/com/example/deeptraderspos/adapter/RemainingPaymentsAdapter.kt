@@ -27,7 +27,7 @@ class RemainingPaymentsAdapter(
             txtPaidAmount.text = "The Paid Amount $currency$totalPaidAmount is paid at ${payment.paidTime} ${payment.paidDate}"
 
 
-            textRemainingAmount.text = "Remaining Amount :$currency$totalRemainingAmount"
+            textRemainingAmount.text = "Remaining Amount :$currency${totalRemainingAmount.toInt()}"
 
             buttonDownloadPdf.setOnClickListener {
                 onDownloadPdfClick(payment)
