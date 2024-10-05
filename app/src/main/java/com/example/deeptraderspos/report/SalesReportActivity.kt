@@ -1,6 +1,8 @@
 package com.example.deeptraderspos.report
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
@@ -101,8 +104,9 @@ class SalesReportActivity : InternetCheckActivity() {
         }
 
         binding.addExpenses.setOnClickListener {
-            val intent = Intent(this@SalesReportActivity, AddExpenseActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this@SalesReportActivity, AddExpenseActivity::class.java)
+//            startActivity(intent)
+            showAddExpenseDialog()
         }
 
         // Set up RecyclerView
@@ -113,6 +117,143 @@ class SalesReportActivity : InternetCheckActivity() {
         // Set up the calendar icon to select a date
         binding.imgCalendar.setOnClickListener { showDatePicker() }
 
+    }
+
+
+
+    private fun showAddExpenseDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_expense, null)
+
+        // Get references to the EditText fields in the dialog view
+        val etxtExpenseDate = dialogView.findViewById<EditText>(R.id.etxt_date)
+        val etxtExpenseTime = dialogView.findViewById<EditText>(R.id.etxt_time)
+
+        // Set current date and time initially
+        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(Date())
+        val currentTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(Date())
+
+        etxtExpenseDate.setText(currentDate)
+        etxtExpenseTime.setText(currentTime)
+
+        // Handle DatePicker for expense date
+        etxtExpenseDate.setOnClickListener {
+            datePicker(etxtExpenseDate) // Call date picker function
+        }
+
+        // Handle TimePicker for expense time
+        etxtExpenseTime.setOnClickListener {
+            timePicker(etxtExpenseTime) // Call time picker function
+        }
+
+        // AlertDialog builder
+        val dialogBuilder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setTitle("Add Expense")
+            .setPositiveButton("Add") { dialog, _ ->
+                // Handle the positive button click (Add button)
+                val expenseName = dialogView.findViewById<EditText>(R.id.etxt_expense_name).text.toString()
+                val expenseAmount = dialogView.findViewById<EditText>(R.id.etxt_expense_amount).text.toString().toDoubleOrNull() ?: 0.0
+                val expenseNote = dialogView.findViewById<EditText>(R.id.etxt_expense_note).text.toString().trim()
+                val expenseDate = etxtExpenseDate.text.toString().trim()
+                val expenseTime = etxtExpenseTime.text.toString().trim()
+
+                // Validation
+                if (expenseName.isEmpty() || expenseAmount == 0.0 || expenseDate.isEmpty() || expenseTime.isEmpty()) {
+                    Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                // Create an Expense object and save to Firebase (same logic as in AddExpenseActivity)
+                val expense = Expense(
+                    expenseName = expenseName,
+                    expenseNote = if (expenseNote.isNotEmpty()) expenseNote else null,
+                    expenseAmount = expenseAmount,
+                    expenseDate = expenseDate,
+                    expenseTime = expenseTime
+                )
+
+                saveExpenseToFirestore(expense)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss() // Cancel button
+            }
+
+        // Show the dialog
+        dialogBuilder.create().show()
+    }
+
+    private fun saveExpenseToFirestore(expense: Expense) {
+        // Your Firestore logic for saving the expense
+        showProgressBar("Saving Expense information...")
+        // Can copy from your saveExpenseData() in AddExpenseActivity
+        firestore.collection("AllExpenses")
+            .add(expense)
+            .addOnSuccessListener { documentReference ->
+                hideProgressBar()
+
+            }
+            .addOnFailureListener { e ->
+                hideProgressBar()
+
+            }
+    }
+
+
+    private fun datePicker(etxtExpenseDate: EditText) {
+        // Get Current Date
+        val c = Calendar.getInstance()
+        val mYear = c.get(Calendar.YEAR)
+        val mMonth = c.get(Calendar.MONTH)
+        val mDay = c.get(Calendar.DAY_OF_MONTH)
+
+        // Create a DatePickerDialog
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, year, monthOfYear, dayOfMonth ->
+                // Increment month because monthOfYear is 0-based
+                val month = monthOfYear + 1
+                val fm = if (month < 10) "0$month" else "$month"
+                val fd = if (dayOfMonth < 10) "0$dayOfMonth" else "$dayOfMonth"
+
+                // Format the date string
+                val date_time = "$year-$fm-$fd"
+
+                // Set the selected date in the EditText
+                etxtExpenseDate.setText(date_time)
+            }, mYear, mMonth, mDay
+        )
+
+        datePickerDialog.show()
+    }
+
+    private fun timePicker(etxtExpenseTime: EditText) {
+        // Get Current Time
+        val c = Calendar.getInstance()
+        val mHour = c.get(Calendar.HOUR_OF_DAY)
+        val mMinute = c.get(Calendar.MINUTE)
+
+        // Create a TimePickerDialog
+        val timePickerDialog = TimePickerDialog(
+            this,
+            { _, hourOfDay, minute ->
+                val amPm: String
+                val hour: Int
+
+                if (hourOfDay < 12) {
+                    amPm = "AM"
+                    hour = hourOfDay
+                } else {
+                    amPm = "PM"
+                    hour = hourOfDay - 12
+                }
+
+                // Set the selected time in the EditText
+                etxtExpenseTime.setText(String.format("%02d:%02d %s", hour, minute, amPm))
+            }, mHour, mMinute, false
+        )
+
+        timePickerDialog.show()
     }
 
 
