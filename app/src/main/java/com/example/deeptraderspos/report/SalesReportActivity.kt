@@ -191,7 +191,7 @@ class SalesReportActivity : InternetCheckActivity() {
             .add(expense)
             .addOnSuccessListener { documentReference ->
                 hideProgressBar()
-
+fetchExpensesFromFirebase()
             }
             .addOnFailureListener { e ->
                 hideProgressBar()
