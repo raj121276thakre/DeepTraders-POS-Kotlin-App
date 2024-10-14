@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Profit Amount Input -->
+    <TextView
+        android:id="@+id/txt_profit_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Today's Profit"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginBottom="12dp" />
+
+    <EditText
+        android:id="@+id/edt_profit_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Profit Amount"
+        android:inputType="numberDecimal"
+        android:padding="12dp"
+        android:background="@drawable/round_border" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:layout_marginEnd="12dp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="?attr/colorError" />
+
+        <Button
+            android:id="@+id/btn_add_profit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="?attr/colorPrimary" />
+    </LinearLayout>
+
+</LinearLayout>

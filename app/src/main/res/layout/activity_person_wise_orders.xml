@@ -46,6 +46,7 @@
             android:textStyle="bold" />
 
         <ImageView
+            android:visibility="invisible"
             android:id="@+id/gotoPosBtn"
             android:layout_width="50dp"
             android:layout_height="30dp"
@@ -189,7 +190,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Place Orders"
+            android:text="Add Venders Bill"
             android:textColor="@color/white"
             android:textSize="18dp"
             android:textStyle="bold" />

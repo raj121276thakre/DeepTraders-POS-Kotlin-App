@@ -1,7 +1,7 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -14,20 +14,45 @@
         android:padding="5dp"
         android:text="@string/product_name" />
 
-    <EditText
-        android:id="@+id/edt_product_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="22dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="35dp"
+        android:orientation="horizontal"
         android:background="@drawable/round_border"
-        android:fontFamily="@font/sailec_regular"
-        android:hint="@string/product_name"
-        android:inputType="text"
-        android:padding="16dp"
-        android:textColor="@color/colorPrimary"
-        android:textSize="16sp" />
+   android:weightSum="3"
+        >
+
+        <EditText
+            android:layout_weight="2.5"
+            android:background="@drawable/round_border"
+            android:id="@+id/edt_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sailec_regular"
+            android:hint="@string/product_name"
+            android:inputType="text"
+            android:padding="16dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/btnProductList"
+            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:backgroundTint="@color/colorPrimary"
+            app:tint="@color/colorPrimary"
+            android:scaleType="centerInside"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_drop_down"
+
+            />
+
+    </LinearLayout>
+
+
 
     <TextView
         android:layout_width="match_parent"

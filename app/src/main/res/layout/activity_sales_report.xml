@@ -168,7 +168,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="3dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/profitLossCard"
@@ -199,6 +199,33 @@
                 </androidx.cardview.widget.CardView>
 
 
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/totalExpenseCard"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/colorPrimary"
+                    app:cardBackgroundColor="@color/grey_5">
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:id="@+id/txt_Expense"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_marginHorizontal="5dp"
+                        android:padding="10dp"
+                        android:text="Expense :"
+                        android:textStyle="bold"
+                        android:textColor="#fff"
+                        android:textSize="21sp"
+                        app:fontFamily="@font/sailec_regular" />
+
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
@@ -331,6 +358,22 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/addTodaysProfit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="15dp"
+                android:padding="10dp"
+                android:text="Add Today's Profit"
+                android:textColor="#fff"
+                android:textSize="21sp"
+                android:layout_marginVertical="12dp"
+                android:background="@drawable/round_border"
+                android:backgroundTint="@color/colorPrimary"
+                app:fontFamily="@font/sailec_regular" />
 
             <TextView
                 android:layout_weight="1"

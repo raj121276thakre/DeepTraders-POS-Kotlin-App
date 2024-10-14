@@ -54,5 +54,8 @@ class SplashActivity : AppCompatActivity() {
             finish()
         }, splashTimeOut.toLong())
 
+
+
+
     }
 }

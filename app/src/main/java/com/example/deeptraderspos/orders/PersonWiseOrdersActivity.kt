@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +28,7 @@ import com.example.deeptraderspos.customers.CustomersActivity
 import com.example.deeptraderspos.databinding.ActivityPersonWiseOrdersBinding
 import com.example.deeptraderspos.internetConnection.InternetCheckActivity
 import com.example.deeptraderspos.models.Order
+import com.example.deeptraderspos.models.Product
 import com.example.deeptraderspos.models.ProductOrder
 import com.example.deeptraderspos.pos.PosActivity
 import com.example.deeptraderspos.suppliers.SuppliersActivity
@@ -48,6 +50,7 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
     private lateinit var productOrderAdapter: ProductOrderAdapter
 
     private var selectedCustomerID: String = "0" // Store selected supplier ID
+    private var selectedSupplierID: String = "0" // Store selected supplier ID
 
     // private lateinit var order: Order
     private lateinit var name: String
@@ -101,21 +104,25 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             startActivity(intent)
         }
 
-        binding.fabAddBill.setOnClickListener {
-            val intent =
-                Intent(this, PosActivity::class.java)
-            intent.putExtra("name", name)
-            intent.putExtra("isSupplier", isSupplier)// Replace with your POS Activity class name
-            startActivity(intent)
+//        binding.fabAddBill.setOnClickListener {
+//            val intent =
+//                Intent(this, PosActivity::class.java)
+//            intent.putExtra("name", name)
+//            intent.putExtra("isSupplier", isSupplier)// Replace with your POS Activity class name
+//            startActivity(intent)
+//        }
+
+        binding.fabAddBill.setOnClickListener{
+            showOrderDetailsDialog(name)
         }
 
+
         binding.fabAddBillManually.setOnClickListener {
-            showOrderDetailsDialog()
+            showOrderDetailsDialog(name)
         }
 
         // Setup RecyclerView and Adapter
         setupRecyclerView()
-
 
         fetchOrdersByPersonName(name)
 
@@ -138,20 +145,19 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
     //
 
 
-    private fun showOrderDetailsDialog() {
+    private fun showOrderDetailsDialog(personName: String) {
         // Show the dialog
-
         val dialog = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_bill, null)
         dialog.setView(dialogView)
         dialog.setCancelable(false)
-
 
         // Initialize dialog views
         val txtCustomer = dialogView.findViewById<TextView>(R.id.dialog_customer)
         val txtPaymentMethod = dialogView.findViewById<TextView>(R.id.dialog_payMethod)
         val txtOrderType = dialogView.findViewById<TextView>(R.id.dialog_orderType)
         val edtSubtotal = dialogView.findViewById<TextView>(R.id.dialog_txt_subtotal)
+        val personText = dialogView.findViewById<TextView>(R.id.personTxt)
         val edtDiscount = dialogView.findViewById<EditText>(R.id.etxt_discount)
         val edtTax = dialogView.findViewById<TextView>(R.id.dialog_txt_total_tax)
         val txtTotalAmount = dialogView.findViewById<TextView>(R.id.dialog_txt_total_price)
@@ -162,7 +168,6 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         val btnAddProduct = dialogView.findViewById<Button>(R.id.btnAddProduct)
         val btnClose = dialogView.findViewById<ImageButton>(R.id.btn_close)
         val recyclerViewProducts = dialogView.findViewById<RecyclerView>(R.id.rvProducts)
-
 
         val paidAmount = edtTotalPaid.text.toString().trim().toDoubleOrNull()
 
@@ -180,7 +185,7 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         recyclerViewProducts.layoutManager = LinearLayoutManager(this)
 
         // Set up listeners for customer, payment method, and order type selection
-        txtCustomer.setOnClickListener { showCustomersList(txtCustomer) }
+
         txtPaymentMethod.setOnClickListener { showPaymentMethodsList(txtPaymentMethod) }
         txtOrderType.setOnClickListener { showOrderTypesList(txtOrderType) }
 
@@ -190,10 +195,15 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             showProductSelectionDialog(productOrders, productOrderAdapter)
         }
 
-
-
-
-        txtCustomer.text = name
+        if (isSupplier){
+            personText.text = "Suppler Name"
+            txtCustomer.setOnClickListener { showSuppliersList(txtCustomer) }
+        }else{
+            personText.text = "Customer Name"
+            txtCustomer.setOnClickListener { showCustomersList(txtCustomer) }
+        }
+       // txtCustomer.text = this.name
+        txtCustomer.text = personName
         txtOrderType.text = "Home Delivery"
         txtPaymentMethod.text = "Upi"
         txtRemainingAmount.text = productOrderAdapter.getTotalPrice().toString()
@@ -245,7 +255,7 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
                 totalCostString = totalCost,
                 totalPaidAmount = totalPaidAmount,
                 remainingAmount = remainingAmount,
-                isSupplier = false // It's a customer order
+                isSupplier = isSupplier // It's a customer order
             )
 
 
@@ -254,6 +264,134 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
 
         alertDialog.show()
     }
+
+
+
+    @SuppressLint("MissingInflatedId")
+    private fun showProductSelectionDialog(
+        productOrders: ArrayList<ProductOrder>,
+        productOrderAdapter: ProductOrderAdapter
+    ) {
+        val dialog = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(
+            R.layout.dialog_product_input,
+            null
+        ) // Update the layout to use a custom input dialog
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+
+        val edtProductName = dialogView.findViewById<EditText>(R.id.edt_product_name)
+        val edtProductPrice = dialogView.findViewById<EditText>(R.id.edt_product_price)
+        val edtQuantity = dialogView.findViewById<EditText>(R.id.edt_quantity)
+        val btnAddProduct = dialogView.findViewById<Button>(R.id.btn_add_product)
+        val btnShowProductList = dialogView.findViewById<ImageView>(R.id.btnProductList)
+
+        val alertDialog = dialog.create()
+
+
+        // Handle click on product name to show product list
+        btnShowProductList.setOnClickListener {
+            showProductsList(edtProductName, edtProductPrice)
+        }
+
+        btnAddProduct.setOnClickListener {
+            val productName = edtProductName.text.toString()
+            val productPrice = edtProductPrice.text.toString().toDoubleOrNull()
+            val quantity = edtQuantity.text.toString().toIntOrNull()
+
+
+
+            if (productName.isNotEmpty() && productPrice != null && quantity != null && quantity > 0) {
+                val productOrder = ProductOrder(
+                    productId = "", // You can generate a unique ID or leave it empty
+                    productName = productName,
+                    productPrice = productPrice,
+                    quantity = quantity
+                )
+
+                productOrders.add(productOrder)
+                productOrderAdapter.notifyDataSetChanged()
+                alertDialog.dismiss()
+            } else {
+                Toast.makeText(this, "Please enter valid product details", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
+        alertDialog.show()
+    }
+
+
+
+    private fun showProductsList(edtProductName: EditText, edtProductPrice: EditText) {
+        val productAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+
+        // Fetch products from Firestore
+        firestore.collection("AllProducts")
+            .get()
+            .addOnSuccessListener { documents ->
+                val productNames = mutableListOf<String>()
+                val productData = mutableListOf<Product>()
+
+                for (document in documents) {
+                    val product = document.toObject(Product::class.java)
+                    productNames.add(product.productName)
+                    productData.add(product)
+                }
+
+                productAdapter.addAll(productNames)
+
+                val dialog = AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
+                dialog.setView(dialogView)
+                dialog.setCancelable(false)
+
+                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
+                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
+                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
+
+                dialogTitle.text = "Select Product"
+                dialogList.adapter = productAdapter
+
+                // Implement search functionality
+                dialogInput.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        productAdapter.filter.filter(s)
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                val alertDialog = dialog.create()
+
+                dialogButton.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                dialogList.setOnItemClickListener { _, _, position, _ ->
+                    alertDialog.dismiss()
+                    val selectedProduct = productAdapter.getItem(position) ?: return@setOnItemClickListener
+
+                    // Find the selected product's data
+                    val product = productData.find { it.productName == selectedProduct }
+
+                    if (product != null) {
+                        edtProductName.setText(product.productName)
+                        edtProductPrice.setText(product.sellPrice.toString())
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch products: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
 
     private fun proceedOrder(
@@ -417,52 +555,13 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
         txtRemainingAmount.text = "₹${String.format("%.2f", remainingAmount)}"
     }
 
-    @SuppressLint("MissingInflatedId")
-    private fun showProductSelectionDialog(
-        productOrders: ArrayList<ProductOrder>,
-        productOrderAdapter: ProductOrderAdapter
-    ) {
-        val dialog = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(
-            R.layout.dialog_product_input,
-            null
-        ) // Update the layout to use a custom input dialog
-        dialog.setView(dialogView)
-        dialog.setCancelable(false)
-
-        val edtProductName = dialogView.findViewById<EditText>(R.id.edt_product_name)
-        val edtProductPrice = dialogView.findViewById<EditText>(R.id.edt_product_price)
-        val edtQuantity = dialogView.findViewById<EditText>(R.id.edt_quantity)
-        val btnAddProduct = dialogView.findViewById<Button>(R.id.btn_add_product)
-
-        val alertDialog = dialog.create()
-
-        btnAddProduct.setOnClickListener {
-            val productName = edtProductName.text.toString()
-            val productPrice = edtProductPrice.text.toString().toDoubleOrNull()
-            val quantity = edtQuantity.text.toString().toIntOrNull()
 
 
 
-            if (productName.isNotEmpty() && productPrice != null && quantity != null && quantity > 0) {
-                val productOrder = ProductOrder(
-                    productId = "", // You can generate a unique ID or leave it empty
-                    productName = productName,
-                    productPrice = productPrice,
-                    quantity = quantity
-                )
 
-                productOrders.add(productOrder)
-                productOrderAdapter.notifyDataSetChanged()
-                alertDialog.dismiss()
-            } else {
-                Toast.makeText(this, "Please enter valid product details", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
 
-        alertDialog.show()
-    }
+
+
 
 
     private fun showCustomersList(dialogCustomer: TextView) {
@@ -553,6 +652,83 @@ class PersonWiseOrdersActivity : InternetCheckActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to fetch customers: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
+            }
+    }
+
+    private fun showSuppliersList(dialogSupplier: TextView) {
+        val supplierAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+
+        // Fetch suppliers from Firestore
+        firestore.collection("AllSuppliers")
+            .get()
+            .addOnSuccessListener { documents ->
+                val supplierNames = mutableListOf<String>()
+                val supplierData = mutableListOf<Map<String, String>>()
+
+                for (document in documents) {
+                    val supplierName = document.getString("supplierName") ?: ""
+                    supplierNames.add(supplierName)
+
+                    // Create a new Map<String, String> to store supplier data
+                    val supplierInfo = mutableMapOf<String, String>()
+                    for ((key, value) in document.data) {
+                        supplierInfo[key] = value?.toString() ?: "N/A"
+                        //supplierInfo[key] = value.toString() // Convert each value to String
+                    }
+
+                    supplierData.add(supplierInfo)
+                }
+
+                supplierAdapter.addAll(supplierNames)
+
+                val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+                val dialogView = layoutInflater.inflate(R.layout.dialog_list_search, null)
+                dialog.setView(dialogView)
+                dialog.setCancelable(false)
+
+                val dialogButton = dialogView.findViewById<Button>(R.id.dialog_button)
+                val dialogInput = dialogView.findViewById<EditText>(R.id.dialog_input)
+                val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
+                val dialogList = dialogView.findViewById<ListView>(R.id.dialog_list)
+
+                dialogTitle.setText(R.string.suppliers) // Update title for suppliers
+                dialogList.adapter = supplierAdapter
+
+                // Implement search functionality
+                dialogInput.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {
+                        supplierAdapter.filter.filter(charSequence)
+                    }
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+
+                val alertDialog = dialog.create()
+
+                dialogButton.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                dialogList.setOnItemClickListener { parent, view, position, id ->
+                    alertDialog.dismiss()
+                    val selectedItem = supplierAdapter.getItem(position) ?: return@setOnItemClickListener
+
+                    dialogSupplier.setText(selectedItem)
+
+                    var supplierId = "0"
+                    for (i in supplierNames.indices) {
+                        if (supplierNames[i].equals(selectedItem, ignoreCase = true)) {
+                            supplierId = supplierData[i]["supplier_id"] ?: "0"
+                        }
+                    }
+
+                    selectedSupplierID = supplierId // Assuming you have a variable for selectedSupplierID
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch suppliers: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 

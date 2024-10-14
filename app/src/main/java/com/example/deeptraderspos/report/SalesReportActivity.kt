@@ -1,5 +1,6 @@
 package com.example.deeptraderspos.report
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -10,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -97,6 +99,7 @@ class SalesReportActivity : InternetCheckActivity() {
 
         // Get data from Firestore
         fetchData()
+        fetchAndCalculateTotalProfit()
         // fetchAllOrdersForGraph(mYear)
 
         binding.sortSalesBtn.setOnClickListener {
@@ -117,8 +120,168 @@ class SalesReportActivity : InternetCheckActivity() {
         // Set up the calendar icon to select a date
         binding.imgCalendar.setOnClickListener { showDatePicker() }
 
+
+        binding.addTodaysProfit.setOnClickListener { showAddProfitDialog() }
+
     }
 
+
+    private fun fetchAndCalculateTotalProfit(timeFrame: String? = null) {
+        val firestore = FirebaseFirestore.getInstance()
+        val query = firestore.collection("ProfitsData")
+
+        // Apply filters based on the time frame
+        val startDate: String?
+        val endDate: String?
+
+        when (timeFrame) {
+
+
+            "monthly" -> {
+                val calendar = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                startDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                }.time)
+
+                calendar.set(
+                    Calendar.DAY_OF_MONTH,
+                    calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                )
+                endDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                }.time)
+            }
+
+            "yearly" -> {
+                val calendar = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+
+                calendar.set(Calendar.MONTH, 0) // January
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                startDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                }.time)
+
+                calendar.set(Calendar.MONTH, 11) // December
+                calendar.set(Calendar.DAY_OF_MONTH, 31)
+                endDate = dateFormat.format(calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                }.time)
+            }
+
+            else -> {
+                // No filtering, fetch all orders
+                startDate = null
+                endDate = null
+            }
+        }
+
+        val orderQuery = if (startDate != null && endDate != null) {
+            query.whereGreaterThanOrEqualTo("date", startDate)
+                .whereLessThanOrEqualTo("date", endDate)
+        } else {
+            query // No filtering
+        }
+
+
+
+       // val profitsCollection = firestore.collection("ProfitsData")
+
+        orderQuery.get()
+            .addOnSuccessListener { querySnapshot ->
+                var totalProfit = 0.0 // Initialize total profit
+
+                // Loop through each document and sum the profit amounts
+                for (document in querySnapshot.documents) {
+                    val profitAmount = document.getDouble("profitAmount") ?: 0.0
+                    totalProfit += profitAmount
+                }
+
+                // Set total profit to the TextView
+                binding.txtProfit.text = "Total Profit: ₹${totalProfit}"
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error fetching profits: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+    @SuppressLint("MissingInflatedId")
+    private fun showAddProfitDialog() {
+        // Create the dialog
+        val dialog = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_profit, null)
+        dialog.setView(dialogView)
+
+        val edtProfitAmount = dialogView.findViewById<EditText>(R.id.edt_profit_amount)
+        val btnAddProfit = dialogView.findViewById<Button>(R.id.btn_add_profit)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_cancel)
+
+        val alertDialog = dialog.create()
+
+        btnAddProfit.setOnClickListener {
+            val profitAmount = edtProfitAmount.text.toString().toDoubleOrNull()
+
+            if (profitAmount != null && profitAmount > 0) {
+                // Get current date and time
+                val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val currentTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+
+                // Create a unique ID for the profit entry
+                val profitId = firestore.collection("ProfitsData").document().id
+
+                // Prepare the data to be stored in Firestore
+                val profitData = hashMapOf(
+                    "id" to profitId,
+                    "profitAmount" to profitAmount,
+                    "date" to currentDate,
+                    "time" to currentTime
+                )
+
+                // Store the data in Firestore
+                firestore.collection("ProfitsData")
+                    .document(profitId)
+                    .set(profitData)
+                    .addOnSuccessListener {
+                        Toast.makeText(
+                            this,
+                            "Today's profit added successfully!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        fetchAndCalculateTotalProfit()
+                        alertDialog.dismiss()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            this,
+                            "Error adding profit: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            } else {
+                Toast.makeText(this, "Please enter a valid profit amount", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            alertDialog.dismiss() // Close the dialog if canceled
+        }
+
+        alertDialog.show()
+    }
 
 
     private fun showAddExpenseDialog() {
@@ -151,15 +314,20 @@ class SalesReportActivity : InternetCheckActivity() {
             .setTitle("Add Expense")
             .setPositiveButton("Add") { dialog, _ ->
                 // Handle the positive button click (Add button)
-                val expenseName = dialogView.findViewById<EditText>(R.id.etxt_expense_name).text.toString()
-                val expenseAmount = dialogView.findViewById<EditText>(R.id.etxt_expense_amount).text.toString().toDoubleOrNull() ?: 0.0
-                val expenseNote = dialogView.findViewById<EditText>(R.id.etxt_expense_note).text.toString().trim()
+                val expenseName =
+                    dialogView.findViewById<EditText>(R.id.etxt_expense_name).text.toString()
+                val expenseAmount =
+                    dialogView.findViewById<EditText>(R.id.etxt_expense_amount).text.toString()
+                        .toDoubleOrNull() ?: 0.0
+                val expenseNote =
+                    dialogView.findViewById<EditText>(R.id.etxt_expense_note).text.toString().trim()
                 val expenseDate = etxtExpenseDate.text.toString().trim()
                 val expenseTime = etxtExpenseTime.text.toString().trim()
 
                 // Validation
                 if (expenseName.isEmpty() || expenseAmount == 0.0 || expenseDate.isEmpty() || expenseTime.isEmpty()) {
-                    Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT)
+                        .show()
                     return@setPositiveButton
                 }
 
@@ -191,7 +359,7 @@ class SalesReportActivity : InternetCheckActivity() {
             .add(expense)
             .addOnSuccessListener { documentReference ->
                 hideProgressBar()
-fetchExpensesFromFirebase()
+                fetchExpensesFromFirebase()
             }
             .addOnFailureListener { e ->
                 hideProgressBar()
@@ -297,7 +465,6 @@ fetchExpensesFromFirebase()
         }
 
 
-
     }
 
 
@@ -330,12 +497,16 @@ fetchExpensesFromFirebase()
             .addOnSuccessListener { result ->
                 hideProgressBar()
                 expensesList.clear()
+                var totalExpenses = 0.0 // Initialize total expenses
+
                 for (document in result) {
                     val expense = document.toObject(Expense::class.java)
                     expensesList.add(expense)
+                    totalExpenses += expense.expenseAmount // Sum up the expense amount
                 }
                 expensesList.reverse()
                 expenseAdapter.notifyDataSetChanged()
+                binding.txtExpense.text = "Expenses: ₹${totalExpenses}"
             }
             .addOnFailureListener {
                 hideProgressBar()
@@ -351,12 +522,16 @@ fetchExpensesFromFirebase()
             .addOnSuccessListener { result ->
                 hideProgressBar()
                 expensesList.clear()
+                var totalExpenses = 0.0 // Initialize total expenses
                 for (document in result) {
                     val expense = document.toObject(Expense::class.java)
                     expensesList.add(expense)
+                    totalExpenses += expense.expenseAmount // Sum up the expense amount
                 }
                 expensesList.reverse()
                 expenseAdapter.notifyDataSetChanged()
+
+                binding.txtExpense.text = "Expenses: ₹${totalExpenses}"
             }
             .addOnFailureListener {
                 hideProgressBar()
@@ -868,21 +1043,21 @@ fetchExpensesFromFirebase()
             getString(R.string.net_sales) + " " + getString(R.string.currency_symbol) + netSales.toInt()
 
         // Check if totalProfit is greater than 0
-        if (totalProfit > 0) {
-            binding.txtProfit.text =
-                getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
-            // Set background color to green or any desired color for profit
-            binding.txtProfit.setBackgroundColor(getColor(R.color.green))
-
-
-        } else {
-            binding.txtProfit.text =
-                getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
-            // Set background color to red for loss
-            binding.txtProfit.setBackgroundColor(getColor(R.color.red))
-
-
-        }
+//        if (totalProfit > 0) {
+//            binding.txtProfit.text =
+//                getString(R.string.profit) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
+//            // Set background color to green or any desired color for profit
+//            binding.txtProfit.setBackgroundColor(getColor(R.color.green))
+//
+//
+//        } else {
+//            binding.txtProfit.text =
+//                getString(R.string.loss) + " " + getString(R.string.currency_symbol) + totalProfit.toInt()
+//            // Set background color to red for loss
+//            binding.txtProfit.setBackgroundColor(getColor(R.color.red))
+//
+//
+//        }
 
 // Check if totalLoss is greater than 0
         if (totalLoss.toInt() > 0) {
@@ -941,6 +1116,7 @@ fetchExpensesFromFirebase()
                 R.id.menu_all_sales -> {
                     setToolbarTitle("All Sales Report")
                     fetchData()
+                    fetchAndCalculateTotalProfit()
                     true
                 }
 
@@ -953,12 +1129,14 @@ fetchExpensesFromFirebase()
                 R.id.menu_monthly -> {
                     setToolbarTitle("Monthly Sales Report")
                     fetchData("monthly")
+                    fetchAndCalculateTotalProfit("monthly")
                     true
                 }
 
                 R.id.menu_yearly -> {
                     setToolbarTitle("Yearly Sales Report")
                     fetchData("yearly")
+                    fetchAndCalculateTotalProfit("yearly")
                     true
                 }
 
